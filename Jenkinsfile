@@ -3,7 +3,7 @@ pipeline {
   stages {
     stage('First step lol') {
       steps {
-        git(url: 'https://github.com/mtijas/lopokulu', branch: 'main', poll: true)
+        git(url: 'https://github.com/mtijas/lopokulu', branch: 'development', poll: true)
       }
     }
 
