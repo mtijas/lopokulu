@@ -1,13 +1,24 @@
 version: "3"
 
 services:
+  lopokuluapp:
+    build: .
+    command: gunicorn lopokulu.wsgi:application --bind 0.0.0.0:8000
+    volumes:
+      - ./app:/app/
+    env_file:
+      - development/lopokulu.env
+    depends_on:
+      - postgres
+
+
   postgres:
     image: postgres:latest
     restart: always
     volumes:
       - lopokulu-dev-data:/var/lib/postgresql/data
     env_file:
-      - docker-env/postgres.dev
+      - development/postgres.env
 
   adminer:
     image: adminer:latest
@@ -15,16 +26,19 @@ services:
     ports:
       - 8081:8080
     env_file:
-      - docker-env/adminer.dev
+      - development/adminer.env
 
   web:
     image: nginx:latest
     volumes:
       - ./nginx-templates:/etc/nginx/templates
+      - ./static:/srv/www/assets
     ports:
       - 8080:80
     env_file:
-      - docker-env/nginx.dev
+      - development/nginx.env
+    depends_on:
+      - lopokuluapp
 
 volumes:
   lopokulu-dev-data:
