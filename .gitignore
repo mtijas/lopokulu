@@ -133,4 +133,4 @@ dmypy.json
 *.swp
 
 # Docker .env for production environment values
-.env
+*.env
