@@ -6,27 +6,25 @@ services:
     restart: always
     volumes:
       - lopokulu-dev-data:/var/lib/postgresql/data
-    environment:
-      POSTGRES_PASSWORD: lopokuluDev
-      PGDATA: /var/lib/postgresql/data/pgdata
+    env_file:
+      - docker-env/postgres.dev
 
   adminer:
-    image: adminer
+    image: adminer:latest
     restart: always
     ports:
       - 8081:8080
-    environment:
-      ADMINER_DEFAULT_SERVER: postgres
+    env_file:
+      - docker-env/adminer.dev
 
   web:
-    image: nginx
+    image: nginx:latest
     volumes:
       - ./nginx-templates:/etc/nginx/templates
     ports:
       - 8080:80
-    environment:
-      NGINX_HOST: localhost
-      NGINX_PORT: 80
+    env_file:
+      - docker-env/nginx.dev
 
 volumes:
   lopokulu-dev-data:
