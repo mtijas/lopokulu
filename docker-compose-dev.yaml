@@ -31,7 +31,7 @@ services:
   web:
     image: nginx:latest
     volumes:
-      - ./nginx-templates:/etc/nginx/templates
+      - ./development/nginx-templates:/etc/nginx/templates
       - ./static:/srv/www/assets
     ports:
       - 8080:80
