@@ -1,3 +1,0 @@
-/* Löpökulu Base JS
- * 
- */
