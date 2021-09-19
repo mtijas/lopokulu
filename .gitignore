@@ -132,3 +132,5 @@ dmypy.json
 *~
 *.swp
 
+# Django staticfiles
+#static/
