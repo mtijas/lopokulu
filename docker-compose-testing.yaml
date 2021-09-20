@@ -4,40 +4,39 @@ services:
   lopokuluapp:
     build:
       context: .
-      dockerfile: development/lopokuluapp.dockerfile
-    command: gunicorn lopokulu.wsgi:application --bind 0.0.0.0:8000
+      dockerfile: testing/lopokuluapp.dockerfile
+    command: /bin/sh -c "/testing-entrypoint.sh"
     volumes:
       - ./app:/app/
+      - ./staticfiles:/static/
     env_file:
-      - development/lopokulu.env
+      - testing/lopokulu.env
     depends_on:
       - postgres
 
   postgres:
     image: postgres:latest
-    restart: always
     volumes:
       - lopokulu-dev-data:/var/lib/postgresql/data
     env_file:
-      - development/postgres.env
+      - testing/postgres.env
 
   adminer:
     image: adminer:latest
-    restart: always
     ports:
       - 8081:8080
     env_file:
-      - development/adminer.env
+      - testing/adminer.env
 
   web:
     image: nginx:latest
     volumes:
-      - ./development/nginx-templates:/etc/nginx/templates
-      - ./static:/srv/www/assets
+      - ./testing/nginx-templates:/etc/nginx/templates
+      - ./staticfiles:/srv/www/assets
     ports:
       - 8080:80
     env_file:
-      - development/nginx.env
+      - testing/nginx.env
     depends_on:
       - lopokuluapp
 

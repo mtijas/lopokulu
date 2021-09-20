@@ -1,0 +1,44 @@
+version: "3"
+
+services:
+  lopokuluapp:
+    build:
+      context: .
+      dockerfile: local/lopokuluapp.dockerfile
+    command: python3 manage.py runserver 0.0.0.0:8000
+    volumes:
+      - ./app:/app/
+    env_file:
+      - local/lopokulu.env
+    depends_on:
+      - postgres
+
+  postgres:
+    image: postgres:latest
+    restart: always
+    volumes:
+      - lopokulu-dev-data:/var/lib/postgresql/data
+    env_file:
+      - local/postgres.env
+
+  adminer:
+    image: adminer:latest
+    restart: always
+    ports:
+      - 8081:8080
+    env_file:
+      - local/adminer.env
+
+  web:
+    image: nginx:latest
+    volumes:
+      - ./local/nginx-templates:/etc/nginx/templates
+    ports:
+      - 8080:80
+    env_file:
+      - local/nginx.env
+    depends_on:
+      - lopokuluapp
+
+volumes:
+  lopokulu-dev-data:
