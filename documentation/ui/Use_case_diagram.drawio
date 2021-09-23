@@ -1,11 +1,11 @@
-<mxfile host="app.diagrams.net" modified="2021-09-23T07:12:36.398Z" agent="5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4613.0 Safari/537.36 Edg/95.0.1000.0" etag="v-J3jEqr2LR3vhj6RYgt" version="15.2.9" type="github">
+<mxfile host="app.diagrams.net" modified="2021-09-23T07:20:10.403Z" agent="5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4613.0 Safari/537.36 Edg/95.0.1000.0" etag="PMloqhZJTuAZQpPS6_KN" version="15.2.9" type="github">
   <diagram id="Hj7Q_Jciw4nzZQ8Qi_2c" name="Page-1">
     <mxGraphModel dx="1619" dy="1134" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
         <mxCell id="A2cVZQFBHPuvANkPRbIw-1" value="" style="swimlane;startSize=0;" parent="1" vertex="1">
-          <mxGeometry x="160" y="80" width="500" height="660" as="geometry" />
+          <mxGeometry x="160" y="80" width="500" height="980" as="geometry" />
         </mxCell>
         <mxCell id="GTZ52rKqXmYIKtmkYB2n-2" value="" style="shape=ellipse;container=1;horizontal=1;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;html=1;dashed=0;collapsible=0;" vertex="1" parent="A2cVZQFBHPuvANkPRbIw-1">
           <mxGeometry x="40" y="30" width="180" height="90" as="geometry" />
@@ -44,7 +44,7 @@
           <mxGeometry y="30.000000000000004" width="180" height="37.50000000000001" as="geometry" />
         </mxCell>
         <mxCell id="GTZ52rKqXmYIKtmkYB2n-21" value="" style="shape=ellipse;container=1;horizontal=1;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;html=1;dashed=0;collapsible=0;" vertex="1" parent="A2cVZQFBHPuvANkPRbIw-1">
-          <mxGeometry x="40" y="340" width="180" height="90" as="geometry" />
+          <mxGeometry x="40" y="530" width="180" height="90" as="geometry" />
         </mxCell>
         <mxCell id="GTZ52rKqXmYIKtmkYB2n-22" value="UC4" style="html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rotatable=0;" vertex="1" parent="GTZ52rKqXmYIKtmkYB2n-21">
           <mxGeometry width="180" height="22.5" as="geometry" />
@@ -56,7 +56,7 @@
           <mxGeometry y="30.000000000000004" width="180" height="37.50000000000001" as="geometry" />
         </mxCell>
         <mxCell id="GTZ52rKqXmYIKtmkYB2n-34" value="" style="shape=ellipse;container=1;horizontal=1;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;html=1;dashed=0;collapsible=0;" vertex="1" parent="A2cVZQFBHPuvANkPRbIw-1">
-          <mxGeometry x="40" y="480" width="180" height="90" as="geometry" />
+          <mxGeometry x="40" y="680" width="180" height="90" as="geometry" />
         </mxCell>
         <mxCell id="GTZ52rKqXmYIKtmkYB2n-35" value="UC5" style="html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rotatable=0;" vertex="1" parent="GTZ52rKqXmYIKtmkYB2n-34">
           <mxGeometry width="180" height="22.5" as="geometry" />
@@ -110,7 +110,7 @@
           </mxGeometry>
         </mxCell>
         <mxCell id="GTZ52rKqXmYIKtmkYB2n-32" value="Owner" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;" vertex="1" parent="1">
-          <mxGeometry x="65" y="480" width="30" height="60" as="geometry" />
+          <mxGeometry x="60" y="610" width="30" height="60" as="geometry" />
         </mxCell>
         <mxCell id="GTZ52rKqXmYIKtmkYB2n-33" value="&amp;lt;&amp;lt;extend&amp;gt;&amp;gt;" style="html=1;verticalAlign=bottom;labelBackgroundColor=none;endArrow=open;endFill=0;dashed=1;" edge="1" parent="1" source="GTZ52rKqXmYIKtmkYB2n-32" target="GTZ52rKqXmYIKtmkYB2n-1">
           <mxGeometry width="160" relative="1" as="geometry">
@@ -128,6 +128,9 @@
           <mxGeometry width="160" relative="1" as="geometry">
             <mxPoint x="330" y="580" as="sourcePoint" />
             <mxPoint x="490" y="580" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="380" y="540" />
+            </Array>
           </mxGeometry>
         </mxCell>
         <mxCell id="GTZ52rKqXmYIKtmkYB2n-44" value="Admin" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;" vertex="1" parent="1">
@@ -137,6 +140,30 @@
           <mxGeometry width="160" relative="1" as="geometry">
             <mxPoint x="330" y="570" as="sourcePoint" />
             <mxPoint x="490" y="570" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="GTZ52rKqXmYIKtmkYB2n-46" value="" style="shape=ellipse;container=1;horizontal=1;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;html=1;dashed=0;collapsible=0;" vertex="1" parent="1">
+          <mxGeometry x="200" y="410" width="180" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="GTZ52rKqXmYIKtmkYB2n-47" value="UC7" style="html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rotatable=0;" vertex="1" parent="GTZ52rKqXmYIKtmkYB2n-46">
+          <mxGeometry width="180" height="22.5" as="geometry" />
+        </mxCell>
+        <mxCell id="GTZ52rKqXmYIKtmkYB2n-48" value="" style="line;strokeWidth=1;fillColor=none;rotatable=0;labelPosition=right;points=[];portConstraint=eastwest;dashed=0;resizeWidth=1;" vertex="1" parent="GTZ52rKqXmYIKtmkYB2n-46">
+          <mxGeometry x="9" y="22.5" width="162" height="7.500000000000001" as="geometry" />
+        </mxCell>
+        <mxCell id="GTZ52rKqXmYIKtmkYB2n-49" value="View a consumption report for single vehicle" style="text;html=1;align=center;verticalAlign=middle;rotatable=0;whiteSpace=wrap;" vertex="1" parent="GTZ52rKqXmYIKtmkYB2n-46">
+          <mxGeometry y="30.000000000000004" width="180" height="37.50000000000001" as="geometry" />
+        </mxCell>
+        <mxCell id="GTZ52rKqXmYIKtmkYB2n-50" value="" style="endArrow=none;startArrow=none;endFill=0;startFill=0;endSize=8;html=1;verticalAlign=bottom;labelBackgroundColor=none;strokeWidth=3;" edge="1" parent="1" source="GTZ52rKqXmYIKtmkYB2n-32" target="GTZ52rKqXmYIKtmkYB2n-46">
+          <mxGeometry width="160" relative="1" as="geometry">
+            <mxPoint x="330" y="560" as="sourcePoint" />
+            <mxPoint x="490" y="560" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="GTZ52rKqXmYIKtmkYB2n-51" value="" style="endArrow=none;startArrow=none;endFill=0;startFill=0;endSize=8;html=1;verticalAlign=bottom;labelBackgroundColor=none;strokeWidth=3;" edge="1" parent="1" source="GTZ52rKqXmYIKtmkYB2n-1" target="GTZ52rKqXmYIKtmkYB2n-46">
+          <mxGeometry width="160" relative="1" as="geometry">
+            <mxPoint x="330" y="560" as="sourcePoint" />
+            <mxPoint x="490" y="560" as="targetPoint" />
           </mxGeometry>
         </mxCell>
       </root>
