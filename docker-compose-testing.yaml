@@ -5,7 +5,7 @@ services:
     build:
       context: .
       dockerfile: testing/lopokuluapp.dockerfile
-    command: /bin/sh -c "/testing-entrypoint.sh"
+    command: /bin/sh -c "/entrypoint.sh"
     volumes:
       - ./app:/app/
       - ./staticfiles:/static/
