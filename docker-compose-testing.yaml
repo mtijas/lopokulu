@@ -7,7 +7,7 @@ services:
       dockerfile: testing/lopokuluapp.dockerfile
     command: /bin/sh -c "/entrypoint.sh"
     volumes:
-      - ./app:/app/
+      - ./src:/src/
       - ./staticfiles:/static/
     env_file:
       - testing/lopokulu.env

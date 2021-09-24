@@ -9,7 +9,7 @@ services:
     ports:
       - 8080:8000
     volumes:
-      - ./app:/app/
+      - ./src:/src/
     env_file:
       - local/lopokulu.env
     depends_on:
