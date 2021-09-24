@@ -1,1 +1,22 @@
-<mxfile host="app.diagrams.net" modified="2021-09-24T07:31:02.820Z" agent="5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.0 Safari/537.36 Edg/95.0.1020.0" version="15.3.1" etag="xjKFMF-DHv4BgQS4oL90" type="github"><diagram id="AhDA4QehDr_70T0KtmID">UzV2zq1wL0osyPDNT0nNUTV2VTV2LsrPL4GwciucU3NyVI0MMlNUjV1UjYwMgFjVyA2HrCFY1qAgsSg1rwSLBiADYTaQg2Y1AA==</diagram></mxfile>
+<mxfile host="app.diagrams.net" modified="2021-09-24T08:31:15.653Z" agent="5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.0 Safari/537.36 Edg/95.0.1020.0" etag="DcQrbXZZim-SKE_32umS" version="15.3.1" type="github">
+  <diagram id="AhDA4QehDr_70T0KtmID" name="Page-1">
+    <mxGraphModel dx="1750" dy="1134" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1654" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="548_xJrb3ZepgbzJuqi1-2" value="fillup" style="shape=module;align=left;spacingLeft=20;align=center;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="60" y="120" width="320" height="210" as="geometry" />
+        </mxCell>
+        <mxCell id="548_xJrb3ZepgbzJuqi1-3" value="reports" style="shape=module;align=left;spacingLeft=20;align=center;verticalAlign=top;strokeColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="440" y="120" width="330" height="210" as="geometry" />
+        </mxCell>
+        <mxCell id="548_xJrb3ZepgbzJuqi1-4" value="rest" style="shape=module;align=left;spacingLeft=20;align=center;verticalAlign=top;strokeColor=#000000;fillColor=default;" vertex="1" parent="1">
+          <mxGeometry x="840" y="120" width="330" height="210" as="geometry" />
+        </mxCell>
+        <mxCell id="548_xJrb3ZepgbzJuqi1-6" value="Löpökulu Django Apps" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=23;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="40" y="40" width="1570" height="20" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
