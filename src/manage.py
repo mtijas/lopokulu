@@ -1,4 +1,11 @@
 #!/usr/bin/env python
+
+# SPDX-FileCopyrightText: 2021 Jani Lehtinen
+# SPDX-FileCopyrightText: 2021 Markus Ijäs
+# SPDX-FileCopyrightText: 2021 Markus Murto
+#
+# SPDX-License-Identifier: MIT
+
 """Django's command-line utility for administrative tasks."""
 import os
 import sys

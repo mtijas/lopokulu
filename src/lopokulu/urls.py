@@ -1,3 +1,9 @@
+# SPDX-FileCopyrightText: 2021 Jani Lehtinen
+# SPDX-FileCopyrightText: 2021 Markus Ijäs
+# SPDX-FileCopyrightText: 2021 Markus Murto
+#
+# SPDX-License-Identifier: MIT
+
 """lopokulu URL Configuration
 
 The `urlpatterns` list routes URLs to views. For more information please see:
