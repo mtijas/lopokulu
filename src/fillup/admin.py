@@ -6,4 +6,8 @@
 
 from django.contrib import admin
 
-# Register your models here.
+from .models.fillups import Fillup
+from .models.vehicles import Vehicle
+
+admin.site.register(Fillup)
+admin.site.register(Vehicle)
