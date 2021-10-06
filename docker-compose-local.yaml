@@ -17,7 +17,7 @@ services:
     volumes:
       - ./src:/src/
     env_file:
-      - local/lopokulu.env
+      - src/.env
     depends_on:
       - postgres
 
@@ -26,14 +26,14 @@ services:
     volumes:
       - lopokulu-dev-data:/var/lib/postgresql/data
     env_file:
-      - local/postgres.env
+      - src/.env
 
   adminer:
     image: adminer:latest
     ports:
       - 8081:8080
     env_file:
-      - local/adminer.env
+      - src/.env
 
 volumes:
   lopokulu-dev-data:

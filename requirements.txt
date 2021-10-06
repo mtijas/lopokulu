@@ -7,3 +7,4 @@
 gunicorn
 Django
 psycopg2-binary
+django-environ
