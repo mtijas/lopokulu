@@ -4,6 +4,22 @@
 #
 # SPDX-License-Identifier: MIT
 
+from django.http import HttpResponseRedirect
 from django.shortcuts import render
+from .forms import FillupForm
+from django.contrib.auth.decorators import login_required
 
-# Create your views here.
+
+@login_required
+def add_fillup(request):
+    if request.method == 'POST':
+        form = FillupForm(request.POST)
+        if form.is_valid():
+            # process the data in form.cleaned_data as required
+            # ...
+            return HttpResponseRedirect('/thanks/')
+
+    else:
+        form = FillupForm()
+
+    return render(request, 'fillup/add_fillup.html', {'form': form})
