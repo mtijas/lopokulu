@@ -5,15 +5,15 @@
 # SPDX-License-Identifier: MIT
 
 from django.utils.translation import gettext_lazy as _
-from django.contrib.auth.models import User
 from django.db import models
 
 from .vehicles import Vehicle
+from .persons import Person
 
 
 class VehicleUser(models.Model):
     vehicle = models.ForeignKey(Vehicle, on_delete=models.CASCADE)
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    person = models.ForeignKey(Person, on_delete=models.CASCADE)
 
     class Role(models.TextChoices):
         READ_ONLY = 'RO', _('Read only')
@@ -23,4 +23,4 @@ class VehicleUser(models.Model):
         max_length=2, choices=Role.choices, default=Role.READ_ONLY)
 
     def __str__(self):
-        return f'{self.vehicle.name} has {self.role} user {self.user}'
+        return f'{self.vehicle.name} has {self.role} person {self.person.user}'

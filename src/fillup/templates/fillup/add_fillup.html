@@ -1,5 +1,6 @@
 {% extends 'lopokulu/base.html' %} {% block content %}
 <h2>Add fillup</h2>
+{{ allowed_vehicles }}
 <form action="/fillup/" method="post">
   {% csrf_token %} {{ form.as_p }}
   <input type="submit" value="Add fillup" />
