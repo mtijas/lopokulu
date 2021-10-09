@@ -7,6 +7,9 @@
   </head>
   <body>
     <h1>Löpökulu</h1>
+    {% if user.is_authenticated %}
+    <p><a href="{% url 'logout' %}">Log out</a></p>
+    {% endif  %}
     {% block content %} {% endblock %}
   </body>
 </html>
