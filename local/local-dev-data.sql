@@ -10,7 +10,7 @@ INSERT INTO "auth_user" ("id", "password", "last_login", "is_superuser", "userna
 INSERT INTO "fillup_fillup" ("id", "price", "amount", "distance", "vehicle_id") VALUES
 (1,	1.507,	48.7,	215485,	1);
 
-NSERT INTO "fillup_person" ("id", "user_id") VALUES
+INSERT INTO "fillup_person" ("id", "user_id") VALUES
 (1,	1);
 
 INSERT INTO "fillup_vehicle" ("id", "register_number", "name") VALUES
