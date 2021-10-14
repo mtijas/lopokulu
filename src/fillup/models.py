@@ -5,7 +5,7 @@
 # SPDX-License-Identifier: MIT
 
 from django.db import models
-from .vehicles import Vehicle
+from manager.models import Vehicle
 
 
 class Fillup(models.Model):

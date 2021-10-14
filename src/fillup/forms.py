@@ -1,5 +1,5 @@
 from django.forms import ModelForm
-from .models.fillups import Fillup
+from .models import Fillup
 
 
 class FillupForm(ModelForm):

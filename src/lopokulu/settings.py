@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'fillup',
+    'manager',
 ]
 
 MIDDLEWARE = [
@@ -146,3 +147,5 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # Redirect to the login page after logout
 
 LOGOUT_REDIRECT_URL = 'login'
+
+AUTH_USER_MODEL = 'manager.Person'

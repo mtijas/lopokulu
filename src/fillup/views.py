@@ -8,15 +8,14 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from .forms import FillupForm
 from django.contrib.auth.decorators import login_required
-from .models.persons import Person
-from django.contrib.auth.models import User
+from manager.models import Vehicle
 
 
 @login_required
 def add_fillup(request):
-    user = Person.objects.get(user=request.user)
-    allowed_vehicles = Person.objects.filter(
-        user__id=user.id,
+    #person = Person.objects.get(id=request.user)
+    allowed_vehicles = Vehicle.objects.filter(
+        vehicleuser__person_id=request.user.id,
         vehicleuser__role__in=['DR', 'OW']
     )
 
