@@ -13,12 +13,6 @@ from manager.models import Vehicle
 
 @login_required
 def add_fillup(request):
-    #person = Person.objects.get(id=request.user)
-    allowed_vehicles = Vehicle.objects.filter(
-        vehicleuser__person_id=request.user.id,
-        vehicleuser__role__in=['DR', 'OW']
-    )
-
     if request.method == 'POST':
         form = FillupForm(request.POST)
         if form.is_valid():
@@ -29,8 +23,13 @@ def add_fillup(request):
     else:
         form = FillupForm()
 
+    form.fields['vehicle'].widget.choices.queryset = Vehicle.objects.filter(
+        vehicleuser__person_id=request.user.id,
+        vehicleuser__role__in=['DR', 'OW']
+    )
+
+
     content = {
         'form': form,
-        'allowed_vehicles': allowed_vehicles,
     }
     return render(request, 'fillup/add_fillup.html', content)

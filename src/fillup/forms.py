@@ -4,11 +4,11 @@
 #
 # SPDX-License-Identifier: MIT
 
-from django.forms import ModelForm
+from django import forms
 from .models import Fillup
 
 
-class FillupForm(ModelForm):
+class FillupForm(forms.ModelForm):
     class Meta:
         model = Fillup
         fields = ['price', 'amount', 'distance', 'vehicle']
