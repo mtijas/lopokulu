@@ -13,21 +13,20 @@ from manager.models import Vehicle
 
 @login_required
 def add_fillup(request):
-    if request.method == 'POST':
-        form = FillupForm(request.POST)
-        if form.is_valid():
-            # process the data in form.cleaned_data as required
-            # ...
-            return HttpResponseRedirect('/thanks/')
-
-    else:
-        form = FillupForm()
-
-    form.fields['vehicle'].widget.choices.queryset = Vehicle.objects.filter(
+    allowed_vehicles = Vehicle.objects.filter(
         vehicleuser__person_id=request.user.id,
         vehicleuser__role__in=['DR', 'OW']
     )
 
+    if request.method == 'POST':
+        form = FillupForm(request.user, request.POST)
+        if form.is_valid():
+            return HttpResponseRedirect('/thanks/')
+
+    else:
+        form = FillupForm(request.user)
+
+    form.fields['vehicle'].widget.choices.queryset = allowed_vehicles
 
     content = {
         'form': form,
