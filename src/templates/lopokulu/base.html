@@ -22,7 +22,7 @@ SPDX-License-Identifier: MIT
         </ul>
         <ul>
           {% if user.is_authenticated %}
-          <li><button class="outline"><a href="{% url 'logout' %}">Log out</a></button></li>
+          <li><a href="{% url 'logout' %}" role="button">Log out</a></li>
           {% endif  %}
         </ul>
         <nav>
