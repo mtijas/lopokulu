@@ -44,12 +44,12 @@ class FillupForm(forms.ModelForm):
         if vehicle is None:
             return
 
-        try:
-            # Get the latest fillup for vehicle in question
-            previous_fillup = Fillup.objects.filter(
-                vehicle_id=vehicle.id,
-            ).get()
-        except ObjectDoesNotExist:
+        # Get the latest fillup for vehicle in question
+        previous_fillup = Fillup.objects.filter(
+            vehicle_id=vehicle.id,
+        ).first()
+
+        if previous_fillup is None:
             return # It's ok to not have any fillups yet
 
         if distance <= previous_fillup.distance:
