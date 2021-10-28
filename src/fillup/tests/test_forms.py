@@ -18,17 +18,42 @@ class FillupFormTestCase(TestCase):
         vehicle = Vehicle.objects.create(name="TestRO", register_number="TEST-RO")
         vehicle_user = VehicleUser.objects.create(
             person=self.user, vehicle=vehicle, role="RO")
+        expected = {
+            "vehicle": ["You are not allowed to report fillup for that vehicle"],
+        }
 
-        form = FillupForm(
-            self.user,
-            data={
-                'price': 12.34,
-                'amount': 43.21,
-                'distance': 100000,
-                'vehicle': vehicle,
-            }
-        )
+        form = FillupForm(self.user, data={'vehicle': vehicle})
 
-        self.assertEqual(
-            form.errors["vehicle"], ["You are not allowed to report fillup for that vehicle"]
-        )
+        # We only want to test for expected key-value pairs
+        subset = {k:v for k, v in form.errors.items() if k in expected}
+        self.assertDictEqual(subset, expected)
+
+    def test_fillup_allowed_for_vehicle_driver(self):
+        """Fillup is allowed for user with driver status on a vehicle"""
+        vehicle = Vehicle.objects.create(name="TestDR", register_number="TEST-DR")
+        vehicle_user = VehicleUser.objects.create(
+            person=self.user, vehicle=vehicle, role="DR")
+        expected = {}
+
+        form = FillupForm(self.user, data={'vehicle': vehicle})
+
+        # We only want to test for expected key-value pairs
+        subset = {k:v for k, v in form.errors.items() if k in expected}
+        self.assertDictEqual(subset, expected)
+        # Vehicle should not be found
+        self.assertNotIn("vehicle", form.errors)
+
+    def test_fillup_allowed_for_vehicle_owner(self):
+        """Fillup is allowed for user with owner status on a vehicle"""
+        vehicle = Vehicle.objects.create(name="TestOW", register_number="TEST-OW")
+        vehicle_user = VehicleUser.objects.create(
+            person=self.user, vehicle=vehicle, role="OW")
+        expected = {}
+
+        form = FillupForm(self.user, data={'vehicle': vehicle})
+
+        # We only want to test for expected key-value pairs
+        subset = {k:v for k, v in form.errors.items() if k in expected}
+        self.assertDictEqual(subset, expected)
+        # Vehicle should not be found
+        self.assertNotIn("vehicle", form.errors)
