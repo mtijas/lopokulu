@@ -7,9 +7,13 @@ SPDX-License-Identifier: MIT
 -->
 
 {% extends 'lopokulu/base.html' %} {% block content %}
-<h2>Add fillup</h2>
-<form action="/fillup/" method="post">
-  {% csrf_token %} {{ form.as_p }}
-  <input type="submit" value="Add fillup" />
-</form>
+<article>
+  <header>
+    <h2>Add fillup</h2>
+  </header>
+  <form action="/fillup/" method="post">
+    {% csrf_token %} {{ form.as_p }}
+    <input type="submit" value="Add fillup" />
+  </form>
+</article>
 {% endblock %}

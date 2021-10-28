@@ -12,12 +12,23 @@ SPDX-License-Identifier: MIT
   <head>
     <meta charset="utf-8" />
     <title>Löpökulu</title>
+    <link rel="stylesheet" href="https://unpkg.com/@picocss/pico@latest/css/pico.min.css">
   </head>
   <body>
-    <h1>Löpökulu</h1>
-    {% if user.is_authenticated %}
-    <p><a href="{% url 'logout' %}">Log out</a></p>
-    {% endif  %}
-    {% block content %} {% endblock %}
+    <header>
+      <nav class="container">
+        <ul>
+          <li><h1>Löpökulu</h1></li>
+        </ul>
+        <ul>
+          {% if user.is_authenticated %}
+          <li><button class="outline"><a href="{% url 'logout' %}">Log out</a></button></li>
+          {% endif  %}
+        </ul>
+        <nav>
+    </header>
+    <main class=container>
+      {% block content %} {% endblock %}
+    </main>
   </body>
 </html>

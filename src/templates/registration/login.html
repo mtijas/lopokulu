@@ -6,7 +6,9 @@ SPDX-FileCopyrightText: 2021 Markus Murto
 SPDX-License-Identifier: MIT
 -->
 
-{% extends "lopokulu/base.html" %} {% block content %} {% if form.errors %}
+{% extends "lopokulu/base.html" %} {% block content %}
+<article>
+{% if form.errors %}
 <p>Your username and password didn't match. Please try again.</p>
 {% endif %}
 
@@ -26,4 +28,5 @@ SPDX-License-Identifier: MIT
   <input type="submit" value="login" />
   <input type="hidden" name="next" value="{{ next }}" />
 </form>
+</article>
 {% endblock %}
