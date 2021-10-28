@@ -7,7 +7,7 @@
 from django import forms
 from .models import Fillup
 from manager.models import Vehicle
-from django.core.exceptions import ValidationError
+from django.core.exceptions import ValidationError, ObjectDoesNotExist
 from django.utils.translation import ugettext_lazy as _
 
 
@@ -20,13 +20,43 @@ class FillupForm(forms.ModelForm):
         data = self.cleaned_data['vehicle']
         if data not in self.get_allowed_vehicles():
             raise ValidationError(
-                _("You are not allowed to report fillup for that vehicle"),
+                _('You are not allowed to report fillup for that vehicle'),
                 code='invalid'
             )
 
-        # Always return a value to use as the new cleaned data, even if
-        # this method didn't change it.
         return data
+
+    def clean_distance(self):
+        data = self.cleaned_data['distance']
+        if data < 0:
+            raise ValidationError(
+                _('Distance should be zero or more'),
+                code='invalid'
+            )
+
+        return data
+
+    def clean(self):
+        cleaned_data = super().clean()
+        distance = cleaned_data.get('distance')
+        vehicle = cleaned_data.get('vehicle')
+
+        if vehicle is None:
+            return
+
+        try:
+            # Get the latest fillup for vehicle in question
+            previous_fillup = Fillup.objects.filter(
+                vehicle_id=vehicle.id,
+            ).get()
+        except ObjectDoesNotExist:
+            return # It's ok to not have any fillups yet
+
+        if distance <= previous_fillup.distance:
+            self.add_error(
+                'distance',
+                _('Distance should be more than %(dist)s') % {'dist':previous_fillup.distance}
+            )
 
     def get_allowed_vehicles(self):
         return Vehicle.objects.filter(
