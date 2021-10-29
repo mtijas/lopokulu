@@ -1,65 +1,93 @@
-<mxfile host="app.diagrams.net" modified="2021-10-29T10:24:24.776Z" agent="5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.1047.2 Safari/537.36 Edg/96.0.1047.2" etag="lDKucpXLSnKEH_-wO3nu" version="15.5.9" type="github">
+<mxfile host="app.diagrams.net" modified="2021-10-29T10:44:32.357Z" agent="5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.1047.2 Safari/537.36 Edg/96.0.1047.2" etag="JpinnX31mSoeXQcEwAxl" version="15.5.9" type="github">
   <diagram id="zq4EDngElbWwZI230A72" name="Page-1">
-    <mxGraphModel dx="1756" dy="1142" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
+    <mxGraphModel dx="1211" dy="788" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
         <mxCell id="rrvN5EUfyGgxll58mSvy-1" value="User&#39;s browser" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=1;collapsible=0;recursiveResize=0;outlineConnect=0;" vertex="1" parent="1">
-          <mxGeometry x="200" y="80" width="100" height="300" as="geometry" />
+          <mxGeometry x="200" y="80" width="110" height="640" as="geometry" />
         </mxCell>
         <mxCell id="rrvN5EUfyGgxll58mSvy-2" value=":add_fillup view" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=1;collapsible=0;recursiveResize=0;outlineConnect=0;" vertex="1" parent="1">
-          <mxGeometry x="360" y="80" width="100" height="300" as="geometry" />
+          <mxGeometry x="360" y="80" width="110" height="640" as="geometry" />
         </mxCell>
-        <mxCell id="rrvN5EUfyGgxll58mSvy-3" value=":FillupForm" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=1;collapsible=0;recursiveResize=0;outlineConnect=0;" vertex="1" parent="1">
-          <mxGeometry x="520" y="80" width="100" height="300" as="geometry" />
-        </mxCell>
-        <mxCell id="rrvN5EUfyGgxll58mSvy-9" value="" style="html=1;points=[];perimeter=orthogonalPerimeter;" vertex="1" parent="rrvN5EUfyGgxll58mSvy-3">
-          <mxGeometry x="45" y="90" width="10" height="110" as="geometry" />
-        </mxCell>
-        <mxCell id="rrvN5EUfyGgxll58mSvy-4" value=":VehicleModel" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=1;collapsible=0;recursiveResize=0;outlineConnect=0;" vertex="1" parent="1">
-          <mxGeometry x="680" y="80" width="100" height="300" as="geometry" />
-        </mxCell>
-        <mxCell id="rrvN5EUfyGgxll58mSvy-13" value="" style="html=1;points=[];perimeter=orthogonalPerimeter;" vertex="1" parent="rrvN5EUfyGgxll58mSvy-4">
-          <mxGeometry x="45" y="130" width="10" height="20" as="geometry" />
-        </mxCell>
-        <mxCell id="rrvN5EUfyGgxll58mSvy-5" value="Open add fillup page" style="html=1;verticalAlign=bottom;startArrow=oval;startFill=1;endArrow=block;startSize=8;rounded=0;" edge="1" parent="1" target="rrvN5EUfyGgxll58mSvy-1">
-          <mxGeometry width="60" relative="1" as="geometry">
-            <mxPoint x="120" y="150" as="sourcePoint" />
-            <mxPoint x="244.94999999999982" y="149.84000000000003" as="targetPoint" />
-          </mxGeometry>
-        </mxCell>
-        <mxCell id="rrvN5EUfyGgxll58mSvy-6" value="GET /" style="html=1;verticalAlign=bottom;endArrow=block;rounded=0;" edge="1" parent="1" source="rrvN5EUfyGgxll58mSvy-1" target="rrvN5EUfyGgxll58mSvy-2">
-          <mxGeometry width="80" relative="1" as="geometry">
-            <mxPoint x="255.89999999999986" y="160.32000000000005" as="sourcePoint" />
-            <mxPoint x="406.8599999999999" y="160.76" as="targetPoint" />
+        <mxCell id="rrvN5EUfyGgxll58mSvy-21" value="Replace form vehicle&lt;br&gt;selection options with&lt;br&gt;VehicleModel QuerySet" style="edgeStyle=orthogonalEdgeStyle;html=1;align=left;spacingLeft=2;endArrow=block;rounded=0;entryX=1;entryY=0;comic=0;" edge="1" target="rrvN5EUfyGgxll58mSvy-20" parent="rrvN5EUfyGgxll58mSvy-2">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="60" y="181" as="sourcePoint" />
             <Array as="points">
-              <mxPoint x="350" y="160" />
+              <mxPoint x="90" y="181" />
+              <mxPoint x="90" y="201" />
             </Array>
           </mxGeometry>
         </mxCell>
-        <mxCell id="rrvN5EUfyGgxll58mSvy-10" value="instantiate FillupForm" style="html=1;verticalAlign=bottom;endArrow=block;rounded=0;entryX=0.043;entryY=0.004;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="rrvN5EUfyGgxll58mSvy-2" target="rrvN5EUfyGgxll58mSvy-9">
+        <mxCell id="rrvN5EUfyGgxll58mSvy-22" value="" style="html=1;points=[];perimeter=orthogonalPerimeter;" vertex="1" parent="rrvN5EUfyGgxll58mSvy-2">
+          <mxGeometry x="50" y="80" width="10" height="170" as="geometry" />
+        </mxCell>
+        <mxCell id="rrvN5EUfyGgxll58mSvy-25" value="Django Render Response" style="html=1;verticalAlign=bottom;endArrow=open;dashed=1;endSize=8;rounded=0;comic=0;" edge="1" parent="rrvN5EUfyGgxll58mSvy-2" target="rrvN5EUfyGgxll58mSvy-1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="50" y="250" as="sourcePoint" />
+            <mxPoint x="-30" y="250" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="rrvN5EUfyGgxll58mSvy-3" value=":FillupForm" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=1;collapsible=0;recursiveResize=0;outlineConnect=0;" vertex="1" parent="1">
+          <mxGeometry x="585" y="80" width="110" height="640" as="geometry" />
+        </mxCell>
+        <mxCell id="rrvN5EUfyGgxll58mSvy-9" value="" style="html=1;points=[];perimeter=orthogonalPerimeter;" vertex="1" parent="rrvN5EUfyGgxll58mSvy-3">
+          <mxGeometry x="50" y="85" width="10" height="25" as="geometry" />
+        </mxCell>
+        <mxCell id="rrvN5EUfyGgxll58mSvy-4" value=":VehicleModel" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=1;collapsible=0;recursiveResize=0;outlineConnect=0;" vertex="1" parent="1">
+          <mxGeometry x="745" y="80" width="110" height="640" as="geometry" />
+        </mxCell>
+        <mxCell id="rrvN5EUfyGgxll58mSvy-13" value="" style="html=1;points=[];perimeter=orthogonalPerimeter;recursiveResize=0;dropTarget=1;container=0;fixDash=0;" vertex="1" parent="rrvN5EUfyGgxll58mSvy-4">
+          <mxGeometry x="50" y="140" width="10" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="rrvN5EUfyGgxll58mSvy-5" value="Open add fillup page" style="html=1;verticalAlign=bottom;startArrow=oval;startFill=1;endArrow=block;startSize=8;rounded=0;" edge="1" parent="1" source="rrvN5EUfyGgxll58mSvy-24" target="rrvN5EUfyGgxll58mSvy-1">
+          <mxGeometry width="60" relative="1" as="geometry">
+            <mxPoint x="120" y="150" as="sourcePoint" />
+            <mxPoint x="244.94999999999982" y="149.84000000000003" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="180" y="150" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="rrvN5EUfyGgxll58mSvy-6" value="GET /" style="html=1;verticalAlign=bottom;endArrow=block;rounded=0;" edge="1" parent="1" source="rrvN5EUfyGgxll58mSvy-1">
           <mxGeometry width="80" relative="1" as="geometry">
-            <mxPoint x="430" y="290" as="sourcePoint" />
+            <mxPoint x="255.89999999999986" y="160.32000000000005" as="sourcePoint" />
+            <mxPoint x="410" y="160" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="370" y="160" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="rrvN5EUfyGgxll58mSvy-10" value="instantiate FillupForm" style="html=1;verticalAlign=bottom;endArrow=block;rounded=0;entryX=0.043;entryY=0.004;entryDx=0;entryDy=0;entryPerimeter=0;bendable=0;comic=0;exitX=1.141;exitY=0.034;exitDx=0;exitDy=0;exitPerimeter=0;" edge="1" parent="1" source="rrvN5EUfyGgxll58mSvy-22" target="rrvN5EUfyGgxll58mSvy-9">
+          <mxGeometry width="80" relative="1" as="geometry">
+            <mxPoint x="420.7199999999998" y="165.19999999999993" as="sourcePoint" />
             <mxPoint x="510" y="290" as="targetPoint" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="rrvN5EUfyGgxll58mSvy-11" value="form object" style="html=1;verticalAlign=bottom;endArrow=open;dashed=1;endSize=8;rounded=0;exitX=-0.005;exitY=0.193;exitDx=0;exitDy=0;exitPerimeter=0;" edge="1" parent="1" source="rrvN5EUfyGgxll58mSvy-9" target="rrvN5EUfyGgxll58mSvy-2">
+        <mxCell id="rrvN5EUfyGgxll58mSvy-11" value="form object" style="html=1;verticalAlign=bottom;endArrow=open;dashed=1;endSize=8;rounded=0;exitX=-0.1;exitY=1.04;exitDx=0;exitDy=0;exitPerimeter=0;entryX=1.072;entryY=0.184;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="rrvN5EUfyGgxll58mSvy-9" target="rrvN5EUfyGgxll58mSvy-22">
           <mxGeometry relative="1" as="geometry">
             <mxPoint x="510" y="290" as="sourcePoint" />
-            <mxPoint x="415.89999999999986" y="233.14999999999998" as="targetPoint" />
+            <mxPoint x="425.54999999999995" y="190.5999999999999" as="targetPoint" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="rrvN5EUfyGgxll58mSvy-14" value="query for user&#39;s vehicles" style="html=1;verticalAlign=bottom;endArrow=block;entryX=0;entryY=0;rounded=0;" edge="1" target="rrvN5EUfyGgxll58mSvy-13" parent="1" source="rrvN5EUfyGgxll58mSvy-2">
-          <mxGeometry x="0.5162" relative="1" as="geometry">
-            <mxPoint x="414.9499999999998" y="280.65" as="sourcePoint" />
+        <mxCell id="rrvN5EUfyGgxll58mSvy-14" value="query for user&#39;s vehicles with proper roles" style="html=1;verticalAlign=bottom;endArrow=block;entryX=0.021;entryY=0.048;rounded=0;exitX=1.141;exitY=0.355;exitDx=0;exitDy=0;exitPerimeter=0;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" target="rrvN5EUfyGgxll58mSvy-13" parent="1" source="rrvN5EUfyGgxll58mSvy-22">
+          <mxGeometry x="0.1751" relative="1" as="geometry">
+            <mxPoint x="420.7199999999998" y="210" as="sourcePoint" />
             <mxPoint as="offset" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="rrvN5EUfyGgxll58mSvy-15" value="QuerySet" style="html=1;verticalAlign=bottom;endArrow=open;dashed=1;endSize=8;exitX=0;exitY=0.95;rounded=0;" edge="1" source="rrvN5EUfyGgxll58mSvy-13" parent="1" target="rrvN5EUfyGgxll58mSvy-2">
+        <mxCell id="rrvN5EUfyGgxll58mSvy-15" value="QuerySet" style="html=1;verticalAlign=bottom;endArrow=open;dashed=1;endSize=8;rounded=0;entryX=1.003;entryY=0.464;entryDx=0;entryDy=0;entryPerimeter=0;exitX=-0.048;exitY=0.979;exitDx=0;exitDy=0;exitPerimeter=0;" edge="1" source="rrvN5EUfyGgxll58mSvy-13" parent="1" target="rrvN5EUfyGgxll58mSvy-22">
           <mxGeometry x="-0.5162" relative="1" as="geometry">
-            <mxPoint x="414.9499999999998" y="322.45000000000005" as="targetPoint" />
+            <mxPoint x="460" y="229" as="targetPoint" />
+            <mxPoint x="790" y="239" as="sourcePoint" />
             <mxPoint as="offset" />
           </mxGeometry>
+        </mxCell>
+        <mxCell id="rrvN5EUfyGgxll58mSvy-20" value="" style="html=1;points=[];perimeter=orthogonalPerimeter;" vertex="1" parent="1">
+          <mxGeometry x="415" y="281" width="10" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="rrvN5EUfyGgxll58mSvy-24" value="" style="shape=umlLifeline;participant=umlActor;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=1;collapsible=0;recursiveResize=0;verticalAlign=top;spacingTop=36;outlineConnect=0;" vertex="1" parent="1">
+          <mxGeometry x="110" y="80" width="20" height="640" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>
