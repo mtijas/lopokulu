@@ -1,24 +1,15 @@
+// SPDX-FileCopyrightText: 2021 Jani Lehtinen
+// SPDX-FileCopyrightText: 2021 Markus Ijäs
+// SPDX-FileCopyrightText: 2021 Markus Murto
+//
+// SPDX-License-Identifier: CC0-1.0
+
 pipeline {
   agent any
   stages {
-    stage('Pull development') {
+    stage('First step lol') {
       steps {
         git(url: 'https://github.com/mtijas/lopokulu', branch: 'development', poll: true)
-      }
-    }
-
-    stage('Run docker-compose') {
-      steps {
-        sh '''cd lopokulu
-docker-compose -d -f docker-compose-testing.yaml up --build'''
-      }
-    }
-
-    stage('Run tests') {
-      steps {
-        sh '''sudo docker exec -it lopokulu_lopokuluapp_1 sh
-cd src
-python3 manage.py unittest'''
       }
     }
 
