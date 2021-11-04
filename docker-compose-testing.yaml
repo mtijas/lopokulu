@@ -10,6 +10,7 @@ services:
   lopokuluapp:
     image: lopokulu:latest
     container_name: lopokulu_app_1
+    user: jenkins
     build:
       context: .
       dockerfile: testing/lopokuluapp.dockerfile
