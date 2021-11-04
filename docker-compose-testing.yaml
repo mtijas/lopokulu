@@ -27,20 +27,13 @@ services:
     env_file:
       - src/.env
 
-  adminer:
-    image: adminer:latest
-    ports:
-      - 8081:8080
-    env_file:
-      - src/.env
-
   web:
     image: nginx:latest
     volumes:
       - ./testing/nginx-templates:/etc/nginx/templates
       - ./staticfiles:/srv/www/assets
     ports:
-      - 8080:80
+      - 8088:80
     env_file:
       - src/.env
     depends_on:
