@@ -38,7 +38,7 @@ class FillupFormTestCase(TestCase):
     def test_fillup_not_allowed_for_vehicle_readonly_user(self):
         '''Fillup is not allowed for user with readonly status on a vehicle'''
         expected = {
-            'vehicle': ['You are not allowed to report fillup for that vehicle'],
+            'vehicle': ['Select a valid choice. That choice is not one of the available choices.'],
         }
         data = self.base_form_data
         data['vehicle'] = Vehicle.objects.get(name='TestRO')

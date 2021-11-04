@@ -15,16 +15,8 @@ class FillupForm(forms.ModelForm):
     def __init__(self, user, *args, **kwargs):
         self.user = user
         super(FillupForm, self).__init__(*args, **kwargs)
-
-    def clean_vehicle(self):
-        data = self.cleaned_data['vehicle']
-        if data not in self.get_allowed_vehicles():
-            raise ValidationError(
-                _('You are not allowed to report fillup for that vehicle'),
-                code='invalid'
-            )
-
-        return data
+        self.fields['vehicle'].queryset = self.get_allowed_vehicles()
+        self.fields['vehicle'].initial = self.fields['vehicle'].queryset[0].id
 
     def clean_distance(self):
         data = self.cleaned_data['distance']
@@ -66,6 +58,7 @@ class FillupForm(forms.ModelForm):
 
     class Meta:
         model = Fillup
+        widgets = {'vehicle': forms.RadioSelect}
         fields = ['price', 'amount', 'distance', 'vehicle', 'tank_full']
 
     field_order = ['vehicle', 'distance', 'amount', 'price', 'tank_full']
