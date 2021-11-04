@@ -1,5 +1,19 @@
 pipeline {
   agent any
+  stages {
+    stage('Build') {
+      steps {
+        sh 'docker-compose -f docker-compose-testing.yaml up -d --build'
+      }
+    }
+
+    stage('Test') {
+      steps {
+        sh 'docker exec lpkulu_lopokuluapp_1 bash -c "python3 /src/manage.py test /src/"'
+      }
+    }
+
+  }
   environment {
     DEBUG = 'True'
     POSTGRES_DB = 'lopokulu'
@@ -11,13 +25,5 @@ pipeline {
     POSTGRES_USER = credentials('lopokulu-postgres-user')
     POSTGRES_PASSWORD = credentials('lopokulu-postgres-password')
     SECRET_KEY = credentials('lopokulu-django-secret-key')
-  }
-  stages {
-    stage('First step lol') {
-      steps {
-        git(url: 'https://github.com/mtijas/lopokulu', branch: 'development', poll: true)
-      }
-    }
-
   }
 }
