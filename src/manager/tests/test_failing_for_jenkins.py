@@ -7,3 +7,7 @@
 from django.test import TestCase
 
 # Create your tests here.
+
+class FailingTestCase(TestCase):
+    def test_failing_for_jenkins_pipeline_development(self):
+        self.assertTrue(False)
