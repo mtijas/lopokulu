@@ -9,7 +9,7 @@ pipeline {
 
     stage('Test') {
       steps {
-        sh 'docker exec lpkulu_lopokuluapp_1 bash -c "python3 /src/manage.py test /src/"'
+        sh 'docker exec lopokulu_app_1 bash -c "python3 /src/manage.py test /src/"'
       }
     }
 
