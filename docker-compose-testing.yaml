@@ -17,11 +17,26 @@ services:
       - ./staticfiles:/static/
     depends_on:
       - postgres
+    environment:
+      - DEBUG
+      - POSTGRES_DB
+      - POSTGRES_PORT
+      - POSTGRES_HOST
+      - POSTGRES_PASSWORD
+      - POSTGRES_USER
+      - SECRET_KEY
 
   postgres:
     image: postgres:latest
     volumes:
       - lopokulu-dev-data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB
+      - POSTGRES_PORT
+      - POSTGRES_HOST
+      - POSTGRES_PASSWORD
+      - POSTGRES_USER
+      - PGDATA
 
   web:
     image: nginx:latest
@@ -32,6 +47,9 @@ services:
       - 8088:80
     depends_on:
       - lopokuluapp
+    environment:
+      - NGINX_HOST
+      - NGINX_PORT
 
 volumes:
   lopokulu-dev-data:
