@@ -66,4 +66,6 @@ class FillupForm(forms.ModelForm):
 
     class Meta:
         model = Fillup
-        fields = ['price', 'amount', 'distance', 'vehicle']
+        fields = ['price', 'amount', 'distance', 'vehicle', 'tank_full']
+
+    field_order = ['vehicle', 'distance', 'amount', 'price', 'tank_full']

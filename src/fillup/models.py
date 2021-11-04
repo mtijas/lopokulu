@@ -22,6 +22,7 @@ class Fillup(models.Model):
     amount = models.FloatField("Total filled up amount", validators=[validate_positive])
     distance = models.FloatField("Total odometer")
     addition_date = models.DateTimeField(default=timezone.now)
+    tank_full = models.BooleanField(default=True)
 
     vehicle = models.ForeignKey(Vehicle, on_delete=models.CASCADE)
     person = models.ForeignKey(
