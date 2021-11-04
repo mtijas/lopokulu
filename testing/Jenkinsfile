@@ -13,6 +13,12 @@ pipeline {
       }
     }
 
+    stage('Cleanup') {
+      steps {
+        sh 'docker container rm lopokulu_app_1'
+        sh 'docker rmi lopokulu:latest'
+      }
+    }
   }
   environment {
     DEBUG = 'True'
