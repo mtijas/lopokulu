@@ -9,3 +9,7 @@
 #id_vehicle li {
     list-style-type: none;
 }
+
+label[for="id_tank_full"] {
+    display: inline;
+}
