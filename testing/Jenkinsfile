@@ -15,8 +15,7 @@ pipeline {
 
     stage('Cleanup') {
       steps {
-        sh 'docker container rm lopokulu_app_1'
-        sh 'docker rmi lopokulu:latest'
+        sh 'docker-compose -f docker-compose-testing.yaml down'
       }
     }
   }
