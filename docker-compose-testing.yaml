@@ -15,8 +15,6 @@ services:
     volumes:
       - ./src:/src/
       - ./staticfiles:/static/
-    env_file:
-      - src/.env
     depends_on:
       - postgres
 
@@ -24,8 +22,6 @@ services:
     image: postgres:latest
     volumes:
       - lopokulu-dev-data:/var/lib/postgresql/data
-    env_file:
-      - src/.env
 
   web:
     image: nginx:latest
@@ -34,8 +30,6 @@ services:
       - ./staticfiles:/srv/www/assets
     ports:
       - 8088:80
-    env_file:
-      - src/.env
     depends_on:
       - lopokuluapp
 
