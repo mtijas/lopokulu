@@ -1,9 +1,3 @@
-// SPDX-FileCopyrightText: 2021 Jani Lehtinen
-// SPDX-FileCopyrightText: 2021 Markus Ijäs
-// SPDX-FileCopyrightText: 2021 Markus Murto
-//
-// SPDX-License-Identifier: CC0-1.0
-
 pipeline {
   agent any
   stages {
@@ -13,5 +7,14 @@ pipeline {
       }
     }
 
+  }
+  environment {
+    DEBUG = 'True'
+    POSTGRES_DB = 'lopokulu'
+    POSTGRES_PORT = '5432'
+    POSTGRES_HOST = 'postgres'
+    PGDATA = '/var/lib/postgresql/data/pgdata'
+    NGINX_HOST = 'localhost'
+    NGINX_PORT = '80'
   }
 }
