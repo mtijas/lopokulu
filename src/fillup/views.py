@@ -5,7 +5,7 @@
 # SPDX-License-Identifier: MIT
 
 from django.http import HttpResponseRedirect
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.utils import timezone
 from .forms import FillupForm
 from django.contrib.auth.decorators import login_required
@@ -22,7 +22,7 @@ def add_fillup(request):
             fillup.person = request.user
             fillup.addition_date = timezone.now()
             fillup.save()
-            return HttpResponseRedirect('/dashboard/')
+            return redirect('dashboard')
 
     else:
         form = FillupForm(request.user)
