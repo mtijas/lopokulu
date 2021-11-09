@@ -35,12 +35,9 @@ def add_fillup(request):
 @login_required
 def dashboard(request):
     user = Person.objects.get(email=request.user)
-    user_vehicles = Vehicle.objects.filter(
-        vehicleuser__person_id=user.id
-    )
 
     content = {
-        'user_vehicles': user_vehicles
+        'user_vehicles': user.vehicles.all()
     }
 
     return render(request, 'fillup/dashboard.html', content)
