@@ -10,6 +10,7 @@ from django.utils import timezone
 from .forms import FillupForm
 from django.contrib.auth.decorators import login_required
 from manager.models import Vehicle
+from manager.models import Person
 
 
 @login_required
@@ -30,3 +31,17 @@ def add_fillup(request):
         'form': form,
     }
     return render(request, 'fillup/add_fillup.html', content)
+
+@login_required
+def dashboard(request):
+    user = Person.objects.get(email=request.user)
+    allowed_vehicles = Vehicle.objects.filter(
+        vehicleuser__person_id=user.id,
+        vehicleuser__role__in=['DR', 'OW']
+    )
+
+    content = {
+        'allowed_vehicles': allowed_vehicles
+    }
+
+    return render(request, 'fillup/dashboard.html', content)
