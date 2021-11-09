@@ -26,4 +26,5 @@ from . import views
 urlpatterns = [
     path('', views.add_fillup, name='add_fillup'),
     path('fillup/', views.add_fillup, name='add_fillup'),
+    path('dashboard/', views.dashboard, name='dashboard'),
 ]

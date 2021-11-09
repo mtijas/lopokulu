@@ -1,0 +1,23 @@
+<!--
+SPDX-FileCopyrightText: 2021 Jani Lehtinen
+SPDX-FileCopyrightText: 2021 Markus Ijäs
+SPDX-FileCopyrightText: 2021 Markus Murto
+
+SPDX-License-Identifier: MIT
+-->
+
+{% extends 'lopokulu/base.html' %} {% block content %}
+<h2>Dashboard</h2>
+<article>
+  <header>
+    <h4>Your vehicles</h4>
+  </header>
+  <main>
+    <ul>
+      {% for vehicle in allowed_vehicles %}
+      <li>{{ vehicle }}</li>
+      {% endfor %}
+    </ul>
+  </main>
+</article>
+{% endblock %}
