@@ -22,7 +22,7 @@ def add_fillup(request):
             fillup.person = request.user
             fillup.addition_date = timezone.now()
             fillup.save()
-            return HttpResponseRedirect('/thanks/')
+            return HttpResponseRedirect('/dashboard/')
 
     else:
         form = FillupForm(request.user)
