@@ -7,7 +7,7 @@
 pipeline {
   agent any
   stages {
-    stage('Build') {
+    stage('Prepare') {
       steps {
         sh 'docker-compose -f docker-compose-testing.yaml up -d --build'
       }
