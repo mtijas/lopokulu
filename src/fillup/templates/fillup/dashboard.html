@@ -6,7 +6,8 @@ SPDX-FileCopyrightText: 2021 Markus Murto
 SPDX-License-Identifier: MIT
 -->
 
-{% extends 'lopokulu/base.html' %} {% block content %}
+{% extends 'lopokulu/base.html' %}
+{% block content %}
 {% for vehicle in vehicles %}
 <article>
   <header>
@@ -26,8 +27,8 @@ SPDX-License-Identifier: MIT
           <th>Total</th>
         </tr>
       </thead>
-      </tbody>
-      {% for fillup in vehicle.fillups %}
+      <tbody>
+        {% for fillup in vehicle.fillups %}
         <tr>
           <td>{{ fillup.addition_date|date:'j.n G:i' }}</td>
           <td>{{ fillup.tank_full }}</td>
@@ -38,11 +39,11 @@ SPDX-License-Identifier: MIT
           <td>{{ fillup.price }}</td>
           <td>TBD</td>
         </tr>
-      {% empty %}
+        {% empty %}
         <tr>
-          <td colspan=8>No results...</td>
+          <td colspan="8">No results...</td>
         </tr>
-      {% endfor %}
+        {% endfor %}
       </tbody>
     </table>
   </main>

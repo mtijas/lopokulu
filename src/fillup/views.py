@@ -4,12 +4,10 @@
 #
 # SPDX-License-Identifier: MIT
 
-from django.http import HttpResponseRedirect
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 from django.utils import timezone
 from .forms import FillupForm
-from django.contrib.auth.decorators import login_required
-from manager.models import Vehicle
 from manager.models import Person
 from .models import Fillup
 
