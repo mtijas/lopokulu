@@ -11,10 +11,13 @@ SPDX-License-Identifier: MIT
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Löpökulu</title>
-    <link rel="stylesheet" href="https://unpkg.com/@picocss/pico@latest/css/pico.min.css">
-    <link rel="stylesheet" href="{% static 'fillup/css/core.css' %}">
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/@picocss/pico@latest/css/pico.min.css"
+    />
+    <link rel="stylesheet" href="{% static 'fillup/css/core.css' %}" />
   </head>
   <body>
     <header>
@@ -25,12 +28,10 @@ SPDX-License-Identifier: MIT
         <ul>
           {% if user.is_authenticated %}
           <li><a href="{% url 'logout' %}" role="button">Log out</a></li>
-          {% endif  %}
+          {% endif %}
         </ul>
-        <nav>
+      </nav>
     </header>
-    <main class=container>
-      {% block content %} {% endblock %}
-    </main>
+    <main class="container">{% block content %} {% endblock %}</main>
   </body>
 </html>
