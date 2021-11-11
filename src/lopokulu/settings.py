@@ -147,5 +147,6 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # Redirect to the login page after logout
 
 LOGOUT_REDIRECT_URL = 'login'
+LOGIN_REDIRECT_URL = '/dashboard'
 
 AUTH_USER_MODEL = 'manager.Person'

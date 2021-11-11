@@ -24,7 +24,7 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-    path('', views.add_fillup, name='add_fillup'),
+    path('', views.dashboard),
     path('fillup/', views.add_fillup, name='add_fillup'),
     path('dashboard/', views.dashboard, name='dashboard'),
 ]
