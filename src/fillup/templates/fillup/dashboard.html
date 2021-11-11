@@ -7,17 +7,45 @@ SPDX-License-Identifier: MIT
 -->
 
 {% extends 'lopokulu/base.html' %} {% block content %}
-<h2>Dashboard</h2>
+{% for vehicle in vehicles %}
 <article>
   <header>
-    <h4>Your vehicles</h4>
+    <h4>{{ vehicle.vehicle }}</h4>
   </header>
   <main>
-    <ul>
-      {% for vehicle in user_vehicles %}
-      <li>{{ vehicle }}</li>
+    <table>
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Full</th>
+          <th>Distance</th>
+          <th>Delta</th>
+          <th>Amount</th>
+          <th>Consumption</th>
+          <th>Price</th>
+          <th>Total</th>
+        </tr>
+      </thead>
+      </tbody>
+      {% for fillup in vehicle.fillups %}
+        <tr>
+          <td>{{ fillup.addition_date|date:'j.n G:i' }}</td>
+          <td>{{ fillup.tank_full }}</td>
+          <td>{{ fillup.distance }}</td>
+          <td>TBD</td>
+          <td>{{ fillup.amount }}</td>
+          <td>TBD</td>
+          <td>{{ fillup.price }}</td>
+          <td>TBD</td>
+        </tr>
+      {% empty %}
+        <tr>
+          <td colspan=8>No results...</td>
+        </tr>
       {% endfor %}
-    </ul>
+      </tbody>
+    </table>
   </main>
 </article>
+{% endfor %}
 {% endblock %}

@@ -11,6 +11,7 @@ from .forms import FillupForm
 from django.contrib.auth.decorators import login_required
 from manager.models import Vehicle
 from manager.models import Person
+from .models import Fillup
 
 
 @login_required
@@ -35,9 +36,16 @@ def add_fillup(request):
 @login_required
 def dashboard(request):
     user = Person.objects.get(email=request.user)
+    vehicles = []
+
+    for vehicle in user.vehicles.all():
+        vehicles.append({
+            'vehicle': vehicle,
+            'fillups': Fillup.objects.filter(vehicle=vehicle)[:10],
+        })
 
     content = {
-        'user_vehicles': user.vehicles.all()
+        'vehicles': vehicles,
     }
 
     return render(request, 'fillup/dashboard.html', content)
