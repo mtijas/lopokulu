@@ -4,7 +4,7 @@ FROM python:latest
 
     COPY requirements.txt .
     COPY .coveragerc .
-    COPY local/entrypoint.sh ./entrypoint.sh
+    COPY local/entrypoint.sh .
 
     RUN useradd -m lopokulu
     RUN pip install --upgrade pip
