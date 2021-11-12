@@ -1,0 +1,31 @@
+# SPDX-FileCopyrightText: 2021 Jani Lehtinen
+# SPDX-FileCopyrightText: 2021 Markus Ijäs
+# SPDX-FileCopyrightText: 2021 Markus Murto
+#
+# SPDX-License-Identifier: CC0-1.0
+
+[run]
+branch = True
+source = /src
+omit =
+    *migrations*
+    *tests*
+    */asgi.py
+    */wsgi.py
+
+[report]
+exclude_lines =
+    pragma: no cover
+
+    raise AssertionError
+    raise NotImplementedError
+
+    if 0:
+    if __name__ == .__main__.:
+
+    @(abc\.)?abstractmethod
+
+ignore_errors = True
+
+[html]
+directory = coverage_html_report
