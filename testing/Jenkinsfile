@@ -32,6 +32,11 @@ pipeline {
       }
     }
   }
+  post {
+    success {
+      publishCoverage adapters: [cobertura('coverage.xml')], sourceFileResolver: sourceFiles('NEVER_STORE')
+    }
+  }
   environment {
     DEBUG = 'True'
     POSTGRES_DB = 'lopokulu'
