@@ -14,9 +14,8 @@ services:
     build:
       context: .
       dockerfile: testing/lopokuluapp.dockerfile
-    command: /bin/sh -c "/entrypoint.sh"
     volumes:
-      - ./src:/src/
+      - ./src:/lopokulu/src/
       - ./staticfiles:/static/
     depends_on:
       - postgres

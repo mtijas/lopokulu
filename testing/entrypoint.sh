@@ -6,6 +6,6 @@
 #
 # SPDX-License-Identifier: CC0-1.0
 
-sleep 5
-python3 /src/manage.py collectstatic --no-input
-gunicorn --chdir "/src" lopokulu.wsgi:application --bind 0.0.0.0:8000
+sleep 4
+python3 /lopokulu/src/manage.py collectstatic --no-input
+gunicorn --chdir "/lopokulu/src" lopokulu.wsgi:application --bind 0.0.0.0:8000
