@@ -13,11 +13,10 @@ services:
     build:
       context: .
       dockerfile: local/lopokuluapp.dockerfile
-    command: /bin/sh -c "/entrypoint.sh"
     ports:
       - 8080:8000
     volumes:
-      - ./src:/src/
+      - ./src:/lopokulu/src/
     env_file:
       - src/.env
     depends_on:

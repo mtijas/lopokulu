@@ -6,7 +6,7 @@
 
 [run]
 branch = True
-source = /src
+source = ./src
 omit =
     *migrations*
     *tests*
