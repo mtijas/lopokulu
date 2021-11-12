@@ -12,6 +12,7 @@ omit =
     *tests*
     */asgi.py
     */wsgi.py
+    */manage.py
 
 [report]
 exclude_lines =
