@@ -6,7 +6,7 @@ FROM python:3.10-slim
     COPY .coveragerc .
     COPY local/entrypoint.sh .
 
-    RUN useradd -m lopokulu
+    RUN useradd -ms /bin/bash lopokulu
     RUN pip install --upgrade pip
     RUN pip install -r requirements.txt
     RUN chmod +x ./entrypoint.sh
