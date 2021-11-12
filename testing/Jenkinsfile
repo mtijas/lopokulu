@@ -15,7 +15,14 @@ pipeline {
 
     stage('Test') {
       steps {
-        sh 'docker exec lopokulu_app_1 python3 src/manage.py test src'
+        sh 'docker exec lopokulu_app_1 coverage run src/manage.py test src'
+      }
+    }
+
+    stage('Coverage reports') {
+      steps {
+        sh 'docker exec lopokulu_app_1 coverage xml'
+        sh 'docker cp lopokulu_app_1:/lopokulu/coverage.xml .'
       }
     }
 
