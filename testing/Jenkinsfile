@@ -15,7 +15,7 @@ pipeline {
 
     stage('Test') {
       steps {
-        sh 'docker exec lopokulu_app_1 python3 /src/manage.py test /src'
+        sh 'docker exec lopokulu_app_1 python3 src/manage.py test src'
       }
     }
 
