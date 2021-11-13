@@ -4,14 +4,12 @@ FROM python:3.10-slim
 
     COPY requirements.txt .
     COPY .coveragerc .
-    COPY local/entrypoint.sh .
 
     RUN useradd -ms /bin/bash lopokulu
     RUN pip install --upgrade pip
     RUN pip install -r requirements.txt
-    RUN chmod +x ./entrypoint.sh
     RUN chown lopokulu:lopokulu /lopokulu
 
     USER lopokulu
 
-    ENTRYPOINT ["/lopokulu/entrypoint.sh"]
+    CMD ["gunicorn", "--chdir", "/lopokulu/src", "lopokulu.wsgi:application", "--bind", "0.0.0.0:8000"]

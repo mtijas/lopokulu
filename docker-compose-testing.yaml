@@ -10,10 +10,10 @@ services:
   lopokuluapp:
     image: lopokulu:latest
     container_name: lopokulu_app_1
-    user: jenkins
+    user: lopokulu
     build:
       context: .
-      dockerfile: testing/lopokuluapp.dockerfile
+      dockerfile: lopokuluapp.dockerfile
     volumes:
       - ./src:/lopokulu/src/
       - ./staticfiles:/static/

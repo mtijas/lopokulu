@@ -12,7 +12,7 @@ services:
     container_name: lopokulu_app_1
     build:
       context: .
-      dockerfile: local/lopokuluapp.dockerfile
+      dockerfile: lopokuluapp.dockerfile
     ports:
       - 8080:8000
     volumes:
@@ -21,6 +21,7 @@ services:
       - src/.env
     depends_on:
       - postgres
+    command: ["python3", "/lopokulu/src/manage.py", "runserver", "0.0.0.0:8000"]
 
   postgres:
     image: postgres:latest
