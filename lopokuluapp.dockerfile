@@ -8,7 +8,8 @@ FROM python:3.10-slim
     RUN useradd -ms /bin/bash lopokulu
     RUN pip install --upgrade pip
     RUN pip install -r requirements.txt
-    RUN chown lopokulu:lopokulu /lopokulu
+    RUN mkdir /lopokulu/static
+    RUN chown -R lopokulu:lopokulu /lopokulu
 
     USER lopokulu
 
