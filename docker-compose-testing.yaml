@@ -16,7 +16,7 @@ services:
       dockerfile: lopokuluapp.dockerfile
     volumes:
       - ./src:/lopokulu/src/
-      - ./staticfiles:/static/
+      - ./staticfiles:/lopokulu/static/
     depends_on:
       - postgres
     environment:
