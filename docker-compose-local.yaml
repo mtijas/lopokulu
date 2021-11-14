@@ -18,7 +18,7 @@ services:
     volumes:
       - ./src:/lopokulu/src/
     env_file:
-      - src/.env
+      - .env
     depends_on:
       - postgres
     command: ["python3", "/lopokulu/src/manage.py", "runserver", "0.0.0.0:8000"]
@@ -28,14 +28,14 @@ services:
     volumes:
       - lopokulu-dev-data:/var/lib/postgresql/data
     env_file:
-      - src/.env
+      - .env
 
   adminer:
     image: adminer:latest
     ports:
       - 8081:8080
     env_file:
-      - src/.env
+      - .env
 
 volumes:
   lopokulu-dev-data:
