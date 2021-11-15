@@ -13,8 +13,6 @@ services:
     build:
       context: .
       target: development
-    ports:
-      - 8080:8000
     depends_on:
       - postgres
     environment:

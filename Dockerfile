@@ -1,5 +1,7 @@
 FROM python:3.10-slim AS prebuild
 
+    EXPOSE 8000
+
     WORKDIR /lopokulu
 
     RUN useradd -ms /bin/bash lopokulu
