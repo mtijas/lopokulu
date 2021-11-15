@@ -4,19 +4,17 @@
 #
 # SPDX-License-Identifier: CC0-1.0
 
-version: "3"
+version: "3.5"
 
 services:
   lopokuluapp:
-    image: lopokulu:latest
+    image: lopokulu:testing
     container_name: lopokulu_app_1
-    user: lopokulu
     build:
       context: .
-      dockerfile: lopokuluapp.dockerfile
-    volumes:
-      - ./src:/lopokulu/src/
-      - ./staticfiles:/lopokulu/static/
+      target: development
+    ports:
+      - 8080:8000
     depends_on:
       - postgres
     environment:
@@ -31,7 +29,7 @@ services:
   postgres:
     image: postgres:latest
     volumes:
-      - lopokulu-dev-data:/var/lib/postgresql/data
+      - lopokulu-testing-data:/var/lib/postgresql/data
     environment:
       - POSTGRES_DB
       - POSTGRES_PORT
@@ -40,18 +38,5 @@ services:
       - POSTGRES_USER
       - PGDATA
 
-  web:
-    image: nginx:latest
-    volumes:
-      - ./testing/nginx-templates:/etc/nginx/templates
-      - ./staticfiles:/srv/www/assets
-    ports:
-      - 8088:80
-    depends_on:
-      - lopokuluapp
-    environment:
-      - NGINX_HOST
-      - NGINX_PORT
-
 volumes:
-  lopokulu-dev-data:
+  lopokulu-testing-data:

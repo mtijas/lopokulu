@@ -6,11 +6,11 @@
 
 pipeline {
   agent any
+
   stages {
-    stage('Prepare') {
+    stage('Prepare tests') {
       steps {
         sh 'docker-compose -f docker-compose-testing.yaml up -d --build'
-        sh 'docker exec lopokulu_app_1 python3 src/manage.py collectstatic --no-input'
       }
     }
 
@@ -20,24 +20,38 @@ pipeline {
       }
     }
 
-    stage('Coverage reports') {
+    stage('Generate coverage reports') {
       steps {
         sh 'docker exec lopokulu_app_1 coverage xml'
         sh 'docker cp lopokulu_app_1:/lopokulu/coverage.xml .'
       }
     }
 
-    stage('Cleanup') {
+    stage('Collect static') {
       steps {
-        sh 'docker-compose -f docker-compose-testing.yaml down'
+        sh 'docker exec lopokulu_app_1 python3 src/manage.py collectstatic --no-input'
+        sh 'docker cp lopokulu_app_1:/lopokulu/static ./static'
+      }
+    }
+
+    stage('Build') {
+      steps {
+        sh 'docker build --target production -t lopokulu:latest .'
       }
     }
   }
+
   post {
     success {
       publishCoverage adapters: [coberturaAdapter('coverage.xml')], sourceFileResolver: sourceFiles('NEVER_STORE')
     }
+
+    always {
+      sh 'docker-compose -f docker-compose-testing.yaml down'
+      cleanWs()
+    }
   }
+
   environment {
     DEBUG = 'True'
     POSTGRES_DB = 'lopokulu'

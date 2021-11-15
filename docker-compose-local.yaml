@@ -4,15 +4,15 @@
 #
 # SPDX-License-Identifier: CC0-1.0
 
-version: "3"
+version: "3.5"
 
 services:
   lopokuluapp:
-    image: lopokulu:latest
+    image: lopokulu:dev
     container_name: lopokulu_app_1
     build:
       context: .
-      dockerfile: lopokuluapp.dockerfile
+      target: development
     ports:
       - 8080:8000
     volumes:
@@ -21,7 +21,6 @@ services:
       - .env
     depends_on:
       - postgres
-    command: ["python3", "/lopokulu/src/manage.py", "runserver", "0.0.0.0:8000"]
 
   postgres:
     image: postgres:latest
