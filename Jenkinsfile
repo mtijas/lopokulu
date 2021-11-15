@@ -47,8 +47,8 @@ pipeline {
       steps {
         sh 'docker tag lopokulu mtijas/lopokulu:development'
 
-        withCredentials([usernamePassword(credentialsId: 'lopokuluDockerHub', passwordVariable: 'dockerHubPassword', usernameVariable: 'dockerHubUser')]) {
-          sh 'docker login -u ${env.dockerHubUser} -p ${env.dockerHubPassword}'
+        withCredentials([usernamePassword(credentialsId: 'lopokuluDockerHub', passwordVariable: 'PASSWORD', usernameVariable: 'USERNAME')]) {
+          sh 'docker login -u $USERNAME -p $PASSWORD'
           sh 'docker push mtijas/lopokulu:development'
         }
 
