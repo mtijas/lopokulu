@@ -36,7 +36,31 @@ pipeline {
 
     stage('Build') {
       steps {
-        sh 'docker build --target production -t lopokulu:latest .'
+        sh 'docker build --target production -t lopokulu .'
+      }
+    }
+
+    stage('Deliver Development') {
+      when {
+        branch 'development'
+      }
+      steps {
+        sh 'docker tag lopokulu mtijas/lopokulu:development'
+
+        withCredentials([usernamePassword(credentialsId: 'lopokuluDockerHub', passwordVariable: 'dockerHubPassword', usernameVariable: 'dockerHubUser')]) {
+          sh 'docker login -u ${env.dockerHubUser} -p ${env.dockerHubPassword}'
+          sh 'docker push mtijas/lopokulu:development'
+        }
+
+        sh 'docker rmi mtijas/lopokulu:development'
+      }
+    }
+
+    stage('Cleanup') {
+      steps {
+        sh 'docker-compose -f docker-compose-testing.yaml down'
+        sh 'docker rmi lopokulu'
+        sh 'docker rmi lopokulu:testing'
       }
     }
   }
@@ -47,7 +71,6 @@ pipeline {
     }
 
     always {
-      sh 'docker-compose -f docker-compose-testing.yaml down'
       cleanWs()
     }
   }
@@ -58,8 +81,6 @@ pipeline {
     POSTGRES_PORT = '5432'
     POSTGRES_HOST = 'postgres'
     PGDATA = '/var/lib/postgresql/data/pgdata'
-    NGINX_HOST = 'localhost'
-    NGINX_PORT = '80'
     POSTGRES_USER = credentials('lopokulu-postgres-user')
     POSTGRES_PASSWORD = credentials('lopokulu-postgres-password')
     SECRET_KEY = credentials('lopokulu-django-secret-key')
