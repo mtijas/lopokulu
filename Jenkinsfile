@@ -48,8 +48,9 @@ pipeline {
         sh 'docker tag lopokulu mtijas/lopokulu:development'
 
         withCredentials([usernamePassword(credentialsId: 'lopokuluDockerHub', passwordVariable: 'PASSWORD', usernameVariable: 'USERNAME')]) {
-          sh 'docker login -u $USERNAME -p $PASSWORD'
+          sh 'echo "$PASSWORD" | docker login -u $USERNAME --password-stdin'
           sh 'docker push mtijas/lopokulu:development'
+          sh 'docker logout'
         }
 
         sh 'docker rmi mtijas/lopokulu:development'
