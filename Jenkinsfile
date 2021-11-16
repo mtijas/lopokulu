@@ -24,6 +24,7 @@ pipeline {
       steps {
         sh 'docker exec lopokulu_app_1 coverage xml'
         sh 'docker cp lopokulu_app_1:/lopokulu/coverage.xml .'
+        publishCoverage adapters: [coberturaAdapter('coverage.xml')], sourceFileResolver: sourceFiles('NEVER_STORE')
       }
     }
 
@@ -67,10 +68,6 @@ pipeline {
   }
 
   post {
-    success {
-      publishCoverage adapters: [coberturaAdapter('coverage.xml')], sourceFileResolver: sourceFiles('NEVER_STORE')
-    }
-
     always {
       cleanWs()
     }
