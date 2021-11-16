@@ -11,6 +11,7 @@ pipeline {
     stage('Prepare tests') {
       steps {
         sh 'docker-compose -f docker-compose-testing.yaml up -d --build'
+        sh 'docker exec lopokulu_app_1 python3 src/manage.py wait_for_database'
       }
     }
 
