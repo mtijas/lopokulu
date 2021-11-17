@@ -58,3 +58,13 @@ class FillupViewsIntegrationTestCase(TestCase):
         response = self.client.post('/fillup/', data=data)
 
         self.assertRedirects(response, '/dashboard/')
+
+    def test_returned_to_fillupform_on_invalid_data(self):
+        '''User should be returned to add_fillup view on posting invalid data'''
+        data = {}
+        self.client.login(email='testuser@foo.bar', password='top_secret')
+
+        with self.assertTemplateUsed('fillup/add_fillup.html'):
+            response = self.client.post('/fillup/', data=data)
+
+        self.assertEqual(response.status_code, 200)
