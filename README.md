@@ -9,6 +9,8 @@ SPDX-License-Identifier: CC0-1.0
 # lopokulu
 
 [![REUSE status](https://api.reuse.software/badge/github.com/mtijas/lopokulu)](https://api.reuse.software/info/github.com/mtijas/lopokulu)
+![MAIN branch status](https://jenkins.tiko2020.trade/job/lopokulu/job/main/badge/icon?subject=Main)]
+![DEVELOPMENT branch status](https://jenkins.tiko2020.trade/job/lopokulu/job/development/badge/icon?subject=Development)]
 
 This is a work-in-progress project to create a Django web application for vehicle fuel usage monitoring.
 
