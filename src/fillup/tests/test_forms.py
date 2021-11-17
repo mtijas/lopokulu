@@ -80,7 +80,7 @@ class FillupFormTestCase(TestCase):
     def test_negative_amount_not_allowed(self):
         '''Filled amount should not be negative'''
         expected = {
-            'amount': ['Value should be over zero',]
+            'amount': ['Value should be over zero']
         }
         data = self.base_form_data
         data['amount'] = -1
@@ -93,7 +93,7 @@ class FillupFormTestCase(TestCase):
     def test_zero_amount_not_allowed(self):
         '''Filled amount should not be zero'''
         expected = {
-            'amount': ['Value should be over zero',]
+            'amount': ['Value should be over zero']
         }
         data = self.base_form_data
         data['amount'] = 0
@@ -119,7 +119,7 @@ class FillupFormTestCase(TestCase):
     def test_negative_price_not_allowed(self):
         '''Filled price should not be negative'''
         expected = {
-            'price': ['Value should be over zero',]
+            'price': ['Value should be over zero']
         }
         data = self.base_form_data
         data['price'] = -1
@@ -132,7 +132,7 @@ class FillupFormTestCase(TestCase):
     def test_zero_price_not_allowed(self):
         '''Filled price should not be zero'''
         expected = {
-            'price': ['Value should be over zero',]
+            'price': ['Value should be over zero']
         }
         data = self.base_form_data
         data['price'] = 0
@@ -158,7 +158,7 @@ class FillupFormTestCase(TestCase):
     def test_negative_distance_not_allowed(self):
         '''Filled distance should not be negative'''
         expected = {
-            'distance': ['Distance should be zero or more',]
+            'distance': ['Distance should be zero or more']
         }
         data = self.base_form_data
         data['distance'] = -1
@@ -168,7 +168,7 @@ class FillupFormTestCase(TestCase):
         subset = {k:v for k, v in form.errors.items() if k in expected}
         self.assertDictEqual(subset, expected)
 
-    def test_zero_distance_is_allowed(self):
+    def test_zero_distance_is_not_allowed(self):
         '''Filled distance should not be zero'''
         expected = {}
         data = self.base_form_data
@@ -202,6 +202,69 @@ class FillupFormTestCase(TestCase):
         data = self.base_form_data
         data['vehicle'] = Vehicle.objects.get(name='TestOW')
         data['distance'] = 42
+
+        form = FillupForm(self.user, data=data)
+
+        subset = {k:v for k, v in form.errors.items() if k in expected}
+        self.assertDictEqual(subset, expected)
+
+    def test_price_cant_have_over_three_decimals(self):
+        '''Price should not have over three decimals'''
+        expected = {
+            'price': ['Ensure that there are no more than 3 decimal places.']
+        }
+        data = self.base_form_data
+        data['price'] = 1.3243
+
+        form = FillupForm(self.user, data=data)
+
+        subset = {k:v for k, v in form.errors.items() if k in expected}
+        self.assertDictEqual(subset, expected)
+
+    def test_price_cant_be_over_five_digits_long(self):
+        '''Price should not be over five digits long'''
+        expected = {
+            'price': ['Ensure that there are no more than 5 digits in total.']
+        }
+        data = self.base_form_data
+        data['price'] = 132.324
+
+        form = FillupForm(self.user, data=data)
+
+        subset = {k:v for k, v in form.errors.items() if k in expected}
+        self.assertDictEqual(subset, expected)
+
+    def test_price_with_five_digits_allowed(self):
+        '''Price with five digits should be allowed'''
+        expected = {}
+        data = self.base_form_data
+        data['price'] = 99.999
+
+        form = FillupForm(self.user, data=data)
+
+        subset = {k:v for k, v in form.errors.items() if k in expected}
+        self.assertDictEqual(subset, expected)
+        self.assertNotIn('price', form.errors)
+
+    def test_lowest_price_of_0_001_allowed(self):
+        '''Price of 0.001 should be allowed'''
+        expected = {}
+        data = self.base_form_data
+        data['price'] = 0.001
+
+        form = FillupForm(self.user, data=data)
+
+        subset = {k:v for k, v in form.errors.items() if k in expected}
+        self.assertDictEqual(subset, expected)
+        self.assertNotIn('price', form.errors)
+
+    def test_price_cant_have_hundreds(self):
+        '''Price should not have hundreds'''
+        expected = {
+            'price': ['Ensure that there are no more than 2 digits before the decimal point.']
+        }
+        data = self.base_form_data
+        data['price'] = 132
 
         form = FillupForm(self.user, data=data)
 
