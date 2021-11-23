@@ -1,0 +1,38 @@
+/*
+ * SPDX-FileCopyrightText: 2021 Jani Lehtinen
+ * SPDX-FileCopyrightText: 2021 Markus Ijäs
+ * SPDX-FileCopyrightText: 2021 Markus Murto
+ *
+ * SPDX-License-Identifier: MIT
+ */
+
+:root {
+    --spacing: 0.5rem;
+    --form-element-spacing-vertical: 0.25rem;
+    --form-element-spacing-horizontal: 0.33rem;
+}
+
+#site-header #main-nav li {
+    margin: 0 1px;
+}
+
+#site-header #main-nav a {
+    background-color: var(--primary);
+    border-radius: 0;
+    color: var(--primary-inverse);
+    padding: calc(var(--spacing) * 0.2) calc(var(--spacing) * .3);
+}
+
+#site-header #main-nav a.active {
+    background-color: var(--primary-focus);
+}
+
+#site-header #main-nav li:first-child a {
+    border-top-left-radius: var(--border-radius);
+    border-bottom-left-radius: var(--border-radius);
+}
+
+#site-header #main-nav li:last-child a {
+    border-top-right-radius: var(--border-radius);
+    border-bottom-right-radius: var(--border-radius);
+}
