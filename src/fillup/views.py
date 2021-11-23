@@ -48,6 +48,7 @@ def dashboard(request):
         })
 
     content = {
+        'allowed_fillups': user.vehicles.filter(vehicleuser__role__in=['DR', 'OW']),
         'vehicles': vehicles,
     }
 

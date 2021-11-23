@@ -15,9 +15,11 @@ SPDX-License-Identifier: MIT
       <ul>
         <li><strong>{{ vehicle.vehicle }}</strong></li>
       </ul>
+      {% if vehicle.vehicle in allowed_fillups %}
       <ul>
         <li><a href="{% url 'add_fillup_for_vehicle' pk=vehicle.vehicle.id %}" role="button">Add fillup</a></li>
       </ul>
+      {% endif %}
     </nav>
   </header>
   <main>
