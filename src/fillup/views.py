@@ -13,7 +13,7 @@ from .models import Fillup
 
 
 @login_required
-def add_fillup(request):
+def add_fillup(request, pk=None):
     if request.method == 'POST':
         form = FillupForm(request.user, request.POST)
         if form.is_valid():
@@ -23,6 +23,11 @@ def add_fillup(request):
             fillup.save()
             return redirect('dashboard')
 
+    elif pk is not None:
+        initial_data = {
+            'vehicle': pk
+        }
+        form = FillupForm(request.user, initial=initial_data)
     else:
         form = FillupForm(request.user)
 

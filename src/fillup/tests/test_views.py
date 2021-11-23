@@ -12,23 +12,26 @@ from manager.models import Person, Vehicle, VehicleUser
 
 
 class FillupViewsIntegrationTestCase(TestCase):
-    def setUp(self):
-        self.user = Person.objects.create_user(email='testuser@foo.bar', password='top_secret')
-        Vehicle.objects.create(name='TestRO', register_number='TEST-RO')
-        Vehicle.objects.create(name='TestDR', register_number='TEST-DR')
-        Vehicle.objects.create(name='TestOW', register_number='TEST-OW')
+    @classmethod
+    def setUpTestData(cls):
+        cls.user = Person.objects.create_user(email='testuser@foo.bar', password='top_secret')
+        cls.vehicle1 = Vehicle.objects.create(name='TestRO', register_number='TEST-RO')
+        cls.vehicle2 = Vehicle.objects.create(name='TestDR', register_number='TEST-DR')
+        cls.vehicle3 = Vehicle.objects.create(name='TestOW', register_number='TEST-OW')
         VehicleUser.objects.create(
-            person=self.user, vehicle=Vehicle.objects.get(name='TestRO'), role='RO')
+            person=cls.user, vehicle=cls.vehicle1, role='RO')
         VehicleUser.objects.create(
-            person=self.user, vehicle=Vehicle.objects.get(name='TestDR'), role='DR')
+            person=cls.user, vehicle=cls.vehicle2, role='DR')
         VehicleUser.objects.create(
-            person=self.user, vehicle=Vehicle.objects.get(name='TestOW'), role='OW')
+            person=cls.user, vehicle=cls.vehicle3, role='OW')
         Fillup.objects.create(
             price=2.013,
             amount=42,
             distance=100,
-            vehicle=Vehicle.objects.get(name='TestOW'),
+            vehicle=cls.vehicle3,
         )
+
+    def setUp(self):
         self.client = Client()
 
     def test_respond_with_200_for_url_fillup(self):
@@ -68,3 +71,77 @@ class FillupViewsIntegrationTestCase(TestCase):
             response = self.client.post('/fillup/', data=data)
 
         self.assertEqual(response.status_code, 200)
+
+    def test_respond_with_200_for_url_fillup_correct_pk(self):
+        '''Response 200 should be given on url /fillup/1'''
+        self.client.login(email='testuser@foo.bar', password='top_secret')
+
+        response = self.client.get('/fillup/1/')
+
+        self.assertEqual(response.status_code, 200)
+
+    def test_vehicle_is_preselected_on_existing_vehicle_id(self):
+        '''Vehicle should be preselected on url /fillup/<id>'''
+        self.client.login(email='testuser@foo.bar', password='top_secret')
+        expected_html = (
+            f'''<ul id="id_vehicle">
+                    <li><label for="id_vehicle_0">
+                        <input type="radio" name="vehicle" value="{self.vehicle2.id}" required id="id_vehicle_0" checked>
+                        {str(self.vehicle2)}</label>
+                    </li>
+                    <li><label for="id_vehicle_1">
+                        <input type="radio" name="vehicle" value="{self.vehicle3.id}" required id="id_vehicle_1">
+                        {str(self.vehicle3)}</label>
+                    </li>
+                </ul>
+            '''
+        )
+
+        response = self.client.get(f'/fillup/{self.vehicle2.id}/')
+
+        self.assertEqual(response.status_code, 200)
+        self.assertInHTML(expected_html, response.content.decode(), 1)
+
+    def test_vehicle_is_preselected_on_existing_vehicle_id_test_2(self):
+        '''Vehicle should be preselected on url /fillup/<id>, test 2'''
+        self.client.login(email='testuser@foo.bar', password='top_secret')
+        expected_html = (
+            f'''<ul id="id_vehicle">
+                    <li><label for="id_vehicle_0">
+                        <input type="radio" name="vehicle" value="{self.vehicle2.id}" required id="id_vehicle_0">
+                        {str(self.vehicle2)}</label>
+                    </li>
+                    <li><label for="id_vehicle_1">
+                        <input type="radio" name="vehicle" value="{self.vehicle3.id}" required id="id_vehicle_1" checked>
+                        {str(self.vehicle3)}</label>
+                    </li>
+                </ul>
+            '''
+        )
+
+        response = self.client.get(f'/fillup/{self.vehicle3.id}/')
+
+        self.assertEqual(response.status_code, 200)
+        self.assertInHTML(expected_html, response.content.decode(), 1)
+
+    def test_vehicle_is_preselected_by_default(self):
+        '''Vehicle should be preselected on url /fillup/'''
+        self.client.login(email='testuser@foo.bar', password='top_secret')
+        expected_html = (
+            f'''<ul id="id_vehicle">
+                    <li><label for="id_vehicle_0">
+                        <input type="radio" name="vehicle" value="{self.vehicle2.id}" required id="id_vehicle_0" checked>
+                        {str(self.vehicle2)}</label>
+                    </li>
+                    <li><label for="id_vehicle_1">
+                        <input type="radio" name="vehicle" value="{self.vehicle3.id}" required id="id_vehicle_1">
+                        {str(self.vehicle3)}</label>
+                    </li>
+                </ul>
+            '''
+        )
+
+        response = self.client.get('/fillup/')
+
+        self.assertEqual(response.status_code, 200)
+        self.assertInHTML(expected_html, response.content.decode(), 1)

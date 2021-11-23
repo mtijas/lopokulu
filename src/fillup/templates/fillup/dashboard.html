@@ -11,7 +11,14 @@ SPDX-License-Identifier: MIT
 {% for vehicle in vehicles %}
 <article>
   <header>
-    <h4>{{ vehicle.vehicle }}</h4>
+    <nav>
+      <ul>
+        <li><strong>{{ vehicle.vehicle }}</strong></li>
+      </ul>
+      <ul>
+        <li><a href="{% url 'add_fillup_for_vehicle' pk=vehicle.vehicle.id %}" role="button">Add fillup</a></li>
+      </ul>
+    </nav>
   </header>
   <main>
     <table>

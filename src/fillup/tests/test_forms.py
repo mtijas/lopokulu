@@ -11,23 +11,26 @@ from fillup.models import Fillup
 
 
 class FillupFormTestCase(TestCase):
-    def setUp(self):
-        self.user = Person.objects.create_user(email='testuser@foo.bar', password='top_secret')
-        Vehicle.objects.create(name='TestRO', register_number='TEST-RO')
-        Vehicle.objects.create(name='TestDR', register_number='TEST-DR')
-        Vehicle.objects.create(name='TestOW', register_number='TEST-OW')
+    @classmethod
+    def setUpTestData(cls):
+        cls.user = Person.objects.create_user(email='testuser@foo.bar', password='top_secret')
+        cls.vehicle1 = Vehicle.objects.create(name='TestRO', register_number='TEST-RO')
+        cls.vehicle2 = Vehicle.objects.create(name='TestDR', register_number='TEST-DR')
+        cls.vehicle3 = Vehicle.objects.create(name='TestOW', register_number='TEST-OW')
         VehicleUser.objects.create(
-            person=self.user, vehicle=Vehicle.objects.get(name='TestRO'), role='RO')
+            person=cls.user, vehicle=cls.vehicle1, role='RO')
         VehicleUser.objects.create(
-            person=self.user, vehicle=Vehicle.objects.get(name='TestDR'), role='DR')
+            person=cls.user, vehicle=cls.vehicle2, role='DR')
         VehicleUser.objects.create(
-            person=self.user, vehicle=Vehicle.objects.get(name='TestOW'), role='OW')
+            person=cls.user, vehicle=cls.vehicle3, role='OW')
         Fillup.objects.create(
             price=2.013,
             amount=42,
             distance=100,
-            vehicle=Vehicle.objects.get(name='TestOW'),
+            vehicle=cls.vehicle3,
         )
+
+    def setUp(self):
         self.base_form_data = {
             'price': 1,
             'amount': 1,
@@ -76,6 +79,20 @@ class FillupFormTestCase(TestCase):
         self.assertDictEqual(subset, expected)
         # Vehicle should not be found
         self.assertNotIn('vehicle', form.errors)
+
+    def test_fillup_not_allowed_for_non_existing_vehicle(self):
+        '''Fillup is not allowed for non-existing vehicle'''
+        expected = {
+            'vehicle': ['Select a valid choice. That choice is not one of the available choices.'],
+        }
+        data = self.base_form_data
+        data['vehicle'] = 543214321
+
+        form = FillupForm(self.user, data=data)
+
+        # We only want to test for expected key-value pairs
+        subset = {k:v for k, v in form.errors.items() if k in expected}
+        self.assertDictEqual(subset, expected)
 
     def test_negative_amount_not_allowed(self):
         '''Filled amount should not be negative'''
@@ -270,3 +287,92 @@ class FillupFormTestCase(TestCase):
 
         subset = {k:v for k, v in form.errors.items() if k in expected}
         self.assertDictEqual(subset, expected)
+
+    def test_vehicle_is_preselected_on_existing_vehicle_id(self):
+        '''Vehicle should be preselected on initial data'''
+        initial_data = {
+            'vehicle': self.vehicle2.id,
+        }
+        expected_html = (
+            f'''<ul id="id_vehicle">\n
+                    <li><label for="id_vehicle_0">
+                        <input type="radio" name="vehicle" value="{self.vehicle2.id}" required id="id_vehicle_0" checked>\n
+                        {str(self.vehicle2)}</label>\n\n
+                    </li>\n
+                    <li><label for="id_vehicle_1">
+                        <input type="radio" name="vehicle" value="{self.vehicle3.id}" required id="id_vehicle_1">\n
+                        {str(self.vehicle3)}</label>\n\n
+                    </li>\n
+                </ul>
+            '''
+        )
+
+        form = FillupForm(self.user, initial=initial_data)
+
+        self.assertInHTML(expected_html, str(form), 1)
+
+    def test_vehicle_is_preselected_on_existing_vehicle_id_2(self):
+        '''Vehicle should be preselected on different initial data'''
+        initial_data = {
+            'vehicle': self.vehicle3.id,
+        }
+        expected_html = (
+            f'''<ul id="id_vehicle">\n
+                    <li><label for="id_vehicle_0">
+                        <input type="radio" name="vehicle" value="{self.vehicle2.id}" required id="id_vehicle_0">\n
+                        {str(self.vehicle2)}</label>\n\n
+                    </li>\n
+                    <li><label for="id_vehicle_1">
+                        <input type="radio" name="vehicle" value="{self.vehicle3.id}" required id="id_vehicle_1" checked>\n
+                        {str(self.vehicle3)}</label>\n\n
+                    </li>\n
+                </ul>
+            '''
+        )
+
+        form = FillupForm(self.user, initial=initial_data)
+
+        self.assertInHTML(expected_html, str(form), 1)
+
+    def test_vehicle_is_not_preselected_on_non_existing_vehicle_id(self):
+        '''First vehicle should be selected on non-existing initial vehicle id'''
+        initial_data = {
+            'vehicle': 9877676,
+        }
+        expected_html = (
+            f'''<ul id="id_vehicle">
+                    <li><label for="id_vehicle_0">
+                        <input type="radio" name="vehicle" value="{self.vehicle2.id}" required id="id_vehicle_0">
+                        {str(self.vehicle2)}</label>
+                    </li>
+                    <li><label for="id_vehicle_1">
+                        <input type="radio" name="vehicle" value="{self.vehicle3.id}" required id="id_vehicle_1">
+                        {str(self.vehicle3)}</label>
+                    </li>
+                </ul>
+            '''
+        )
+
+        form = FillupForm(self.user, initial=initial_data)
+
+        self.assertInHTML(expected_html, str(form), 1)
+
+    def test_vehicle_is_preselected_without_initial_data(self):
+        '''Vehicle should be preselected without initial data'''
+        expected_html = (
+            f'''<ul id="id_vehicle">\n
+                    <li><label for="id_vehicle_0">
+                        <input type="radio" name="vehicle" value="{self.vehicle2.id}" required id="id_vehicle_0" checked>\n
+                        {str(self.vehicle2)}</label>\n\n
+                    </li>\n
+                    <li><label for="id_vehicle_1">
+                        <input type="radio" name="vehicle" value="{self.vehicle3.id}" required id="id_vehicle_1">\n
+                        {str(self.vehicle3)}</label>\n\n
+                    </li>\n
+                </ul>
+            '''
+        )
+
+        form = FillupForm(self.user)
+
+        self.assertInHTML(expected_html, str(form), 1)
