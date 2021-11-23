@@ -139,8 +139,8 @@ dmypy.json
 *.swp
 
 # Django staticfiles
-staticfiles/
-static/
+/staticfiles/
+/static/
 
 # VSCode
 .vscode/
