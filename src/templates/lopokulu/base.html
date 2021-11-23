@@ -17,21 +17,25 @@ SPDX-License-Identifier: MIT
       rel="stylesheet"
       href="https://unpkg.com/@picocss/pico@latest/css/pico.min.css"
     />
-    <link rel="stylesheet" href="{% static 'fillup/css/core.css' %}" />
+    <link rel="stylesheet" href="{% static 'lopokulu/css/core.css' %}" />
+    {% block header %} {% endblock %}
   </head>
   <body>
-    <header>
-      <nav class="container">
+      <nav id="site-header" class="container-fluid">
         <ul>
-          <li><h1>Löpökulu</h1></li>
+          <li><a href="{% url 'dashboard' %}"><strong>Löpökulu</strong></a></li>
+        </ul>
+        {% if user.is_authenticated %}
+        <ul id="main-nav">
+          <li><a class="active" href="{% url 'dashboard' %}">Dashboard</a></li>
+          <li><a href="#">Vehicles</a></li>
+          <li><a href="#">Settings</a></li>
         </ul>
         <ul>
-          {% if user.is_authenticated %}
-          <li><a href="{% url 'logout' %}" role="button">Log out</a></li>
-          {% endif %}
+          <li><a href="{% url 'logout' %}">Log out</a></li>
         </ul>
+        {% endif %}
       </nav>
-    </header>
     <main class="container">{% block content %} {% endblock %}</main>
   </body>
 </html>

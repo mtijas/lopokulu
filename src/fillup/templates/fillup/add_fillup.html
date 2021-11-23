@@ -6,7 +6,14 @@ SPDX-FileCopyrightText: 2021 Markus Murto
 SPDX-License-Identifier: MIT
 -->
 
-{% extends 'lopokulu/base.html' %} {% block content %}
+{% extends 'lopokulu/base.html' %}
+{% load static %}
+
+{% block header %}
+<link rel="stylesheet" href="{% static 'fillup/css/form.css' %}" />
+{% endblock %}
+
+{% block content %}
 <article>
   <header>
     <h2>Add fillup</h2>
