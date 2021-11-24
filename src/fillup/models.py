@@ -18,11 +18,15 @@ def validate_positive(value):
 
 class Fillup(models.Model):
     price = models.DecimalField(
-        "Price per unit", decimal_places=3, max_digits=5, validators=[validate_positive])
-    amount = models.FloatField("Total filled up amount", validators=[validate_positive])
-    distance = models.FloatField("Total odometer")
+        'Price per unit', decimal_places=3, max_digits=5, validators=[validate_positive])
+    amount = models.FloatField('Total filled up amount', validators=[validate_positive])
+    distance = models.FloatField('Total odometer')
     addition_date = models.DateTimeField(default=timezone.now)
     tank_full = models.BooleanField(default=True)
+    distance_delta = models.FloatField(
+        'Distance delta',
+        null=True
+    )
 
     vehicle = models.ForeignKey(Vehicle, on_delete=models.CASCADE)
     person = models.ForeignKey(
@@ -31,6 +35,20 @@ class Fillup(models.Model):
         blank=True,
         null=True,
     )
+
+    def calculate_distance_delta(self):
+        previous = Fillup.objects.filter(
+            vehicle_id=self.vehicle.id,
+            addition_date__lt=self.addition_date
+        ).first()
+
+        if previous is not None:
+            return round(self.distance - previous.distance, 1)
+        return self.distance
+
+    def save(self, *args, **kwargs):
+        self.distance_delta = self.calculate_distance_delta()
+        super(Fillup, self).save(*args, **kwargs)
 
     class Meta:
         ordering = ['-id']
