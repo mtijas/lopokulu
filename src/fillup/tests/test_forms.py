@@ -55,29 +55,21 @@ class FillupFormTestCase(TestCase):
 
     def test_fillup_allowed_for_vehicle_driver(self):
         '''Fillup is allowed for user with driver status on a vehicle'''
-        expected = {}
         data = self.base_form_data
         data['vehicle'] = Vehicle.objects.get(name='TestDR')
 
         form = FillupForm(self.user, data=data)
 
-        # We only want to test for expected key-value pairs
-        subset = {k:v for k, v in form.errors.items() if k in expected}
-        self.assertDictEqual(subset, expected)
         # Vehicle should not be found in errors dictionary
         self.assertNotIn('vehicle', form.errors)
 
     def test_fillup_allowed_for_vehicle_owner(self):
         '''Fillup is allowed for user with owner status on a vehicle'''
-        expected = {}
         data = self.base_form_data
         data['vehicle'] = Vehicle.objects.get(name='TestOW')
 
         form = FillupForm(self.user, data=data)
 
-        # We only want to test for expected key-value pairs
-        subset = {k:v for k, v in form.errors.items() if k in expected}
-        self.assertDictEqual(subset, expected)
         # Vehicle should not be found
         self.assertNotIn('vehicle', form.errors)
 
@@ -123,14 +115,11 @@ class FillupFormTestCase(TestCase):
 
     def test_positive_amount_is_allowed(self):
         '''Positive number allowed for filled amount'''
-        expected = {}
         data = self.base_form_data
         data['amount'] = 0.1
 
         form = FillupForm(self.user, data=data)
 
-        subset = {k:v for k, v in form.errors.items() if k in expected}
-        self.assertDictEqual(subset, expected)
         # Amount should not be found in errors dictionary
         self.assertNotIn('amount', form.errors)
 
@@ -162,14 +151,11 @@ class FillupFormTestCase(TestCase):
 
     def test_positive_price_is_allowed(self):
         '''Positive number allowed for filled price'''
-        expected = {}
         data = self.base_form_data
         data['price'] = 0.1
 
         form = FillupForm(self.user, data=data)
 
-        subset = {k:v for k, v in form.errors.items() if k in expected}
-        self.assertDictEqual(subset, expected)
         # price should not be found in errors dictionary
         self.assertNotIn('price', form.errors)
 
@@ -188,27 +174,21 @@ class FillupFormTestCase(TestCase):
 
     def test_zero_distance_is_not_allowed(self):
         '''Filled distance should not be zero'''
-        expected = {}
         data = self.base_form_data
         data['distance'] = 0
 
         form = FillupForm(self.user, data=data)
 
-        subset = {k:v for k, v in form.errors.items() if k in expected}
-        self.assertDictEqual(subset, expected)
         # distance should not be found in errors dictionary
         self.assertNotIn('distance', form.errors)
 
     def test_positive_distance_is_allowed(self):
         '''Positive number allowed for filled distance'''
-        expected = {}
         data = self.base_form_data
         data['distance'] = 0.1
 
         form = FillupForm(self.user, data=data)
 
-        subset = {k:v for k, v in form.errors.items() if k in expected}
-        self.assertDictEqual(subset, expected)
         # distance should not be found in errors dictionary
         self.assertNotIn('distance', form.errors)
 
@@ -254,26 +234,20 @@ class FillupFormTestCase(TestCase):
 
     def test_price_with_five_digits_allowed(self):
         '''Price with five digits should be allowed'''
-        expected = {}
         data = self.base_form_data
         data['price'] = 99.999
 
         form = FillupForm(self.user, data=data)
 
-        subset = {k:v for k, v in form.errors.items() if k in expected}
-        self.assertDictEqual(subset, expected)
         self.assertNotIn('price', form.errors)
 
     def test_lowest_price_of_0_001_allowed(self):
         '''Price of 0.001 should be allowed'''
-        expected = {}
         data = self.base_form_data
         data['price'] = 0.001
 
         form = FillupForm(self.user, data=data)
 
-        subset = {k:v for k, v in form.errors.items() if k in expected}
-        self.assertDictEqual(subset, expected)
         self.assertNotIn('price', form.errors)
 
     def test_price_cant_have_hundreds(self):
