@@ -41,12 +41,12 @@ SPDX-License-Identifier: MIT
         <tr>
           <td>{{ fillup.addition_date|date:'j.n G:i' }}</td>
           <td>{{ fillup.tank_full }}</td>
-          <td>{{ fillup.distance }}</td>
-          <td>{{ fillup.distance_delta }}</td>
-          <td>{{ fillup.amount }}</td>
+          <td>{{ fillup.distance }} km</td>
+          <td>{{ fillup.distance_delta }} km</td>
+          <td>{{ fillup.amount }} l</td>
           <td>TBD</td>
-          <td>{{ fillup.price }}</td>
-          <td>TBD</td>
+          <td>{{ fillup.price }} €/l</td>
+          <td>{{ fillup.total_price }} €</td>
         </tr>
         {% empty %}
         <tr>

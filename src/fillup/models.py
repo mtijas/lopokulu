@@ -10,6 +10,7 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from manager.models import Vehicle
 from manager.models import Person
+import decimal
 
 def validate_positive(value):
     if value <= 0:
@@ -25,6 +26,10 @@ class Fillup(models.Model):
     tank_full = models.BooleanField(default=True)
     distance_delta = models.FloatField(
         'Distance delta',
+        null=True
+    )
+    total_price = models.FloatField(
+        'Total price',
         null=True
     )
 
@@ -46,8 +51,13 @@ class Fillup(models.Model):
             return round(self.distance - previous.distance, 1)
         return self.distance
 
+    def calculate_total_price(self):
+        '''Calculate total price of fillup'''
+        return round(decimal.Decimal(self.amount) * self.price, 2)
+
     def save(self, *args, **kwargs):
         self.distance_delta = self.calculate_distance_delta()
+        self.total_price = self.calculate_total_price()
         super(Fillup, self).save(*args, **kwargs)
 
     class Meta:

@@ -9,6 +9,7 @@ from django.test import Client
 from fillup.forms import FillupForm
 from fillup.models import Fillup
 from manager.models import Person, Vehicle, VehicleUser
+from decimal import Decimal
 
 
 class FillupViewsIntegrationTestCase(TestCase):
@@ -25,7 +26,7 @@ class FillupViewsIntegrationTestCase(TestCase):
         VehicleUser.objects.create(
             person=cls.user, vehicle=cls.vehicle3, role='OW')
         Fillup.objects.create(
-            price=2.013,
+            price=Decimal(2.013),
             amount=42,
             distance=100,
             vehicle=cls.vehicle3,
@@ -161,7 +162,7 @@ class DashboardViewsIntegrationTestCase(TestCase):
         VehicleUser.objects.create(
             person=cls.user, vehicle=cls.vehicle3, role='OW')
         Fillup.objects.create(
-            price=2.013,
+            price=Decimal(2.013),
             amount=42,
             distance=100,
             vehicle=cls.vehicle3,

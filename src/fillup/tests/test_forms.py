@@ -8,6 +8,7 @@ from django.test import TestCase
 from fillup.forms import FillupForm
 from manager.models import Person, Vehicle, VehicleUser
 from fillup.models import Fillup
+from decimal import Decimal
 
 
 class FillupFormTestCase(TestCase):
@@ -24,7 +25,7 @@ class FillupFormTestCase(TestCase):
         VehicleUser.objects.create(
             person=cls.user, vehicle=cls.vehicle3, role='OW')
         Fillup.objects.create(
-            price=2.013,
+            price=Decimal(2.013),
             amount=42,
             distance=100,
             vehicle=cls.vehicle3,
