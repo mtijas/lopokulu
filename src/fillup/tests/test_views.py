@@ -43,11 +43,11 @@ class FillupViewsIntegrationTestCase(TestCase):
 
         self.assertEqual(response.status_code, 200)
 
-    def test_respond_with_302_for_non_logged_in_on_fillup(self):
-        '''Response 302 should be given to non-logged-in user on url /fillup/'''
+    def test_redirects_to_login_for_non_logged_in_user_on_fillup(self):
+        '''Non-logged-in users should get redirected to login on fillup view'''
         response = self.client.get('/fillup/')
 
-        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, '/accounts/login/?next=/fillup/')
 
     def test_redirect_to_dashboard_after_successful_addition(self):
         '''User should be redirected to dashboard after successful fillup addition'''
@@ -170,6 +170,12 @@ class DashboardViewsIntegrationTestCase(TestCase):
 
     def setUp(self):
         self.client = Client()
+
+    def test_redirects_to_login_for_non_logged_in_user_on_dashboard(self):
+        '''Non-logged-in users should get redirected to login on dashboard view'''
+        response = self.client.get('/dashboard/')
+
+        self.assertRedirects(response, '/accounts/login/?next=/dashboard/')
 
     def test_vehicle_has_add_fillup_btn_for_owner(self):
         '''Vehicle should have add fillup button for owner'''
