@@ -6,6 +6,7 @@
 
 from django.core.exceptions import ValidationError
 from django.db import models
+from django.db.models import Sum
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from manager.models import Vehicle
@@ -32,6 +33,10 @@ class Fillup(models.Model):
         'Total price',
         null=True
     )
+    consumption = models.FloatField(
+        'Consumption',
+        null=True
+    )
 
     vehicle = models.ForeignKey(Vehicle, on_delete=models.CASCADE)
     person = models.ForeignKey(
@@ -55,9 +60,44 @@ class Fillup(models.Model):
         '''Calculate total price of fillup'''
         return round(decimal.Decimal(self.amount) * self.price, 2)
 
+    def calculate_consumption(self):
+        '''Calculate fuel consumption from previous full fillup'''
+        if not self.tank_full:
+            return None
+
+        total_filled_amount = self.amount
+
+        previous_full_fillup = Fillup.objects.filter(
+            vehicle_id=self.vehicle.id,
+            addition_date__lt=self.addition_date,
+            tank_full=True,
+        ).first()
+
+        if previous_full_fillup is not None:
+            total_distance_delta = self.distance - previous_full_fillup.distance
+
+            if total_distance_delta <= 0:
+                return None
+
+            '''We need sum of amount from partial fillups between current and
+            previous full fillups to calculate accurate consumption'''
+            partial_filled_sum = Fillup.objects.filter(
+                vehicle_id=self.vehicle.id,
+                addition_date__lt=self.addition_date,
+                pk__gt=previous_full_fillup.id,
+            ).aggregate(sum_amount=Sum('amount'))
+
+            if partial_filled_sum['sum_amount'] is not None:
+                total_filled_amount += partial_filled_sum['sum_amount']
+
+            return total_filled_amount / total_distance_delta * 100
+
+        return None
+
     def save(self, *args, **kwargs):
         self.distance_delta = self.calculate_distance_delta()
         self.total_price = self.calculate_total_price()
+        self.consumption = self.calculate_consumption()
         super(Fillup, self).save(*args, **kwargs)
 
     class Meta:

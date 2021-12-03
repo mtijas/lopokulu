@@ -44,7 +44,11 @@ SPDX-License-Identifier: MIT
           <td>{{ fillup.distance }} km</td>
           <td>{{ fillup.distance_delta }} km</td>
           <td>{{ fillup.amount }} l</td>
-          <td>TBD</td>
+          {% if fillup.consumption != None %}
+            <td>{{ fillup.consumption|floatformat:1 }} l/100km</td>
+          {% else %}
+            <td>N/A</td>
+          {% endif %}
           <td>{{ fillup.price }} €/l</td>
           <td>{{ fillup.total_price }} €</td>
         </tr>
