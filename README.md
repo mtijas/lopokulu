@@ -145,9 +145,9 @@ $ docker-compose down
 
 ### Creating the superuser
 
-The superuser can be created with:
+The superuser can be created interactively with:
 ```
-$ docker exec -it $(basename $PWD)_lopokuluapp_1
+$ docker exec -it $(basename $PWD)_lopokuluapp_1 python3 src/manage.py createsuperuser
 ```
 
 You might want to use the literal container name here again.
