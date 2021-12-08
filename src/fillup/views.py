@@ -73,10 +73,7 @@ def vehicle(request):
     return render(request, 'fillup/vehicle.html', content)
 
 @login_required
-def single_vehicle(request, pk=None):
-    if pk is None:
-        return redirect('vehicle')
-
+def single_vehicle(request, pk):
     user = Person.objects.get(email=request.user)
 
     content = {
