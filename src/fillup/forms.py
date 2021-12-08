@@ -8,7 +8,7 @@ from django import forms
 from .models import Fillup
 from manager.models import Vehicle
 from django.core.exceptions import ValidationError, ObjectDoesNotExist
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext as _
 
 
 class FillupForm(forms.ModelForm):
