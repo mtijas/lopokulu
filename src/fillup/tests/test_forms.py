@@ -269,16 +269,16 @@ class FillupFormTestCase(TestCase):
             'vehicle': self.vehicle2.id,
         }
         expected_html = (
-            f'''<ul id="id_vehicle">\n
-                    <li><label for="id_vehicle_0">
+            f'''<div id="id_vehicle">\n
+                    <div><label for="id_vehicle_0">
                         <input type="radio" name="vehicle" value="{self.vehicle2.id}" required id="id_vehicle_0" checked>\n
                         {str(self.vehicle2)}</label>\n\n
-                    </li>\n
-                    <li><label for="id_vehicle_1">
+                    </div>\n
+                    <div><label for="id_vehicle_1">
                         <input type="radio" name="vehicle" value="{self.vehicle3.id}" required id="id_vehicle_1">\n
                         {str(self.vehicle3)}</label>\n\n
-                    </li>\n
-                </ul>
+                    </div>\n
+                </div>
             '''
         )
 
@@ -292,16 +292,16 @@ class FillupFormTestCase(TestCase):
             'vehicle': self.vehicle3.id,
         }
         expected_html = (
-            f'''<ul id="id_vehicle">\n
-                    <li><label for="id_vehicle_0">
+            f'''<div id="id_vehicle">\n
+                    <div><label for="id_vehicle_0">
                         <input type="radio" name="vehicle" value="{self.vehicle2.id}" required id="id_vehicle_0">\n
                         {str(self.vehicle2)}</label>\n\n
-                    </li>\n
-                    <li><label for="id_vehicle_1">
+                    </div>\n
+                    <div><label for="id_vehicle_1">
                         <input type="radio" name="vehicle" value="{self.vehicle3.id}" required id="id_vehicle_1" checked>\n
                         {str(self.vehicle3)}</label>\n\n
-                    </li>\n
-                </ul>
+                    </div>\n
+                </div>
             '''
         )
 
@@ -315,16 +315,16 @@ class FillupFormTestCase(TestCase):
             'vehicle': 9877676,
         }
         expected_html = (
-            f'''<ul id="id_vehicle">
-                    <li><label for="id_vehicle_0">
+            f'''<div id="id_vehicle">
+                    <div><label for="id_vehicle_0">
                         <input type="radio" name="vehicle" value="{self.vehicle2.id}" required id="id_vehicle_0">
                         {str(self.vehicle2)}</label>
-                    </li>
-                    <li><label for="id_vehicle_1">
+                    </div>
+                    <div><label for="id_vehicle_1">
                         <input type="radio" name="vehicle" value="{self.vehicle3.id}" required id="id_vehicle_1">
                         {str(self.vehicle3)}</label>
-                    </li>
-                </ul>
+                    </div>
+                </div>
             '''
         )
 
@@ -335,16 +335,16 @@ class FillupFormTestCase(TestCase):
     def test_vehicle_is_preselected_without_initial_data(self):
         '''Vehicle should be preselected without initial data'''
         expected_html = (
-            f'''<ul id="id_vehicle">\n
-                    <li><label for="id_vehicle_0">
+            f'''<div id="id_vehicle">\n
+                    <div><label for="id_vehicle_0">
                         <input type="radio" name="vehicle" value="{self.vehicle2.id}" required id="id_vehicle_0" checked>\n
                         {str(self.vehicle2)}</label>\n\n
-                    </li>\n
-                    <li><label for="id_vehicle_1">
+                    </div>\n
+                    <div><label for="id_vehicle_1">
                         <input type="radio" name="vehicle" value="{self.vehicle3.id}" required id="id_vehicle_1">\n
                         {str(self.vehicle3)}</label>\n\n
-                    </li>\n
-                </ul>
+                    </div>\n
+                </div>
             '''
         )
 

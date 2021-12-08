@@ -85,16 +85,16 @@ class FillupViewsIntegrationTestCase(TestCase):
         '''Vehicle should be preselected on url /fillup/<id>'''
         self.client.login(email='testuser@foo.bar', password='top_secret')
         expected_html = (
-            f'''<ul id="id_vehicle">
-                    <li><label for="id_vehicle_0">
+            f'''<div id="id_vehicle">
+                    <div><label for="id_vehicle_0">
                         <input type="radio" name="vehicle" value="{self.vehicle2.id}" required id="id_vehicle_0" checked>
                         {str(self.vehicle2)}</label>
-                    </li>
-                    <li><label for="id_vehicle_1">
+                    </div>
+                    <div><label for="id_vehicle_1">
                         <input type="radio" name="vehicle" value="{self.vehicle3.id}" required id="id_vehicle_1">
                         {str(self.vehicle3)}</label>
-                    </li>
-                </ul>
+                    </div>
+                </div>
             '''
         )
 
@@ -107,16 +107,16 @@ class FillupViewsIntegrationTestCase(TestCase):
         '''Vehicle should be preselected on url /fillup/<id>, test 2'''
         self.client.login(email='testuser@foo.bar', password='top_secret')
         expected_html = (
-            f'''<ul id="id_vehicle">
-                    <li><label for="id_vehicle_0">
+            f'''<div id="id_vehicle">
+                    <div><label for="id_vehicle_0">
                         <input type="radio" name="vehicle" value="{self.vehicle2.id}" required id="id_vehicle_0">
                         {str(self.vehicle2)}</label>
-                    </li>
-                    <li><label for="id_vehicle_1">
+                    </div>
+                    <div><label for="id_vehicle_1">
                         <input type="radio" name="vehicle" value="{self.vehicle3.id}" required id="id_vehicle_1" checked>
                         {str(self.vehicle3)}</label>
-                    </li>
-                </ul>
+                    </div>
+                </div>
             '''
         )
 
@@ -129,16 +129,16 @@ class FillupViewsIntegrationTestCase(TestCase):
         '''Vehicle should be preselected on url /fillup/'''
         self.client.login(email='testuser@foo.bar', password='top_secret')
         expected_html = (
-            f'''<ul id="id_vehicle">
-                    <li><label for="id_vehicle_0">
+            f'''<div id="id_vehicle">
+                    <div><label for="id_vehicle_0">
                         <input type="radio" name="vehicle" value="{self.vehicle2.id}" required id="id_vehicle_0" checked>
                         {str(self.vehicle2)}</label>
-                    </li>
-                    <li><label for="id_vehicle_1">
+                    </div>
+                    <div><label for="id_vehicle_1">
                         <input type="radio" name="vehicle" value="{self.vehicle3.id}" required id="id_vehicle_1">
                         {str(self.vehicle3)}</label>
-                    </li>
-                </ul>
+                    </div>
+                </div>
             '''
         )
 
