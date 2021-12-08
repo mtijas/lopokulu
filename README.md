@@ -201,7 +201,7 @@ Stop containers:
 $ docker-compose down
 ```
 
-Remove static files volume (you can also replace the `$(basename $PWD)`):
+Remove static files volume:
 ```
 $ docker volume rm $(basename $PWD)_staticfiles
 ```
