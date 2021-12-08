@@ -15,13 +15,24 @@ SPDX-License-Identifier: CC0-1.0
 This is a work-in-progress project to create a Django web application for
 vehicle fuel usage monitoring.
 
+## Table of contents
+
+* [Installation (for development)](#installation-for-development)
+    * [Creating the necessary files](#creating-the-necessary-files)
+        * [Docker Compose file](#docker-compose-file)
+        * [.env file](#env-file)
+        * [Nginx template](#nginx-template)
+    * [Running](#running)
+    * [Creating the superuser](#creating-the-superuser)
+* [License](#license)
+
 ## Installation (for development)
 
 The app is distributed as
 [a Docker container](https://hub.docker.com/r/mtijas/lopokulu), but requires a
 database server and a webserver.
 
-### Creating necessary files
+### Creating the necessary files
 
 Everything can be deployed with the following file and directory structure in
 your working directory (whereever its convenient or appropriate for you, for
