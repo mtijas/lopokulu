@@ -20,7 +20,7 @@
         {% if user.is_authenticated %}
         <ul id="main-nav">
           <li><a class="active" href="{% url 'dashboard' %}">Dashboard</a></li>
-          <li><a href="#">Vehicles</a></li>
+          <li><a href="{% url 'vehicle' %}">Vehicles</a></li>
           <li><a href="#">Settings</a></li>
         </ul>
         <ul>

@@ -1,0 +1,63 @@
+<!--
+SPDX-FileCopyrightText: 2021 Jani Lehtinen
+SPDX-FileCopyrightText: 2021 Markus Ijäs
+SPDX-FileCopyrightText: 2021 Markus Murto
+
+SPDX-License-Identifier: MIT
+-->
+
+{% extends 'lopokulu/base.html' %}
+{% block content %}
+<article>
+  <header>
+    <nav>
+      <ul>
+        <li><strong>{{ vehicle }}</strong></li>
+      </ul>
+      {% if vehicle in allowed_fillups %}
+      <ul>
+        <li><a href="{% url 'add_fillup_for_vehicle' pk=vehicle.id %}" role="button">Add fillup</a></li>
+      </ul>
+      {% endif %}
+    </nav>
+  </header>
+  <main>
+    <table>
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Full</th>
+          <th>Distance</th>
+          <th>Delta</th>
+          <th>Amount</th>
+          <th>Consumption</th>
+          <th>Price</th>
+          <th>Total</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for fillup in fillups %}
+        <tr>
+          <td>{{ fillup.addition_date|date:'j.n G:i' }}</td>
+          <td>{{ fillup.tank_full }}</td>
+          <td>{{ fillup.distance }} km</td>
+          <td>{{ fillup.distance_delta }} km</td>
+          <td>{{ fillup.amount }} l</td>
+          {% if fillup.consumption != None %}
+            <td>{{ fillup.consumption|floatformat:1 }} l/100km</td>
+          {% else %}
+            <td>N/A</td>
+          {% endif %}
+          <td>{{ fillup.price }} €/l</td>
+          <td>{{ fillup.total_price }} €</td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="8">No results...</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </main>
+</article>
+{% endblock %}

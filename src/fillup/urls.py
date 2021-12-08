@@ -28,4 +28,6 @@ urlpatterns = [
     path('fillup/', views.add_fillup, name='add_fillup'),
     path('fillup/<int:pk>/', views.add_fillup, name='add_fillup_for_vehicle'),
     path('dashboard/', views.dashboard, name='dashboard'),
+    path('vehicle/', views.vehicle, name='vehicle'),
+    path('vehicle/<int:pk>/', views.single_vehicle, name='single_vehicle'),
 ]

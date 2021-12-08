@@ -212,3 +212,153 @@ class DashboardViewsIntegrationTestCase(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertNotIn(needle, response.content.decode(), 1)
+
+class VehicleViewsIntegrationTestCase(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.user = Person.objects.create_user(email='testuser@foo.bar', password='top_secret')
+        cls.vehicle1 = Vehicle.objects.create(name='TestRO', register_number='TEST-RO')
+        cls.vehicle2 = Vehicle.objects.create(name='TestDR', register_number='TEST-DR')
+        cls.vehicle3 = Vehicle.objects.create(name='TestOW', register_number='TEST-OW')
+        VehicleUser.objects.create(
+            person=cls.user, vehicle=cls.vehicle1, role='RO')
+        VehicleUser.objects.create(
+            person=cls.user, vehicle=cls.vehicle2, role='DR')
+        VehicleUser.objects.create(
+            person=cls.user, vehicle=cls.vehicle3, role='OW')
+        Fillup.objects.create(
+            price=Decimal(2.013),
+            amount=42,
+            distance=100,
+            vehicle=cls.vehicle3,
+        )
+
+    def setUp(self):
+        self.client = Client()
+
+    def test_redirects_to_login_for_non_logged_in_user_on_vehicle(self):
+        '''Non-logged-in users should get redirected to login on vehicle view'''
+        response = self.client.get('/vehicle/')
+
+        self.assertRedirects(response, '/accounts/login/?next=/vehicle/')
+
+    def test_respond_with_200_for_url_vehicle(self):
+        '''Response 200 should be given on url /vehicle/'''
+        self.client.login(email='testuser@foo.bar', password='top_secret')
+
+        response = self.client.get('/vehicle/')
+
+        self.assertEqual(response.status_code, 200)
+
+    def test_vehicle_has_add_fillup_btn_for_owner(self):
+        '''Vehicle should have add fillup button for owner'''
+        self.client.login(email='testuser@foo.bar', password='top_secret')
+        expected_html = (
+            f'<a href="/fillup/{self.vehicle3.id}/" role="button">Add fillup</a>'
+        )
+
+        response = self.client.get('/vehicle/')
+
+        self.assertEqual(response.status_code, 200)
+        self.assertInHTML(expected_html, response.content.decode(), 1)
+
+    def test_vehicle_has_add_fillup_btn_for_driver(self):
+        '''Vehicle should have add fillup button for driver'''
+        self.client.login(email='testuser@foo.bar', password='top_secret')
+        expected_html = (
+            f'<a href="/fillup/{self.vehicle2.id}/" role="button">Add fillup</a>'
+        )
+
+        response = self.client.get('/vehicle/')
+
+        self.assertEqual(response.status_code, 200)
+        self.assertInHTML(expected_html, response.content.decode(), 1)
+
+    def test_vehicle_does_not_have_add_fillup_btn_for_readonly(self):
+        '''Vehicle should have add fillup button for driver'''
+        self.client.login(email='testuser@foo.bar', password='top_secret')
+        needle = (
+            f'<a href="/fillup/{self.vehicle1.id}/" role="button">Add fillup</a>'
+        )
+
+        response = self.client.get('/vehicle/')
+
+        self.assertEqual(response.status_code, 200)
+        self.assertNotIn(needle, response.content.decode(), 1)
+
+    def test_redirects_to_login_for_non_logged_in_user_on_specific_vehicle(self):
+        '''Non-logged-in users should get redirected to login on vehicle view'''
+        response = self.client.get('/vehicle/1/')
+
+        self.assertRedirects(response, '/accounts/login/?next=/vehicle/1/')
+
+    def test_respond_with_200_for_url_vehicle_single(self):
+        '''Response 200 should be given on url /vehicle/<id>'''
+        self.client.login(email='testuser@foo.bar', password='top_secret')
+
+        response = self.client.get(f'/vehicle/{self.vehicle1.id}/')
+
+        self.assertEqual(response.status_code, 200)
+
+    def test_return_404_on_incorrect_vehicle_id(self):
+        '''404 should be returned to user on missing vehicle'''
+        self.client.login(email='testuser@foo.bar', password='top_secret')
+
+        response = self.client.get('/vehicle/9999/')
+
+        self.assertEqual(response.status_code, 404)
+
+
+    def test_single_vehicle_page_has_add_fillup_btn_for_owner(self):
+        '''Single vehicle page should have add fillup button for owner'''
+        self.client.login(email='testuser@foo.bar', password='top_secret')
+        expected_html = (
+            f'<a href="/fillup/{self.vehicle3.id}/" role="button">Add fillup</a>'
+        )
+
+        response = self.client.get(f'/vehicle/{self.vehicle3.id}/')
+
+        self.assertEqual(response.status_code, 200)
+        self.assertInHTML(expected_html, response.content.decode(), 1)
+
+    def test_single_vehicle_page_has_add_fillup_btn_for_driver(self):
+        '''Single vehicle page should have add fillup button for driver'''
+        self.client.login(email='testuser@foo.bar', password='top_secret')
+        expected_html = (
+            f'<a href="/fillup/{self.vehicle2.id}/" role="button">Add fillup</a>'
+        )
+
+        response = self.client.get(f'/vehicle/{self.vehicle2.id}/')
+
+        self.assertEqual(response.status_code, 200)
+        self.assertInHTML(expected_html, response.content.decode(), 1)
+
+    def test_single_vehicle_page_does_not_have_add_fillup_btn_for_readonly(self):
+        '''Single vehicle page should have add fillup button for driver'''
+        self.client.login(email='testuser@foo.bar', password='top_secret')
+        needle = (
+            f'<a href="/fillup/{self.vehicle1.id}/" role="button">Add fillup</a>'
+        )
+
+        response = self.client.get(f'/vehicle/{self.vehicle1.id}/')
+
+        self.assertEqual(response.status_code, 200)
+        self.assertNotIn(needle, response.content.decode(), 1)
+
+    def test_fillups_listed_on_single_vehicle_page(self):
+        '''Single vehicle page should have fillups listed when there are any'''
+        self.client.login(email='testuser@foo.bar', password='top_secret')
+        needle = 'No results...'
+
+        response = self.client.get(f'/vehicle/{self.vehicle3.id}/')
+
+        self.assertNotContains(response, needle)
+
+    def test_no_fillups_listed_on_single_vehicle_page_when_empty(self):
+        '''Single vehicle page should not have fillups listed when there aren't any'''
+        self.client.login(email='testuser@foo.bar', password='top_secret')
+        needle = 'No results...'
+
+        response = self.client.get(f'/vehicle/{self.vehicle1.id}/')
+
+        self.assertContains(response, needle)

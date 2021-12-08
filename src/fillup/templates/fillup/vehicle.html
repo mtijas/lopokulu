@@ -1,0 +1,50 @@
+<!--
+SPDX-FileCopyrightText: 2021 Jani Lehtinen
+SPDX-FileCopyrightText: 2021 Markus Ijäs
+SPDX-FileCopyrightText: 2021 Markus Murto
+
+SPDX-License-Identifier: MIT
+-->
+
+{% extends 'lopokulu/base.html' %}
+{% block content %}
+<article>
+  <header>
+    <nav>
+      <ul>
+        <li><strong>Vehicles</strong></li>
+      </ul>
+    </nav>
+  </header>
+  <main>
+    <table>
+      <thead>
+        <tr>
+          <th>Register number</th>
+          <th>Name</th>
+          <th>Actions</th>
+          <th>Manage</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for vehicle in vehicles %}
+        <tr>
+          <td><a href="{% url 'single_vehicle' pk=vehicle.vehicle.id %}">{{ vehicle.vehicle.register_number }}</a></td>
+          <td><a href="{% url 'single_vehicle' pk=vehicle.vehicle.id %}">{{ vehicle.vehicle.name }}</a></td>
+          <td>
+            {% if vehicle.vehicle in allowed_fillups %}
+            <a href="{% url 'add_fillup_for_vehicle' pk=vehicle.vehicle.id %}" role="button">Add fillup</a>
+            {% endif %}
+          </td>
+          <td>Buttons</td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="4">No vehicles...</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </main>
+</article>
+{% endblock %}
