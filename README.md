@@ -17,10 +17,27 @@ vehicle fuel usage monitoring.
 
 ## Installation (for development)
 
-The app is distributed as a Docker container, but requires a database server 
-and a webserver. To deploy everything the `docker-compose.yaml` could look like
-this:
+The app is distributed as
+[a Docker container](https://hub.docker.com/r/mtijas/lopokulu), but requires a
+database server and a webserver.
 
+### Creating necessary files
+
+Everything can be deployed with the following file and directory structure in
+your working directory (whereever its convenient or appropriate for you, for
+example a subdirectory in your home directory):
+
+```
+.
+├── .env
+├── docker-compose.yml
+└── nginx-templates
+   └── default.conf.template
+```
+
+#### Docker Compose file
+
+The `docker-compose.yml` could look like this:
 ```
 version: "3"
 
@@ -58,6 +75,8 @@ volumes:
   staticfiles:
 ```
 
+#### .env file
+
 You can see from the Docker Compose file that we need to create two additional
 files. `.env` is used to declare the needed environment variables, for example
 with the following content:
@@ -77,6 +96,8 @@ NGINX_PORT=80
 ```
 
 You should at least change the `SECRET_KEY`.
+
+#### Nginx template
 
 Nginx also can be configured by writing a similar Nginx template in
 `./nginx-templates/default.conf.template` (make sure this is the directory name
@@ -105,15 +126,6 @@ server {
     }
   }
 }
-```
-
-Then your work directory should look like this:
-```
-.
-├── .env
-├── docker-compose.yml
-└── nginx-templates
-   └── default.conf.template
 ```
 
 ### Running
