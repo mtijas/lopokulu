@@ -24,6 +24,7 @@ vehicle fuel usage monitoring.
         * [Nginx template](#nginx-template)
     * [Running](#running)
     * [Creating the superuser](#creating-the-superuser)
+* [Upgrading](#upgrading)
 * [License](#license)
 
 ## Installation (for development)
@@ -148,16 +149,29 @@ Launch the containers declared in the Compose file:
 $ docker-compose up -d
 ```
 
+Docker automatically gives the container a name based on your working directory
+like `${basename $PWD}_lopokuluapp_1`. For example if your working directory
+was `lopokulu-devtest`, the container name would be
+`lopokulu-devtest_lopokuluapp_1`. You can find the container name with the
+following command:
+```
+$ docker ps | grep 'mtijas/lopokulu' | awk '{print $13}'
+```
+
+In addition to the container name, also the Docker volume names
+are automatically generated like `$(basename $PWD)_psql-data` and
+`$(basename $PWD)_staticfiles`.
+
+From here you can replace `$(basename $PWD)_lopokuluapp_1` with the literal
+container name. 
+
 Run the Django migrations:
 ```
 $ docker exec -it $(basename $PWD)_lopokuluapp_1 python3 src/manage.py migrate
 ```
 
-To replace `$(basename $PWD)_lopokuluapp_1`, you can find the literal container
+To replace , you can find the literal container
 name with:
-```
-$ docker ps | grep 'mtijas/lopokulu' | awk '{print $13}'
-```
 
 Then you can access the app in browser `http://localhost:8080/`.
 
@@ -175,7 +189,35 @@ $ docker exec -it $(basename $PWD)_lopokuluapp_1 python3 src/manage.py createsup
 
 You might want to use the literal container name here again.
 
-<!-- TODO(murtoM): add sections for app upgrading and usage -->
+## Upgrading
+
+Pull the new image:
+```
+$ docker pull mtijas/lopokulu:development
+```
+
+Stop containers:
+```
+$ docker-compose down
+```
+
+Remove static files volume (you can also replace the `$(basename $PWD)`):
+```
+$ docker volume rm $(basename $PWD)_staticfiles
+```
+
+This is needed to get the newest static files from the new image since existing
+volumes will not get pre-populated with container data at start of a container.
+
+You might want again replace `$(basename $PWD)_staticfiles` with the literal
+volume name, for example `lopokulu-devtest_staticfiles`.
+
+Then start the containers again:
+```
+$ docker-compose up
+```
+
+<!-- TODO(murtoM): add a section for app usage -->
 
 ## License
 
