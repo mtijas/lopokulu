@@ -25,6 +25,11 @@ vehicle fuel usage monitoring.
     * [Running](#running)
     * [Creating the superuser](#creating-the-superuser)
 * [Upgrading](#upgrading)
+* [Usage](#usage)
+    * [Creating additional users](#creating-additional-users)
+    * [Creating vehicles](#creating-vehicles)
+    * [Giving roles for users on vehicles](#giving-roles-for-users-on-vehicles)
+    * [Adding fillups](#adding-fillups)
 * [License](#license)
 
 ## Installation (for development)
@@ -217,8 +222,60 @@ Then start the containers again:
 $ docker-compose up
 ```
 
-<!-- TODO(murtoM): add a section for app usage -->
+## Usage
+
+### Creating additional users
+
+At the moment the additional users have to be created on the Django admin
+interface which is accessible on `http://localhost:8080/admin` when the
+container is running.
+
+Additional users can be created interactively by clicking the Add button on the
+Persons row in the admin interface. You are required to provide an email
+address and a password for each user.
+
+### Creating vehicles
+
+Creating vehicles is very similar process as creating additional users. Just
+click the Add button and type in vehicle register number and a recogniaable
+name for the vehicle.
+
+### Giving roles for users on vehicles
+
+The Löpökulu role system in nutshell is this:
+
+* Read-only (`RO`) user role on a vehicle allows the user only to view
+vehicle fillup data, but they cannot input any fillups.
+user.
+* Driver (`DR`) user role on a vehicle allows the user to view vehicle fillup
+data and add fillups for the vehicle.
+* (Not yet implemented) Owner (`OW`) user role on a vehicle will allow the user
+to view and add fillup data, and affiliate other users to the vehicle.
+
+You can add user-vehicle roles interactively by clicking the Add button on the
+admin interface Vehicle users row, and then selecting the vehicle, user and the
+desired role for the affiliation.
+
+### Adding fillups
+
+After logging in you will be redirected to the Dashboard. On the Dashboard the
+user is presented with a Add fillup button on each vehicle the user is allowed
+to add fillups. Clicking the Add fillup button brings the user to a form where
+they can input all the relevant information:
+
+* the selected vehicle
+* total odometer reading
+* total filled up amount
+* price per unit
+* and whether or not the tank was filled until it was full
+
+This data is then (after a sanity check validation) is presented on the
+Dashboard.
 
 ## License
 
-The programming code is licensed under the MIT license. The up-to-date licensing and copyright information can be found on each file's header or in a separate `.license` file. Few files' copyright information (or the lack of copyright claim) is declared in `.reuse/dep5`, for example Django model migration files.
+The programming code is licensed under the MIT license. The up-to-date
+licensing and copyright information can be found on each file's header or in a
+separate `.license` file. Few files' copyright information (or the lack of
+copyright claim) is declared in `.reuse/dep5`, for example Django model
+migration files.
