@@ -17,6 +17,7 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 
 from pathlib import Path
+from django.core.exceptions import ImproperlyConfigured
 import environ
 import os
 
@@ -36,7 +37,10 @@ SECRET_KEY = env('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env('DEBUG')
 
-ALLOWED_HOSTS = []
+try:
+    ALLOWED_HOSTS = env.list('ALLOWED_HOSTS')
+except ImproperlyConfigured:
+    ALLOWED_HOSTS = []
 
 
 # Application definition
