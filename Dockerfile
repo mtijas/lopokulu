@@ -17,8 +17,6 @@ FROM python:3.10-slim AS prebuild
     COPY requirements.production.txt .
     RUN pip install -r requirements.production.txt
 
-    COPY ./src ./src
-
 
 FROM prebuild AS development
 
@@ -27,10 +25,12 @@ FROM prebuild AS development
     COPY ./entrypoint.sh .
     RUN chmod +x ./entrypoint.sh
 
-    RUN chown -R lopokulu:lopokulu /lopokulu
-
     COPY requirements.development.txt .
     RUN pip install -r requirements.development.txt
+
+    COPY ./src ./src
+
+    RUN chown -R lopokulu:lopokulu /lopokulu
 
     USER lopokulu
 
@@ -40,6 +40,7 @@ FROM prebuild AS development
 FROM prebuild AS production
 
     COPY ./static ./static
+    COPY ./src ./src
 
     RUN chown -R lopokulu:lopokulu /lopokulu
 
