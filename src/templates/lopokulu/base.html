@@ -1,4 +1,4 @@
-{% load static %}
+{% load static fillup_extras %}
 <!DOCTYPE html>
 <html>
   <head>
@@ -13,21 +13,24 @@
     {% block header %} {% endblock %}
   </head>
   <body>
-      <nav id="site-header" class="container-fluid">
-        <ul>
-          <li><a href="{% url 'dashboard' %}"><strong>Löpökulu</strong></a></li>
-        </ul>
-        {% if user.is_authenticated %}
-        <ul id="main-nav">
-          <li><a class="active" href="{% url 'dashboard' %}">Dashboard</a></li>
-          <li><a href="{% url 'vehicle' %}">Vehicles</a></li>
-          <li><a href="#">Settings</a></li>
-        </ul>
-        <ul>
+    <nav id="site-header" class="container-fluid">
+      <ul>
+        <li><a href="{% url 'dashboard' %}"><strong>Löpökulu</strong></a></li>
+      </ul>
+      {% if user.is_authenticated %}
+      <ul id="main-nav">
+        <li>
+          <a class="{% active request 'dashboard' %}" href="{% url 'dashboard' %}">Dashboard</a>
+        </li>
+        <li>
+          <a class="{% active request 'vehicle' %}" href="{% url 'vehicle' %}">Vehicles</a>
+        </li>
+      </ul>
+      <ul>
           <li><a href="{% url 'logout' %}">Log out</a></li>
-        </ul>
-        {% endif %}
-      </nav>
+      </ul>
+      {% endif %}
+    </nav>
     <main class="container">{% block content %} {% endblock %}</main>
   </body>
 </html>

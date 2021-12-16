@@ -34,6 +34,7 @@ body {
 
 #site-header #main-nav a.active {
     background-color: var(--primary-focus);
+    color: var(--primary);
 }
 
 #site-header #main-nav li:first-child a {
