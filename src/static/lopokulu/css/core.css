@@ -12,6 +12,15 @@
     --form-element-spacing-horizontal: 0.33rem;
 }
 
+body {
+  background-image: url("/static/lopokulu/images/noisy-texture-100x100.png");
+  background-repeat: repeat;
+}
+
+#site-header {
+  background-color: #08222d;
+}
+
 #site-header #main-nav li {
     margin: 0 1px;
 }
