@@ -7,14 +7,17 @@
  */
 
 :root {
-    --spacing: 0.5rem;
-    --form-element-spacing-vertical: 0.25rem;
-    --form-element-spacing-horizontal: 0.33rem;
+  --spacing: 0.5rem;
+  --form-element-spacing-vertical: 0.25rem;
+  --form-element-spacing-horizontal: 0.33rem;
 }
 
 body {
   background-image: url("/static/lopokulu/images/noisy-texture-100x100.png");
   background-repeat: repeat;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  min-height: 100vh;
 }
 
 #site-header {
@@ -22,27 +25,41 @@ body {
 }
 
 #site-header #main-nav li {
-    margin: 0 1px;
+  margin: 0 1px;
 }
 
 #site-header #main-nav a {
-    background-color: var(--primary);
-    border-radius: 0;
-    color: var(--primary-inverse);
-    padding: calc(var(--spacing) * 0.2) calc(var(--spacing) * .3);
+  background-color: var(--primary);
+  border-radius: 0;
+  color: var(--primary-inverse);
+  padding: calc(var(--spacing) * 0.2) calc(var(--spacing) * .3);
 }
 
 #site-header #main-nav a.active {
-    background-color: var(--primary-focus);
-    color: var(--primary);
+  background-color: var(--primary-focus);
+  color: var(--primary);
 }
 
 #site-header #main-nav li:first-child a {
-    border-top-left-radius: var(--border-radius);
-    border-bottom-left-radius: var(--border-radius);
+  border-top-left-radius: var(--border-radius);
+  border-bottom-left-radius: var(--border-radius);
 }
 
 #site-header #main-nav li:last-child a {
-    border-top-right-radius: var(--border-radius);
-    border-bottom-right-radius: var(--border-radius);
+  border-top-right-radius: var(--border-radius);
+  border-bottom-right-radius: var(--border-radius);
+}
+
+body > footer {
+  background-color: #08222d;
+  bottom: 0;
+  margin-bottom: 0;
+  padding: 0;
+  text-align: center;
+}
+
+body > footer p {
+  color: #175d7a;
+  margin-bottom: calc(var(--typography-spacing-vertical) * 0.5);
+  margin-top: calc(var(--typography-spacing-vertical) * 0.5);
 }
