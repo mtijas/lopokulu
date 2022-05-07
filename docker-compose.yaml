@@ -16,7 +16,7 @@ services:
     ports:
       - 8080:8000
     volumes:
-      - ./src:/lopokulu/src/
+      - ./src:/lopokulu/src/:z
     env_file:
       - .env
     depends_on:
