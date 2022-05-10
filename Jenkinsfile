@@ -43,33 +43,31 @@ pipeline {
     }
 
     stage('Publish') {
-      steps {
-        parallel {
-          stage('Publish development') {
-            when { branch 'development' }
-            steps {
-              sh 'docker tag lopokulu mtijas/lopokulu:development'
-              withCredentials([usernamePassword(credentialsId: 'lopokuluDockerHub', passwordVariable: 'PASSWORD', usernameVariable: 'USERNAME')]) {
-                sh 'echo $PASSWORD | docker login -u $USERNAME --password-stdin'
-                sh 'docker push --all-tags mtijas/lopokulu'
-                sh 'docker logout'
-              }
+      parallel {
+        stage('Publish development') {
+          when { branch 'development' }
+          steps {
+            sh 'docker tag lopokulu mtijas/lopokulu:development'
+            withCredentials([usernamePassword(credentialsId: 'lopokuluDockerHub', passwordVariable: 'PASSWORD', usernameVariable: 'USERNAME')]) {
+              sh 'echo $PASSWORD | docker login -u $USERNAME --password-stdin'
+              sh 'docker push --all-tags mtijas/lopokulu'
+              sh 'docker logout'
             }
           }
+        }
 
-          stage('Publish production') {
-            when { 
-              branch 'main'
-              buildingTag()
-            }
-            steps {
-              sh 'docker tag lopokulu mtijas/lopokulu:latest'
-              sh 'docker tag lopokulu mtijas/lopokulu:$TAG_NAME'
-              withCredentials([usernamePassword(credentialsId: 'lopokuluDockerHub', passwordVariable: 'PASSWORD', usernameVariable: 'USERNAME')]) {
-                sh 'echo $PASSWORD | docker login -u $USERNAME --password-stdin'
-                sh 'docker push --all-tags mtijas/lopokulu'
-                sh 'docker logout'
-              }
+        stage('Publish production') {
+          when { 
+            branch 'main'
+            buildingTag()
+          }
+          steps {
+            sh 'docker tag lopokulu mtijas/lopokulu:latest'
+            sh 'docker tag lopokulu mtijas/lopokulu:$TAG_NAME'
+            withCredentials([usernamePassword(credentialsId: 'lopokuluDockerHub', passwordVariable: 'PASSWORD', usernameVariable: 'USERNAME')]) {
+              sh 'echo $PASSWORD | docker login -u $USERNAME --password-stdin'
+              sh 'docker push --all-tags mtijas/lopokulu'
+              sh 'docker logout'
             }
           }
         }
