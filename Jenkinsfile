@@ -84,26 +84,7 @@ pipeline {
           remote.identityFile = identity
           remote.passphrase = passphrase
           remote.allowAnyHosts = true
-          stage('Roll out restart on kubernetes') {
-            parallel {
-              stage('development') {
-                when { branch 'development' }
-                steps {
-                  sshCommand remote: remote, command: 'kubectl rollout restart -n lopokulu-dev deployment/app-depl'
-                }
-              }
-
-              stage('production') {
-                when { 
-                  branch 'main'
-                  buildingTag()
-                }
-                steps {
-                  sshCommand remote: remote, command: 'kubectl rollout restart -n lopokulu deployment/app-depl'
-                }
-              }
-            }
-          }
+          sshCommand remote: remote, command: 'kubectl rollout restart -n lopokulu-dev deployment/app-depl'
         }
       }
     }
