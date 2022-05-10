@@ -76,45 +76,6 @@ pipeline {
       }
     }
 
-    stage('Deploy') {
-      steps {
-        script {
-          def remote = [:]
-        }
-        remote.name = 'Löpökulu target'
-        remote.host = credentials('lopokulu-target-host')
-
-        withCredentials([sshUserPrivateKey(credentialsId: 'kube-control-ssh', keyFileVariable: 'identity', passphraseVariable: 'passphrase', usernameVariable: 'userName')]) {
-          remote.user = userName
-          remote.identityFile = identity
-          remote.passphrase = passphrase
-          remote.allowAnyHosts = true
-          stage('Roll out restart on kubernetes') {
-            steps {
-              parallel {
-                stage('development') {
-                  when { branch 'development' }
-                  steps {
-                    sshCommand remote: remote, command: 'kubectl rollout restart -n lopokulu-dev deployment/app-depl'
-                  }
-                }
-
-                stage('production') {
-                  when { 
-                    branch 'main'
-                    buildingTag()
-                  }
-                  steps {
-                    sshCommand remote: remote, command: 'kubectl rollout restart -n lopokulu deployment/app-depl'
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-
     stage('Cleanup') {
       steps {
         sh 'docker-compose -f docker-compose-testing.yaml down'
@@ -138,5 +99,6 @@ pipeline {
     POSTGRES_USER = credentials('lopokulu-postgres-user')
     POSTGRES_PASSWORD = credentials('lopokulu-postgres-password')
     SECRET_KEY = credentials('lopokulu-django-secret-key')
+    DEPLOY_TARGET = credentials('lopokulu-target-host')
   }
 }
