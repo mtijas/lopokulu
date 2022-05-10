@@ -8,14 +8,6 @@ pipeline {
   agent any
 
   stages {
-    stage('Set environment') {
-        if (env.BRANCH_NAME == 'main') {
-            echo 'Hello from main branch'
-        } else {
-            sh "echo 'Hello from ${env.BRANCH_NAME} branch!'"
-        }
-    }
-
     stage('Prepare tests') {
       steps {
         sh 'docker-compose -f docker-compose-testing.yaml up -d --build'
@@ -54,8 +46,9 @@ pipeline {
       parallel {
         stage('Tag development') {
           when { branch 'development' }
-
-          sh 'docker tag lopokulu mtijas/lopokulu:development'
+          steps {
+            sh 'docker tag lopokulu mtijas/lopokulu:development'
+          }
         }
 
         stage('Tag production') {
@@ -63,22 +56,25 @@ pipeline {
             branch 'main'
             buildingTag()
           }
-
-          sh 'docker tag lopokulu mtijas/lopokulu:latest'
-          sh 'docker tag lopokulu mtijas/lopokulu:$TAG_NAME'
+          steps {
+            sh 'docker tag lopokulu mtijas/lopokulu:latest'
+            sh 'docker tag lopokulu mtijas/lopokulu:$TAG_NAME'
+          }
         }
       }
       stage('Push to Docker Hub') {
-        withCredentials([usernamePassword(credentialsId: 'lopokuluDockerHub', passwordVariable: 'PASSWORD', usernameVariable: 'USERNAME')]) {
+        steps {
+          withCredentials([usernamePassword(credentialsId: 'lopokuluDockerHub', passwordVariable: 'PASSWORD', usernameVariable: 'USERNAME')]) {
             sh 'echo $PASSWORD | docker login -u $USERNAME --password-stdin'
             sh 'docker push --all-tags mtijas/lopokulu'
             sh 'docker logout'
           }
+        }
       }
     }
 
     stage('Deploy') {
-      node {
+      steps {
         def remote = [:]
         remote.name = 'Löpökulu target'
         remote.host = credentials('lopokulu-target-host')
@@ -92,7 +88,9 @@ pipeline {
             parallel {
               stage('development') {
                 when { branch 'development' }
-                sshCommand remote: remote, command: 'kubectl rollout restart -n lopokulu-dev deployment/app-depl'
+                steps {
+                  sshCommand remote: remote, command: 'kubectl rollout restart -n lopokulu-dev deployment/app-depl'
+                }
               }
 
               stage('production') {
@@ -100,7 +98,9 @@ pipeline {
                   branch 'main'
                   buildingTag()
                 }
-                sshCommand remote: remote, command: 'kubectl rollout restart -n lopokulu deployment/app-depl'
+                steps {
+                  sshCommand remote: remote, command: 'kubectl rollout restart -n lopokulu deployment/app-depl'
+                }
               }
             }
           }
