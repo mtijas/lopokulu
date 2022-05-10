@@ -8,6 +8,14 @@ pipeline {
   agent any
 
   stages {
+    stage('Set environment') {
+        if (env.BRANCH_NAME == 'main') {
+            echo 'Hello from main branch'
+        } else {
+            sh "echo 'Hello from ${env.BRANCH_NAME} branch!'"
+        }
+    }
+
     stage('Prepare tests') {
       steps {
         sh 'docker-compose -f docker-compose-testing.yaml up -d --build'
@@ -42,28 +50,68 @@ pipeline {
       }
     }
 
-    stage('Deliver Development') {
-      when {
-        branch 'development'
-      }
-      steps {
-        sh 'docker tag lopokulu mtijas/lopokulu:development'
+    stage('Publish') {
+      parallel {
+        stage('Tag development') {
+          when { branch 'development' }
 
-        withCredentials([usernamePassword(credentialsId: 'lopokuluDockerHub', passwordVariable: 'PASSWORD', usernameVariable: 'USERNAME')]) {
-          sh 'echo "$PASSWORD" | docker login -u $USERNAME --password-stdin'
-          sh 'docker push mtijas/lopokulu:development'
-          sh 'docker logout'
+          sh 'docker tag lopokulu mtijas/lopokulu:development'
         }
 
-        sh 'docker rmi mtijas/lopokulu:development'
+        stage('Tag production') {
+          when { 
+            branch 'main'
+            buildingTag()
+          }
+
+          sh 'docker tag lopokulu mtijas/lopokulu:latest'
+          sh 'docker tag lopokulu mtijas/lopokulu:$TAG_NAME'
+        }
+      }
+      stage('Push to Docker Hub') {
+        withCredentials([usernamePassword(credentialsId: 'lopokuluDockerHub', passwordVariable: 'PASSWORD', usernameVariable: 'USERNAME')]) {
+            sh 'echo $PASSWORD | docker login -u $USERNAME --password-stdin'
+            sh 'docker push --all-tags mtijas/lopokulu'
+            sh 'docker logout'
+          }
+      }
+    }
+
+    stage('Deploy') {
+      node {
+        def remote = [:]
+        remote.name = 'Löpökulu target'
+        remote.host = credentials('lopokulu-target-host')
+
+        withCredentials([sshUserPrivateKey(credentialsId: 'kube-control-ssh', keyFileVariable: 'identity', passphraseVariable: 'passphrase', usernameVariable: 'userName')]) {
+          remote.user = userName
+          remote.identityFile = identity
+          remote.passphrase = passphrase
+          remote.allowAnyHosts = true
+          stage('Roll out restart on kubernetes') {
+            parallel {
+              stage('development') {
+                when { branch 'development' }
+                sshCommand remote: remote, command: 'kubectl rollout restart -n lopokulu-dev deployment/app-depl'
+              }
+
+              stage('production') {
+                when { 
+                  branch 'main'
+                  buildingTag()
+                }
+                sshCommand remote: remote, command: 'kubectl rollout restart -n lopokulu deployment/app-depl'
+              }
+            }
+          }
+        }
       }
     }
 
     stage('Cleanup') {
       steps {
         sh 'docker-compose -f docker-compose-testing.yaml down'
-        sh 'docker rmi lopokulu'
-        sh 'docker rmi lopokulu:testing'
+        sh 'docker system prune -a -f --volumes'
       }
     }
   }
