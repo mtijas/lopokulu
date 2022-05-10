@@ -45,14 +45,19 @@ pipeline {
     stage('Publish') {
       steps {
         parallel {
-          stage('Tag development') {
+          stage('Publish development') {
             when { branch 'development' }
             steps {
               sh 'docker tag lopokulu mtijas/lopokulu:development'
+              withCredentials([usernamePassword(credentialsId: 'lopokuluDockerHub', passwordVariable: 'PASSWORD', usernameVariable: 'USERNAME')]) {
+                sh 'echo $PASSWORD | docker login -u $USERNAME --password-stdin'
+                sh 'docker push --all-tags mtijas/lopokulu'
+                sh 'docker logout'
+              }
             }
           }
 
-          stage('Tag production') {
+          stage('Publish production') {
             when { 
               branch 'main'
               buildingTag()
@@ -60,15 +65,11 @@ pipeline {
             steps {
               sh 'docker tag lopokulu mtijas/lopokulu:latest'
               sh 'docker tag lopokulu mtijas/lopokulu:$TAG_NAME'
-            }
-          }
-        }
-        stage('Push to Docker Hub') {
-          steps {
-            withCredentials([usernamePassword(credentialsId: 'lopokuluDockerHub', passwordVariable: 'PASSWORD', usernameVariable: 'USERNAME')]) {
-              sh 'echo $PASSWORD | docker login -u $USERNAME --password-stdin'
-              sh 'docker push --all-tags mtijas/lopokulu'
-              sh 'docker logout'
+              withCredentials([usernamePassword(credentialsId: 'lopokuluDockerHub', passwordVariable: 'PASSWORD', usernameVariable: 'USERNAME')]) {
+                sh 'echo $PASSWORD | docker login -u $USERNAME --password-stdin'
+                sh 'docker push --all-tags mtijas/lopokulu'
+                sh 'docker logout'
+              }
             }
           }
         }
@@ -77,7 +78,9 @@ pipeline {
 
     stage('Deploy') {
       steps {
-        def remote = [:]
+        script {
+          def remote = [:]
+        }
         remote.name = 'Löpökulu target'
         remote.host = credentials('lopokulu-target-host')
 
