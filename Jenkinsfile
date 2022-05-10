@@ -43,31 +43,33 @@ pipeline {
     }
 
     stage('Publish') {
-      parallel {
-        stage('Tag development') {
-          when { branch 'development' }
-          steps {
-            sh 'docker tag lopokulu mtijas/lopokulu:development'
+      steps {
+        parallel {
+          stage('Tag development') {
+            when { branch 'development' }
+            steps {
+              sh 'docker tag lopokulu mtijas/lopokulu:development'
+            }
           }
-        }
 
-        stage('Tag production') {
-          when { 
-            branch 'main'
-            buildingTag()
-          }
-          steps {
-            sh 'docker tag lopokulu mtijas/lopokulu:latest'
-            sh 'docker tag lopokulu mtijas/lopokulu:$TAG_NAME'
+          stage('Tag production') {
+            when { 
+              branch 'main'
+              buildingTag()
+            }
+            steps {
+              sh 'docker tag lopokulu mtijas/lopokulu:latest'
+              sh 'docker tag lopokulu mtijas/lopokulu:$TAG_NAME'
+            }
           }
         }
-      }
-      stage('Push to Docker Hub') {
-        steps {
-          withCredentials([usernamePassword(credentialsId: 'lopokuluDockerHub', passwordVariable: 'PASSWORD', usernameVariable: 'USERNAME')]) {
-            sh 'echo $PASSWORD | docker login -u $USERNAME --password-stdin'
-            sh 'docker push --all-tags mtijas/lopokulu'
-            sh 'docker logout'
+        stage('Push to Docker Hub') {
+          steps {
+            withCredentials([usernamePassword(credentialsId: 'lopokuluDockerHub', passwordVariable: 'PASSWORD', usernameVariable: 'USERNAME')]) {
+              sh 'echo $PASSWORD | docker login -u $USERNAME --password-stdin'
+              sh 'docker push --all-tags mtijas/lopokulu'
+              sh 'docker logout'
+            }
           }
         }
       }
@@ -84,7 +86,28 @@ pipeline {
           remote.identityFile = identity
           remote.passphrase = passphrase
           remote.allowAnyHosts = true
-          sshCommand remote: remote, command: 'kubectl rollout restart -n lopokulu-dev deployment/app-depl'
+          stage('Roll out restart on kubernetes') {
+            steps {
+              parallel {
+                stage('development') {
+                  when { branch 'development' }
+                  steps {
+                    sshCommand remote: remote, command: 'kubectl rollout restart -n lopokulu-dev deployment/app-depl'
+                  }
+                }
+
+                stage('production') {
+                  when { 
+                    branch 'main'
+                    buildingTag()
+                  }
+                  steps {
+                    sshCommand remote: remote, command: 'kubectl rollout restart -n lopokulu deployment/app-depl'
+                  }
+                }
+              }
+            }
+          }
         }
       }
     }
