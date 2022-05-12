@@ -83,7 +83,7 @@ pipeline {
               def remote = [:]
               remote.name = 'Löpökulu target'
               remote.host = credentials('lopokulu-target-host')
-              withCredentials([sshUserPrivateKey(credentialsId: 'ansible-jenkins-k8s', keyFileVariable: 'identity', passphraseVariable: 'passphrase', usernameVariable: 'userName')]) {
+              withCredentials([sshUserPrivateKey(credentialsId: 'ansible-jenkins', keyFileVariable: 'identity', passphraseVariable: 'passphrase', usernameVariable: 'userName')]) {
                 remote.user = userName
                 remote.identityFile = identity
                 remote.passphrase = passphrase
@@ -104,7 +104,7 @@ pipeline {
               def remote = [:]
               remote.name = 'Löpökulu target'
               remote.host = credentials('lopokulu-target-host')
-              withCredentials([sshUserPrivateKey(credentialsId: 'ansible-jenkins-k8s', keyFileVariable: 'identity', passphraseVariable: 'passphrase', usernameVariable: 'userName')]) {
+              withCredentials([sshUserPrivateKey(credentialsId: 'ansible-jenkins', keyFileVariable: 'identity', passphraseVariable: 'passphrase', usernameVariable: 'userName')]) {
                 remote.user = userName
                 remote.identityFile = identity
                 remote.passphrase = passphrase
