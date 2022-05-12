@@ -33,6 +33,7 @@ body {
   border-radius: 0;
   color: var(--primary-inverse);
   padding: calc(var(--spacing) * 0.2) calc(var(--spacing) * .3);
+  --spacing: 1em;
 }
 
 #site-header #main-nav a.active {
