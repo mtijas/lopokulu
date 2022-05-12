@@ -76,13 +76,13 @@ pipeline {
 
     stage('Deploy') {
       parallel {
-        stage('Publish development') {
+        stage('Deploy development') {
           when { branch 'development' }
           steps {
             script {
               def remote = [:]
               remote.name = 'Löpökulu target'
-              remote.host = credentials('lopokulu-target-host')
+              remote.host = DEPLOY_TARGET
               withCredentials([sshUserPrivateKey(credentialsId: 'ansible-jenkins', keyFileVariable: 'identity', passphraseVariable: 'passphrase', usernameVariable: 'userName')]) {
                 remote.user = userName
                 remote.identityFile = identity
@@ -94,7 +94,7 @@ pipeline {
           }
         }
 
-        stage('Publish production') {
+        stage('Deploy production') {
           when { 
             branch 'main'
             buildingTag()
@@ -103,7 +103,7 @@ pipeline {
             script {
               def remote = [:]
               remote.name = 'Löpökulu target'
-              remote.host = credentials('lopokulu-target-host')
+              remote.host = DEPLOY_TARGET
               withCredentials([sshUserPrivateKey(credentialsId: 'ansible-jenkins', keyFileVariable: 'identity', passphraseVariable: 'passphrase', usernameVariable: 'userName')]) {
                 remote.user = userName
                 remote.identityFile = identity
