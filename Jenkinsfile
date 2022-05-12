@@ -74,6 +74,49 @@ pipeline {
       }
     }
 
+    stage('Deploy') {
+      parallel {
+        stage('Publish development') {
+          when { branch 'development' }
+          steps {
+            script {
+              def remote = [:]
+              remote.name = 'Löpökulu target'
+              remote.host = credentials('lopokulu-target-host')
+              withCredentials([sshUserPrivateKey(credentialsId: 'kube-control-ssh', keyFileVariable: 'identity', passphraseVariable: 'passphrase', usernameVariable: 'userName')]) {
+                remote.user = userName
+                remote.identityFile = identity
+                remote.passphrase = passphrase
+                remote.allowAnyHosts = true
+                sshCommand remote: remote, command: 'kubectl rollout restart -n lopokulu-dev deployment/app-depl'
+              }
+            }
+          }
+        }
+
+        stage('Publish production') {
+          when { 
+            branch 'main'
+            buildingTag()
+          }
+          steps {
+            script {
+              def remote = [:]
+              remote.name = 'Löpökulu target'
+              remote.host = credentials('lopokulu-target-host')
+              withCredentials([sshUserPrivateKey(credentialsId: 'kube-control-ssh', keyFileVariable: 'identity', passphraseVariable: 'passphrase', usernameVariable: 'userName')]) {
+                remote.user = userName
+                remote.identityFile = identity
+                remote.passphrase = passphrase
+                remote.allowAnyHosts = true
+                sshCommand remote: remote, command: 'kubectl rollout restart -n lopokulu deployment/app-depl'
+              }
+            }
+          }
+        }
+      }
+    }
+
     stage('Cleanup') {
       steps {
         sh 'docker-compose -f docker-compose-testing.yaml down'
