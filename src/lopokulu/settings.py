@@ -55,6 +55,8 @@ INSTALLED_APPS = [
     'django_probes',
     'fillup',
     'manager',
+    'equipment',
+    'measurements',
 ]
 
 MIDDLEWARE = [

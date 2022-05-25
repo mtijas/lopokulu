@@ -1,0 +1,18 @@
+{% extends 'lopokulu/base.html' %}
+{% block content %}
+<article>
+  <header>
+    <nav>
+      <ul>
+        <li><strong>Add new equipment</strong></li>
+      </ul>
+    </nav>
+  </header>
+  <main>
+    <form action="/equipment/add/" method="post">
+      {% csrf_token %} {{ form.as_p }}
+      <input type="submit" value="Add equipment" />
+    </form>
+  </main>
+</article>
+{% endblock %}

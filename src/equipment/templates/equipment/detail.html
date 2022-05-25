@@ -1,0 +1,52 @@
+{% extends 'lopokulu/base.html' %}
+{% block content %}
+<article>
+  <header>
+    <nav>
+      <ul>
+        <li><strong>{{ equipment }}</strong></li>
+      </ul>
+    </nav>
+  </header>
+  <main>
+    <p>{{ equipment.name }}</p>
+    <h6>Permissions</h6>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          {% for role in roles %}
+            <th>{{ role.label }}</th>
+          {% endfor %}
+          <th>No access</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for user in users %}
+          <tr>
+            <td>
+              {{ user.person }}
+            </td>
+            {% for role in roles %}
+              <td>
+                {% if role == user.role %}
+                  YES
+                {% else %}
+                  NO
+                {% endif %}
+              </td>
+            {% endfor %}
+            <td>
+              No Access
+            </td>
+          </tr>
+        {% empty %}
+          <tr>
+            <td colspan="5">Nobody has access...</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </main>
+</article>
+{% endblock %}

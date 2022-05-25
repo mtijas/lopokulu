@@ -1,0 +1,41 @@
+{% extends 'lopokulu/base.html' %}
+{% block content %}
+<article>
+  <header>
+    <nav>
+      <ul>
+        <li><strong>Equipment</strong></li>
+      </ul>
+    </nav>
+  </header>
+  <main>
+    <table>
+      <thead>
+        <tr>
+          <th>Register number</th>
+          <th>Name</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for equipment in equipment_list %}
+        <tr>
+          <td><a href="{% url 'equipment:detail' pk=equipment.id %}">{{ equipment.register_number }}</a></td>
+          <td><a href="{% url 'equipment:detail' pk=equipment.id %}">{{ equipment.name }}</a></td>
+          <td>
+
+          </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="3">No equipment...</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    <p>
+      <a href="{% url 'equipment:add' %}" role="button">Add new equipment</a>
+    </p>
+  </main>
+</article>
+{% endblock %}

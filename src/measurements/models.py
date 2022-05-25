@@ -1,0 +1,21 @@
+# SPDX-FileCopyrightText: 2022 Markus Ijäs
+#
+# SPDX-License-Identifier: MIT
+
+from django.db import models
+from django.utils import timezone
+from django.utils.translation import gettext_lazy as _
+from equipment.models import Equipment
+from manager.models import Person
+
+
+class Measurement(models.Model):
+    addition_date = models.DateTimeField(default=timezone.now)
+    measurement = models.JSONField()
+    equipment = models.ForeignKey(Equipment, on_delete=models.CASCADE)
+    measurer = models.ForeignKey(
+        Person,
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True,
+    )

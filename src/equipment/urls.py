@@ -1,10 +1,8 @@
-# SPDX-FileCopyrightText: 2021 Jani Lehtinen
-# SPDX-FileCopyrightText: 2021 Markus Ijäs
-# SPDX-FileCopyrightText: 2021 Markus Murto
+# SPDX-FileCopyrightText: 2022 Markus Ijäs
 #
 # SPDX-License-Identifier: MIT
 
-"""lopokulu URL Configuration
+"""fillup URL Configuration
 
 The `urlpatterns` list routes URLs to views. For more information please see:
     https://docs.djangoproject.com/en/3.2/topics/http/urls/
@@ -20,14 +18,12 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path, include
-from django.contrib.auth import views
+from django.urls import path
+from equipment.views import EquipmentListView, EquipmentDetailView, EquipmentAddView
 
-
+app_name = 'equipment'
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('accounts/login/', views.LoginView.as_view(), name='login'),
-    path('accounts/logout/', views.LogoutView.as_view(), name='logout'),
-    path('', include('fillup.urls')),
-    path('', include('equipment.urls')),
+    path('equipment/', EquipmentListView.as_view(), name='index'),
+    path('equipment/<int:pk>/', EquipmentDetailView.as_view(), name='detail'),
+    path('equipment/add/', EquipmentAddView.as_view(), name='add'),
 ]
