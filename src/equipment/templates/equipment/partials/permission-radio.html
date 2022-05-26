@@ -1,12 +1,12 @@
 {% load lopokulu_extras %}
-<h6>Permissions</h6>
+<h6>Measurement roles</h6>
 <table>
   <thead>
     <tr>
       <th>Name</th>
-      <th>No access</th>
+      <th class="center">No access</th>
       {% for role in roles %}
-      <th>{{ role.label }}</th>
+      <th class="center">{{ role.label }}</th>
       {% endfor %}
     </tr>
   </thead>
@@ -14,7 +14,7 @@
     {% for user in users %}
     <tr>
       <td>{{ user }}</td>
-      <td>
+      <td class="center">
         <input
           type="radio"
           id="{{ user.id }}-NOACCESS"
@@ -24,7 +24,7 @@
         />
       </td>
       {% for role in roles %}
-      <td>
+      <td class="center">
         <input
           type="radio"
           id="{{ user.id }}-{{ role.name }}"
