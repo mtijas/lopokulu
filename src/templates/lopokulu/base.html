@@ -1,4 +1,4 @@
-{% load static fillup_extras %}
+{% load static lopokulu_extras %}
 <!DOCTYPE html>
 <html>
   <head>
@@ -15,13 +15,10 @@
   <body>
     <nav id="site-header" class="container-fluid">
       <ul>
-        <li><a href="{% url 'dashboard' %}"><strong>Löpökulu</strong></a></li>
+        <li><a href="{% url 'equipment:index' %}"><strong>Löpökulu</strong></a></li>
       </ul>
       {% if user.is_authenticated %}
       <ul id="main-nav">
-        <li>
-          <a class="{% active request 'dashboard' %}" href="{% url 'dashboard' %}">Dashboard</a>
-        </li>
         <li>
           <a class="{% active request 'equipment' %}" href="{% url 'equipment:index' %}">Equipment</a>
         </li>

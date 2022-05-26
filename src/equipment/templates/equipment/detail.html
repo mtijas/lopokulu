@@ -18,27 +18,21 @@
           {% for role in roles %}
             <th>{{ role.label }}</th>
           {% endfor %}
-          <th>No access</th>
         </tr>
       </thead>
       <tbody>
-        {% for user in users %}
+        {% for user in equipment_users %}
           <tr>
             <td>
-              {{ user.person }}
+              {{ user.user }}
             </td>
             {% for role in roles %}
               <td>
                 {% if role == user.role %}
-                  YES
-                {% else %}
-                  NO
+                  &check;
                 {% endif %}
               </td>
             {% endfor %}
-            <td>
-              No Access
-            </td>
           </tr>
         {% empty %}
           <tr>

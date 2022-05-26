@@ -8,7 +8,7 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
-from manager.models import Person
+from django.contrib.auth.models import User
 
 
 class Equipment(models.Model):
@@ -23,14 +23,14 @@ class Equipment(models.Model):
 
 class EquipmentUser(models.Model):
     equipment = models.ForeignKey(Equipment, on_delete=models.CASCADE)
-    person = models.ForeignKey(Person, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
 
     class Role(models.TextChoices):
-        READ_ONLY = 'READONLY', _('Read only')
+        READ_ONLY = 'READ_ONLY', _('Read only')
         USER = 'USER', _('User')
         ADMIN = 'ADMIN', _('Administrator')
     role = models.CharField(
         max_length=32, choices=Role.choices, default=Role.READ_ONLY)
 
     def __str__(self):
-        return f'{self.equipment.name} has {self.role} person {self.person}'
+        return f'{self.equipment.name} has {self.role} user {self.user}'

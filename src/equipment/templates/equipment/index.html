@@ -23,7 +23,12 @@
           <td><a href="{% url 'equipment:detail' pk=equipment.id %}">{{ equipment.register_number }}</a></td>
           <td><a href="{% url 'equipment:detail' pk=equipment.id %}">{{ equipment.name }}</a></td>
           <td>
-
+            {% if perms.equipment.edit_equipment %}
+            <a href="{% url 'equipment:edit' pk=equipment.id %}" role="button">Edit</a>
+            {% endif %}
+            {% if perms.equipment.delete_equipment %}
+            <a href="{% url 'equipment:edit' pk=equipment.id %}" class="secondary">Delete</a>
+            {% endif %}
           </td>
         </tr>
         {% empty %}
@@ -33,9 +38,11 @@
         {% endfor %}
       </tbody>
     </table>
+    {% if perms.equipment.add_equipment %}
     <p>
       <a href="{% url 'equipment:add' %}" role="button">Add new equipment</a>
     </p>
+    {% endif %}
   </main>
 </article>
 {% endblock %}

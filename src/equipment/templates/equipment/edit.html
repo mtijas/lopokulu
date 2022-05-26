@@ -3,15 +3,15 @@
   <header>
     <nav>
       <ul>
-        <li><strong>Add new equipment</strong></li>
+        <li><strong>Edit {{ equipment.name }}</strong></li>
       </ul>
     </nav>
   </header>
   <main>
-    <form action="/equipment/add/" method="post">
+    <form action="/equipment/{{ equipment.id }}/edit/" method="post">
       {% csrf_token %} {{ form.as_p }}
       {% include 'equipment/partials/permission-radio.html' %}
-      <input type="submit" value="Add equipment" />
+      <input type="submit" value="Save" />
     </form>
   </main>
 </article>

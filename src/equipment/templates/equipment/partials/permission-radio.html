@@ -1,0 +1,42 @@
+{% load lopokulu_extras %}
+<h6>Permissions</h6>
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>No access</th>
+      {% for role in roles %}
+      <th>{{ role.label }}</th>
+      {% endfor %}
+    </tr>
+  </thead>
+  <tbody>
+    {% for user in users %}
+    <tr>
+      <td>{{ user }}</td>
+      <td>
+        <input
+          type="radio"
+          id="{{ user.id }}-NOACCESS"
+          name="perm-{{ user.id }}"
+          value="NOACCESS"
+          {% if user.id not in equipment_users %}checked{% endif %}
+        />
+      </td>
+      {% for role in roles %}
+      <td>
+        <input
+          type="radio"
+          id="{{ user.id }}-{{ role.name }}"
+          name="perm-{{ user.id }}"
+          value="{{ role.name }}"
+          {% if equipment_users|get_dict_value:user.id == role.name %}
+            checked
+          {% endif %}
+        />
+      </td>
+      {% endfor %}
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>

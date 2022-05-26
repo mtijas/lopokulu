@@ -1,5 +1,5 @@
 # SPDX-FileCopyrightText: 2021 Jani Lehtinen
-# SPDX-FileCopyrightText: 2021 Markus Ijäs
+# SPDX-FileCopyrightText: 2022 Markus Ijäs
 # SPDX-FileCopyrightText: 2021 Markus Murto
 #
 # SPDX-License-Identifier: MIT
@@ -14,3 +14,7 @@ def active(request, pattern):
     if re.search(f'^\/{pattern}', request.path):
         return 'active'
     return ''
+
+@register.filter
+def get_dict_value(dictionary, key):
+    return dictionary.get(key)

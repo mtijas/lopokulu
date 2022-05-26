@@ -53,8 +53,6 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django_probes',
-    'fillup',
-    'manager',
     'equipment',
     'measurements',
 ]
@@ -77,6 +75,9 @@ TEMPLATES = [
         'DIRS': [(os.path.join(BASE_DIR, 'templates')), ],
         'APP_DIRS': True,
         'OPTIONS': {
+            'libraries': {
+                'lopokulu_extras': 'lopokulu.templatetags.lopokulu_extras',
+            },
             'context_processors': [
                 'django.template.context_processors.debug',
                 'django.template.context_processors.request',
@@ -155,6 +156,5 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # Redirect to the login page after logout
 
 LOGOUT_REDIRECT_URL = 'login'
-LOGIN_REDIRECT_URL = '/dashboard'
+LOGIN_REDIRECT_URL = '/equipment'
 
-AUTH_USER_MODEL = 'manager.Person'

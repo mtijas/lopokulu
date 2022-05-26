@@ -6,7 +6,7 @@ from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from equipment.models import Equipment
-from manager.models import Person
+from django.contrib.auth.models import User
 
 
 class Measurement(models.Model):
@@ -14,7 +14,7 @@ class Measurement(models.Model):
     measurement = models.JSONField()
     equipment = models.ForeignKey(Equipment, on_delete=models.CASCADE)
     measurer = models.ForeignKey(
-        Person,
+        User,
         on_delete=models.SET_NULL,
         blank=True,
         null=True,

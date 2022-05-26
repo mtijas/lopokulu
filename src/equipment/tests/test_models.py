@@ -7,7 +7,7 @@
 from django.test import TestCase
 from equipment.models import Equipment
 from equipment.models import EquipmentUser
-from manager.models import Person
+from django.contrib.auth.models import User
 
 
 class EquipmentModelTestCase(TestCase):
@@ -25,40 +25,40 @@ class EquipmentUserTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
         equipment = Equipment.objects.create(register_number='TE-1', name='TEST EQUIPMENT')
-        person = Person.objects.create(email='person@foo.bar')
-        EquipmentUser.objects.create(equipment=equipment, person=person)
+        user = User.objects.create(username='user@foo.bar')
+        EquipmentUser.objects.create(equipment=equipment, user=user)
 
     def test_default_role_is_READONLY(self):
-        '''Default role should be READONLY when attaching Person to Equipment'''
+        '''Default role should be READONLY when attaching User to Equipment'''
         equipment = Equipment.objects.get(register_number='TE-1')
-        person = Person.objects.get(email='person@foo.bar')
-        equipment_user = EquipmentUser.objects.get(equipment=equipment.id, person=person.id)
+        user = User.objects.get(username='user@foo.bar')
+        equipment_user = EquipmentUser.objects.get(equipment=equipment.id, user=user.id)
 
-        self.assertEqual(equipment_user.role, 'READONLY')
+        self.assertEqual(equipment_user.role, 'READ_ONLY')
 
     def test_role_USER_is_assignable(self):
         '''EquipmentUser should have role USER assignable'''
         equipment = Equipment.objects.get(register_number='TE-1')
-        person = Person.objects.get(email='person@foo.bar')
+        user = User.objects.get(username='user@foo.bar')
         equipment_user = EquipmentUser.objects.create(
-            equipment=equipment, person=person, role='USER')
+            equipment=equipment, user=user, role='USER')
 
         self.assertEqual(equipment_user.role, 'USER')
 
     def test_role_ADMIN_is_assignable(self):
         '''EquipmentUser should have role ADMIN assignable'''
         equipment = Equipment.objects.get(register_number='TE-1')
-        person = Person.objects.get(email='person@foo.bar')
+        user = User.objects.get(username='user@foo.bar')
         equipment_user = EquipmentUser.objects.create(
-            equipment=equipment, person=person, role='ADMIN')
+            equipment=equipment, user=user, role='ADMIN')
 
         self.assertEqual(equipment_user.role, 'ADMIN')
 
     def test_str_outputs_correctly(self):
         '''EquipmentUser __str__ should output correctly'''
         equipment = Equipment.objects.get(register_number='TE-1')
-        person = Person.objects.get(email='person@foo.bar')
-        equipment_user = EquipmentUser.objects.get(equipment=equipment.id, person=person.id)
-        expected = f'TEST EQUIPMENT has READONLY person {person}'
+        user = User.objects.get(username='user@foo.bar')
+        equipment_user = EquipmentUser.objects.get(equipment=equipment.id, user=user.id)
+        expected = f'TEST EQUIPMENT has READ_ONLY user {user}'
 
         self.assertEqual(str(equipment_user), expected)
