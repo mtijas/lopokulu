@@ -5,6 +5,14 @@
     <nav>
       <ul>
         <li><strong>{{ equipment }}</strong></li>
+        {% if perms.equipment.edit_equipment %}
+      </ul>
+      <ul>
+        <li><a href="{% url 'equipment:edit' pk=equipment.id %}" role="button">Edit</a></li>
+        {% endif %}
+        {% if perms.equipment.delete_equipment %}
+        <li><a href="{% url 'equipment:delete' pk=equipment.id %}" class="secondary">Delete</a></li>
+        {% endif %}
       </ul>
     </nav>
   </header>
