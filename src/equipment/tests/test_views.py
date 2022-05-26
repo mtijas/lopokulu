@@ -357,6 +357,7 @@ class EquipmentViewsIntegrationTestCase(TestCase):
     # @TODO: Test for add and edit buttons in index and detail views (permissions)
     # @TODO: Test role edit permissions on edit form
     # @TODO: Test role edit permissions on edit and add views
+    # @TODO: Test deletions
 
     def create_dummy_equipment_users(self, equipment):
         """Create dummy equipment users for equipment"""

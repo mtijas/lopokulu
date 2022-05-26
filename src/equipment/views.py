@@ -94,6 +94,15 @@ class EquipmentEditView(PermissionRequiredMixin, View):
 
         return render(request, self.template_name, {'form': form})
 
+@method_decorator(login_required, name='dispatch')
+class EquipmentDeleteView(PermissionRequiredMixin, View):
+    model = Equipment
+    permission_required = 'equipment.delete_equipment'
+
+    def get(self, request, **kwargs):
+        Equipment.objects.get(id=kwargs.get('pk')).delete()
+        return redirect('equipment:index')
+
 
 def update_measurement_roles(request, equipment):
     # Clear old permissions as we will write them all for current Equipment

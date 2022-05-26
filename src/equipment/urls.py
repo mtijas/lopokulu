@@ -21,12 +21,13 @@ from django.contrib import admin
 from django.urls import path
 
 from equipment.views import (EquipmentAddView, EquipmentDetailView, EquipmentEditView,
-                             EquipmentListView)
+                             EquipmentListView, EquipmentDeleteView)
 
 app_name = 'equipment'
 urlpatterns = [
     path('', EquipmentListView.as_view(), name='index'),
     path('<int:pk>/', EquipmentDetailView.as_view(), name='detail'),
     path('<int:pk>/edit/', EquipmentEditView.as_view(), name='edit'),
+    path('<int:pk>/delete/', EquipmentDeleteView.as_view(), name='delete'),
     path('add/', EquipmentAddView.as_view(), name='add'),
 ]
