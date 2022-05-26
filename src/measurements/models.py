@@ -12,6 +12,7 @@ from django.contrib.auth.models import User
 class Measurement(models.Model):
     addition_date = models.DateTimeField(default=timezone.now)
     measurement = models.JSONField()
+    measurement_type = models.CharField(max_length=64, default='BaseMeasurement')
     equipment = models.ForeignKey(Equipment, on_delete=models.CASCADE)
     measurer = models.ForeignKey(
         User,

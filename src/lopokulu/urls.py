@@ -1,5 +1,5 @@
 # SPDX-FileCopyrightText: 2021 Jani Lehtinen
-# SPDX-FileCopyrightText: 2021 Markus Ijäs
+# SPDX-FileCopyrightText: 2022 Markus Ijäs
 # SPDX-FileCopyrightText: 2021 Markus Murto
 #
 # SPDX-License-Identifier: MIT
@@ -29,4 +29,5 @@ urlpatterns = [
     path('accounts/login/', views.LoginView.as_view(), name='login'),
     path('accounts/logout/', views.LogoutView.as_view(), name='logout'),
     path('equipment/', include('equipment.urls')),
+    path('measurements/', include('measurements.urls')),
 ]

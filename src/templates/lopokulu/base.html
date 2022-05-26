@@ -22,6 +22,9 @@
         <li>
           <a class="{% active request 'equipment' %}" href="{% url 'equipment:index' %}">Equipment</a>
         </li>
+        <li>
+          <a class="{% active request 'measurements' %}" href="{% url 'measurements:index' %}">Measurements</a>
+        </li>
       </ul>
       <ul>
           <li><a href="{% url 'logout' %}">Log out</a></li>
