@@ -23,7 +23,7 @@ from equipment.views import EquipmentListView, EquipmentDetailView, EquipmentAdd
 
 app_name = 'equipment'
 urlpatterns = [
-    path('equipment/', EquipmentListView.as_view(), name='index'),
-    path('equipment/<int:pk>/', EquipmentDetailView.as_view(), name='detail'),
-    path('equipment/add/', EquipmentAddView.as_view(), name='add'),
+    path('', EquipmentListView.as_view(), name='index'),
+    path('<int:pk>/', EquipmentDetailView.as_view(), name='detail'),
+    path('add/', EquipmentAddView.as_view(), name='add'),
 ]
