@@ -6,25 +6,25 @@
 
 from django.test import TestCase
 from fillup.models import Fillup
-from manager.models import Vehicle
+from equipment.models import Equipment
 from decimal import Decimal
 
 
 class FillupModelTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.vehicle = Vehicle.objects.create(name='TestOW', register_number='TEST-OW')
+        cls.equipment = Equipment.objects.create(name='TestOW', register_number='TEST-OW')
 
     def test_correct_output_of_str(self):
         '''Test that __str__ outputs correctly'''
-        vehicle = Vehicle.objects.get(name='TestOW')
+        equipment = Equipment.objects.get(name='TestOW')
         fillup = Fillup(
             price=2.013,
             amount=42,
             distance=100,
-            vehicle=vehicle,
+            equipment=equipment,
         )
-        expected = f'({vehicle}) 100, 42 @ 2.013'
+        expected = f'({equipment}) 100, 42 @ 2.013'
 
         result = str(fillup)
 
@@ -36,7 +36,7 @@ class FillupModelTestCase(TestCase):
             price=Decimal(2.013),
             amount=42,
             distance=200,
-            vehicle=self.vehicle,
+            equipment=self.equipment,
         )
         fillup.save()
 
@@ -49,14 +49,14 @@ class FillupModelTestCase(TestCase):
             price=Decimal(2.013),
             amount=42,
             distance=100,
-            vehicle=self.vehicle,
+            equipment=self.equipment,
         )
 
         fillup = Fillup(
             price=Decimal(2.013),
             amount=42,
             distance=200,
-            vehicle=self.vehicle,
+            equipment=self.equipment,
         )
         fillup.save()
 
@@ -64,21 +64,21 @@ class FillupModelTestCase(TestCase):
 
     def test_updating_fillup_updates_distance_delta_for_latest(self):
         '''Distance delta should be updated for latest row on updating'''
-        vehicle = Vehicle.objects.create(name='TestDR', register_number='TEST-DR')
+        equipment = Equipment.objects.create(name='TestDR', register_number='TEST-DR')
         # Add a couple of fillups to get reliable distance delta expectation
         Fillup.objects.create(
             price=Decimal(2.013),
             amount=42,
             distance=100,
             distance_delta=100,
-            vehicle=vehicle,
+            equipment=equipment,
         )
         target = Fillup.objects.create(
             price=Decimal(2.013),
             amount=42,
             distance=200,
             distance_delta=100,
-            vehicle=vehicle,
+            equipment=equipment,
         )
 
         target.distance = 150
@@ -88,28 +88,28 @@ class FillupModelTestCase(TestCase):
 
     def test_updating_fillup_updates_distance_delta_for_middle_row(self):
         '''Distance delta should be updated for middle row on updating'''
-        vehicle = Vehicle.objects.create(name='TestDR', register_number='TEST-DR')
+        equipment = Equipment.objects.create(name='TestDR', register_number='TEST-DR')
         # Add a couple of fillups to get reliable distance delta expectation
         Fillup.objects.create(
             price=Decimal(2.013),
             amount=42,
             distance=100,
             distance_delta=100,
-            vehicle=vehicle,
+            equipment=equipment,
         )
         target = Fillup.objects.create(
             price=Decimal(2.013),
             amount=42,
             distance=200,
             distance_delta=100,
-            vehicle=vehicle,
+            equipment=equipment,
         )
         Fillup.objects.create(
             price=Decimal(2.013),
             amount=42,
             distance=300,
             distance_delta=100,
-            vehicle=vehicle,
+            equipment=equipment,
         )
 
         target.distance = 160
@@ -123,19 +123,19 @@ class FillupModelTestCase(TestCase):
             price=Decimal(2),
             amount=42,
             distance=200,
-            vehicle=self.vehicle,
+            equipment=self.equipment,
         )
         fillup2 = Fillup(
             price=Decimal(1.5),
             amount=42,
             distance=200,
-            vehicle=self.vehicle,
+            equipment=self.equipment,
         )
         fillup3 = Fillup(
             price=Decimal(1.785),
             amount=10,
             distance=200,
-            vehicle=self.vehicle,
+            equipment=self.equipment,
         )
 
         fillup1.save()
@@ -152,7 +152,7 @@ class FillupModelTestCase(TestCase):
             price=Decimal(1.848),
             amount=18.3,
             distance=200,
-            vehicle=self.vehicle,
+            equipment=self.equipment,
         )
 
         fillup1.save()
@@ -165,14 +165,14 @@ class FillupModelTestCase(TestCase):
             price=Decimal(2.013),
             amount=42,
             distance=100,
-            vehicle=self.vehicle,
+            equipment=self.equipment,
             tank_full=True,
         )
         fillup2 = Fillup(
             price=Decimal(1.988),
             amount=11.48,
             distance=250,
-            vehicle=self.vehicle,
+            equipment=self.equipment,
             tank_full=True,
         )
 
@@ -187,7 +187,7 @@ class FillupModelTestCase(TestCase):
             price=Decimal(2.013),
             amount=42,
             distance=100,
-            vehicle=self.vehicle,
+            equipment=self.equipment,
             tank_full=False,
         )
 
@@ -203,21 +203,21 @@ class FillupModelTestCase(TestCase):
             price=Decimal(2.013),
             amount=42,
             distance=100,
-            vehicle=self.vehicle,
+            equipment=self.equipment,
             tank_full=True,
         )
         fillup2 = Fillup(
             price=Decimal(1.988),
             amount=9,
             distance=200,
-            vehicle=self.vehicle,
+            equipment=self.equipment,
             tank_full=False,
         )
         fillup3 = Fillup(
             price=Decimal(1.8),
             amount=5,
             distance=250,
-            vehicle=self.vehicle,
+            equipment=self.equipment,
             tank_full=True,
         )
 
@@ -235,35 +235,35 @@ class FillupModelTestCase(TestCase):
             price=Decimal(2.013),
             amount=42,
             distance=100,
-            vehicle=self.vehicle,
+            equipment=self.equipment,
             tank_full=True,
         )
         fillup2 = Fillup(
             price=Decimal(1.988),
             amount=9,
             distance=200,
-            vehicle=self.vehicle,
+            equipment=self.equipment,
             tank_full=False,
         )
         fillup3 = Fillup(
             price=Decimal(1.988),
             amount=4.5,
             distance=250,
-            vehicle=self.vehicle,
+            equipment=self.equipment,
             tank_full=False,
         )
         fillup4 = Fillup(
             price=Decimal(1.988),
             amount=5.5,
             distance=300,
-            vehicle=self.vehicle,
+            equipment=self.equipment,
             tank_full=False,
         )
         fillup5 = Fillup(
             price=Decimal(1.8),
             amount=18,
             distance=600,
-            vehicle=self.vehicle,
+            equipment=self.equipment,
             tank_full=True,
         )
 
@@ -281,21 +281,21 @@ class FillupModelTestCase(TestCase):
             price=Decimal(2.013),
             amount=42,
             distance=100,
-            vehicle=self.vehicle,
+            equipment=self.equipment,
             tank_full=False,
         )
         fillup2 = Fillup(
             price=Decimal(1.988),
             amount=9,
             distance=200,
-            vehicle=self.vehicle,
+            equipment=self.equipment,
             tank_full=False,
         )
         fillup3 = Fillup(
             price=Decimal(1.8),
             amount=5,
             distance=250,
-            vehicle=self.vehicle,
+            equipment=self.equipment,
             tank_full=True,
         )
 

@@ -6,7 +6,7 @@
 
 from django.test import TestCase
 from unittest.mock import Mock
-from fillup.templatetags.fillup_extras import active
+from lopokulu.templatetags.lopokulu_extras import active
 
 
 

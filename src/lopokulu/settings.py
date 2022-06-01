@@ -1,5 +1,5 @@
 # SPDX-FileCopyrightText: 2021 Jani Lehtinen
-# SPDX-FileCopyrightText: 2021 Markus Ijäs
+# SPDX-FileCopyrightText: 2022 Markus Ijäs
 # SPDX-FileCopyrightText: 2021 Markus Murto
 #
 # SPDX-License-Identifier: MIT
@@ -54,7 +54,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django_probes',
     'equipment',
-    'measurements',
+    'fillup',
 ]
 
 MIDDLEWARE = [

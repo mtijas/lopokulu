@@ -1,12 +1,12 @@
 # SPDX-FileCopyrightText: 2021 Jani Lehtinen
-# SPDX-FileCopyrightText: 2021 Markus Ijäs
+# SPDX-FileCopyrightText: 2022 Markus Ijäs
 # SPDX-FileCopyrightText: 2021 Markus Murto
 #
 # SPDX-License-Identifier: MIT
 
 from django import forms
 from .models import Fillup
-from manager.models import Vehicle
+from equipment.models import Equipment
 from django.core.exceptions import ValidationError, ObjectDoesNotExist
 from django.utils.translation import gettext as _
 
@@ -15,8 +15,8 @@ class FillupForm(forms.ModelForm):
     def __init__(self, user, *args, **kwargs):
         self.user = user
         super(FillupForm, self).__init__(*args, **kwargs)
-        self.fields['vehicle'].queryset = self.get_allowed_vehicles()
-        self.fields['vehicle'].initial = self.fields['vehicle'].queryset[0].id
+        self.fields['equipment'].queryset = self.get_allowed_equipment()
+        self.fields['equipment'].initial = self.fields['equipment'].queryset[0].id
 
     def clean_distance(self):
         data = self.cleaned_data['distance']
@@ -31,14 +31,14 @@ class FillupForm(forms.ModelForm):
     def clean(self):
         cleaned_data = super().clean()
         distance = cleaned_data.get('distance')
-        vehicle = cleaned_data.get('vehicle')
+        equipment = cleaned_data.get('equipment')
 
-        if vehicle is None:
+        if equipment is None:
             return
 
-        # Get the latest fillup for vehicle in question
+        # Get the latest fillup for equipment in question
         previous_fillup = Fillup.objects.filter(
-            vehicle_id=vehicle.id,
+            equipment_id=equipment.id,
         ).first()
 
         if previous_fillup is None:
@@ -50,15 +50,15 @@ class FillupForm(forms.ModelForm):
                 _('Distance should be more than %(dist)s') % {'dist':previous_fillup.distance}
             )
 
-    def get_allowed_vehicles(self):
-        return Vehicle.objects.filter(
-            vehicleuser__person_id=self.user.id,
-            vehicleuser__role__in=['DR', 'OW']
+    def get_allowed_equipment(self):
+        return Equipment.objects.filter(
+            equipmentuser__user_id=self.user.id,
+            equipmentuser__role__in=['USER', 'ADMIN']
         )
 
     class Meta:
         model = Fillup
-        widgets = {'vehicle': forms.RadioSelect}
-        fields = ['price', 'amount', 'distance', 'vehicle', 'tank_full']
+        widgets = {'equipment': forms.RadioSelect}
+        fields = ['price', 'amount', 'distance', 'equipment', 'tank_full']
 
-    field_order = ['vehicle', 'distance', 'amount', 'price', 'tank_full']
+    field_order = ['equipment', 'distance', 'amount', 'price', 'tank_full']

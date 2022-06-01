@@ -1,5 +1,5 @@
 # SPDX-FileCopyrightText: 2021 Jani Lehtinen
-# SPDX-FileCopyrightText: 2021 Markus Ijäs
+# SPDX-FileCopyrightText: 2022 Markus Ijäs
 # SPDX-FileCopyrightText: 2021 Markus Murto
 #
 # SPDX-License-Identifier: MIT
@@ -8,7 +8,8 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, get_object_or_404
 from django.utils import timezone
 
-from manager.models import Person, Vehicle
+from equipment.models import Equipment, EquipmentUser
+from django.contrib.auth.models import User
 from .forms import FillupForm
 from .models import Fillup
 
@@ -19,14 +20,14 @@ def add_fillup(request, pk=None):
         form = FillupForm(request.user, request.POST)
         if form.is_valid():
             fillup = form.save(commit=False)
-            fillup.person = request.user
+            fillup.user = request.user
             fillup.addition_date = timezone.now()
             fillup.save()
-            return redirect('dashboard')
+            return redirect('fillup:index')
 
     elif pk is not None:
         initial_data = {
-            'vehicle': pk
+            'equipment': pk
         }
         form = FillupForm(request.user, initial=initial_data)
     else:
@@ -38,48 +39,33 @@ def add_fillup(request, pk=None):
     return render(request, 'fillup/add_fillup.html', content)
 
 @login_required
-def dashboard(request):
-    user = Person.objects.get(email=request.user)
-    vehicles = []
+def index(request):
+    equipmentusers = EquipmentUser.objects.filter(user=request.user)
+    equipment = []
 
-    for vehicle in user.vehicles.all():
-        vehicles.append({
-            'vehicle': vehicle,
-            'fillups': Fillup.objects.filter(vehicle=vehicle)[:10],
+    for single_eu in equipmentusers:
+        equipment.append({
+            'equipment': single_eu.equipment,
+            'role': single_eu.role,
+            'fillups': Fillup.objects.filter(equipment=single_eu.equipment)[:10],
         })
 
     content = {
-        'allowed_fillups': user.vehicles.filter(vehicleuser__role__in=['DR', 'OW']),
-        'vehicles': vehicles,
+        'fillup_allowed_roles': ['USER', 'ADMIN'],
+        'equipment': equipment,
     }
 
-    return render(request, 'fillup/dashboard.html', content)
+    return render(request, 'fillup/index.html', content)
 
 @login_required
-def vehicle(request):
-    user = Person.objects.get(email=request.user)
-    vehicles = []
-
-    for vehicle in user.vehicles.all():
-        vehicles.append({
-            'vehicle': vehicle,
-        })
+def single_equipment(request, pk):
+    equipmentusers = get_object_or_404(EquipmentUser, user=request.user, equipment__pk=pk)
 
     content = {
-        'allowed_fillups': user.vehicles.filter(vehicleuser__role__in=['DR', 'OW']),
-        'vehicles': vehicles,
+        'fillup_allowed_roles': ['USER', 'ADMIN'],
+        'equipment': get_object_or_404(Equipment, pk=pk),
+        'fillups': Fillup.objects.filter(equipment__pk=pk),
+        'role': equipmentusers.role,
     }
 
-    return render(request, 'fillup/vehicle.html', content)
-
-@login_required
-def single_vehicle(request, pk):
-    user = Person.objects.get(email=request.user)
-
-    content = {
-        'allowed_fillups': user.vehicles.filter(vehicleuser__role__in=['DR', 'OW']),
-        'vehicle': get_object_or_404(Vehicle, pk=pk),
-        'fillups': Fillup.objects.filter(vehicle__pk=pk),
-    }
-
-    return render(request, 'fillup/single_vehicle.html', content)
+    return render(request, 'fillup/single_equipment.html', content)

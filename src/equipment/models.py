@@ -15,9 +15,6 @@ class Equipment(models.Model):
     name = models.CharField(max_length=256)
     register_number = models.CharField(max_length=256)
 
-    class Meta:
-        ordering = ['-id']
-
     def __str__(self):
         return f'({self.register_number}) {self.name}'
 
