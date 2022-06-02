@@ -14,7 +14,7 @@ from fillup.forms import FillupForm
 from fillup.models import Fillup
 
 
-class FillupViewsIntegrationTestCase(TestCase):
+class FillupViewsBasicTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.user = User.objects.create_user(username='testuser@foo.bar', password='top_secret')
@@ -75,8 +75,47 @@ class FillupViewsIntegrationTestCase(TestCase):
 
         self.assertEqual(response.status_code, 200)
 
+    def test_redirects_to_login_for_non_logged_in_user_on_specific_equipment(self):
+        '''Non-logged-in users should get redirected to login on equipment view'''
+        response = self.client.get('/fillup/equipment/1/')
 
-class FillupEquipmentViewsIntegrationTestCase(TestCase):
+        self.assertRedirects(response, '/accounts/login/?next=/fillup/equipment/1/')
+
+    def test_respond_with_200_for_url_equipment_single(self):
+        '''Response 200 should be given on url /equipment/<id>'''
+        self.client.login(username='testuser@foo.bar', password='top_secret')
+
+        response = self.client.get(f'/fillup/equipment/{self.equipment1.id}/')
+
+        self.assertEqual(response.status_code, 200)
+
+    def test_return_404_on_incorrect_equipment_id(self):
+        '''404 should be returned to user on missing equipment'''
+        self.client.login(username='testuser@foo.bar', password='top_secret')
+
+        response = self.client.get('/fillup/equipment/9999/')
+
+        self.assertEqual(response.status_code, 404)
+
+    def test_fillups_listed_on_single_equipment_page(self):
+        '''Single equipment page should have fillups listed when there are any'''
+        self.client.login(username='testuser@foo.bar', password='top_secret')
+
+        response = self.client.get(f'/fillup/equipment/{self.equipment3.id}/')
+
+        self.assertNotContains(response, 'No results...')
+
+    def test_no_fillups_listed_on_single_equipment_page_when_empty(self):
+        '''Single equipment page should not have fillups listed when there aren't any'''
+        self.client.login(username='testuser@foo.bar', password='top_secret')
+        needle = 'No results...'
+
+        response = self.client.get(f'/fillup/equipment/{self.equipment1.id}/')
+
+        self.assertContains(response, needle)
+
+
+class FillupViewsInputsTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.user = User.objects.create_user(username='testuser@foo.bar', password='top_secret')
@@ -135,29 +174,6 @@ class FillupEquipmentViewsIntegrationTestCase(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertNotIn(needle, response.content.decode(), 1)
 
-    def test_redirects_to_login_for_non_logged_in_user_on_specific_equipment(self):
-        '''Non-logged-in users should get redirected to login on equipment view'''
-        response = self.client.get('/fillup/equipment/1/')
-
-        self.assertRedirects(response, '/accounts/login/?next=/fillup/equipment/1/')
-
-    def test_respond_with_200_for_url_equipment_single(self):
-        '''Response 200 should be given on url /equipment/<id>'''
-        self.client.login(username='testuser@foo.bar', password='top_secret')
-
-        response = self.client.get(f'/fillup/equipment/{self.equipment1.id}/')
-
-        self.assertEqual(response.status_code, 200)
-
-    def test_return_404_on_incorrect_equipment_id(self):
-        '''404 should be returned to user on missing equipment'''
-        self.client.login(username='testuser@foo.bar', password='top_secret')
-
-        response = self.client.get('/fillup/equipment/9999/')
-
-        self.assertEqual(response.status_code, 404)
-
-
     def test_single_equipment_page_has_add_fillup_btn_for_admin(self):
         '''Single equipment page should have add fillup button for admin'''
         self.client.login(username='testuser@foo.bar', password='top_secret')
@@ -193,21 +209,3 @@ class FillupEquipmentViewsIntegrationTestCase(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertNotIn(needle, response.content.decode(), 1)
-
-    def test_fillups_listed_on_single_equipment_page(self):
-        '''Single equipment page should have fillups listed when there are any'''
-        self.client.login(username='testuser@foo.bar', password='top_secret')
-        needle = 'No results...'
-
-        response = self.client.get(f'/fillup/equipment/{self.equipment3.id}/')
-
-        self.assertNotContains(response, needle)
-
-    def test_no_fillups_listed_on_single_equipment_page_when_empty(self):
-        '''Single equipment page should not have fillups listed when there aren't any'''
-        self.client.login(username='testuser@foo.bar', password='top_secret')
-        needle = 'No results...'
-
-        response = self.client.get(f'/fillup/equipment/{self.equipment1.id}/')
-
-        self.assertContains(response, needle)
