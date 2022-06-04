@@ -8,5 +8,4 @@ from django.contrib import admin
 
 from .models import Fillup
 
-
 admin.site.register(Fillup)

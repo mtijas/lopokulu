@@ -3,9 +3,10 @@
 # SPDX-License-Identifier: MIT
 
 from django import forms
-from .models import Equipment
-from django.core.exceptions import ValidationError, ObjectDoesNotExist
+from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.utils.translation import gettext as _
+
+from .models import Equipment
 
 
 class EquipmentForm(forms.ModelForm):
@@ -15,6 +16,6 @@ class EquipmentForm(forms.ModelForm):
 
     class Meta:
         model = Equipment
-        fields = ['name', 'register_number']
+        fields = ["name", "register_number"]
 
-    field_order = ['name', 'register_number']
+    field_order = ["name", "register_number"]

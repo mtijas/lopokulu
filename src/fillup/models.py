@@ -18,28 +18,20 @@ from equipment.models import Equipment
 
 def validate_positive(value):
     if value <= 0:
-        raise ValidationError(_('Value should be over zero'))
+        raise ValidationError(_("Value should be over zero"))
 
 
 class Fillup(models.Model):
     price = models.DecimalField(
-        'Price per unit', decimal_places=3, max_digits=5, validators=[validate_positive])
-    amount = models.FloatField('Total filled up amount', validators=[validate_positive])
-    distance = models.FloatField('Total odometer')
+        "Price per unit", decimal_places=3, max_digits=5, validators=[validate_positive]
+    )
+    amount = models.FloatField("Total filled up amount", validators=[validate_positive])
+    distance = models.FloatField("Total odometer")
     addition_date = models.DateTimeField(default=timezone.now)
     tank_full = models.BooleanField(default=True)
-    distance_delta = models.FloatField(
-        'Distance delta',
-        null=True
-    )
-    total_price = models.FloatField(
-        'Total price',
-        null=True
-    )
-    consumption = models.FloatField(
-        'Consumption',
-        null=True
-    )
+    distance_delta = models.FloatField("Distance delta", null=True)
+    total_price = models.FloatField("Total price", null=True)
+    consumption = models.FloatField("Consumption", null=True)
     equipment = models.ForeignKey(Equipment, on_delete=models.CASCADE)
     user = models.ForeignKey(
         User,
@@ -50,8 +42,7 @@ class Fillup(models.Model):
 
     def calculate_distance_delta(self):
         previous = Fillup.objects.filter(
-            equipment_id=self.equipment.id,
-            addition_date__lt=self.addition_date
+            equipment_id=self.equipment.id, addition_date__lt=self.addition_date
         ).first()
 
         if previous is not None:
@@ -59,11 +50,11 @@ class Fillup(models.Model):
         return self.distance
 
     def calculate_total_price(self):
-        '''Calculate total price of fillup'''
+        """Calculate total price of fillup"""
         return round(decimal.Decimal(self.amount) * self.price, 2)
 
     def calculate_consumption(self):
-        '''Calculate fuel consumption from previous full fillup'''
+        """Calculate fuel consumption from previous full fillup"""
         if not self.tank_full:
             return None
 
@@ -81,16 +72,16 @@ class Fillup(models.Model):
             if total_distance_delta <= 0:
                 return None
 
-            '''We need sum of amount from partial fillups between current and
-            previous full fillups to calculate accurate consumption'''
+            """We need sum of amount from partial fillups between current and
+            previous full fillups to calculate accurate consumption"""
             partial_filled_sum = Fillup.objects.filter(
                 equipment_id=self.equipment.id,
                 addition_date__lt=self.addition_date,
                 pk__gt=previous_full_fillup.id,
-            ).aggregate(sum_amount=Sum('amount'))
+            ).aggregate(sum_amount=Sum("amount"))
 
-            if partial_filled_sum['sum_amount'] is not None:
-                total_filled_amount += partial_filled_sum['sum_amount']
+            if partial_filled_sum["sum_amount"] is not None:
+                total_filled_amount += partial_filled_sum["sum_amount"]
 
             return total_filled_amount / total_distance_delta * 100
 
@@ -103,7 +94,7 @@ class Fillup(models.Model):
         super(Fillup, self).save(*args, **kwargs)
 
     class Meta:
-        ordering = ['-id']
+        ordering = ["-id"]
 
     def __str__(self):
-        return f'({self.equipment}) {self.distance}, {self.amount} @ {self.price}'
+        return f"({self.equipment}) {self.distance}, {self.amount} @ {self.price}"

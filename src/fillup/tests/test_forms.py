@@ -4,12 +4,14 @@
 #
 # SPDX-License-Identifier: MIT
 
-from django.test import TestCase
-from fillup.forms import FillupForm
-from django.contrib.auth.models import Group, Permission, User
-from equipment.models import Equipment, EquipmentUser
-from fillup.models import Fillup
 from decimal import Decimal
+
+from django.contrib.auth.models import Group, Permission, User
+from django.test import TestCase
+
+from equipment.models import Equipment, EquipmentUser
+from fillup.forms import FillupForm
+from fillup.models import Fillup
 
 
 class FillupFormTestCase(TestCase):
