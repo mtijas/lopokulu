@@ -8,7 +8,7 @@ from unittest.mock import Mock
 
 from django.test import TestCase
 
-from lopokulu.templatetags.lopokulu_extras import active
+from lopokulu.templatetags import lopokulu_extras
 
 
 class TemplateTagsTestCase(TestCase):
@@ -18,7 +18,7 @@ class TemplateTagsTestCase(TestCase):
         request.path = "/success/"
         pattern = "success"
 
-        result = active(request, pattern)
+        result = lopokulu_extras.active(request, pattern)
 
         self.assertEquals(result, "active")
 
@@ -28,7 +28,7 @@ class TemplateTagsTestCase(TestCase):
         request.path = "/success/this/is/more/complex/example/"
         pattern = "success"
 
-        result = active(request, pattern)
+        result = lopokulu_extras.active(request, pattern)
 
         self.assertEquals(result, "active")
 
@@ -38,7 +38,7 @@ class TemplateTagsTestCase(TestCase):
         request.path = "/success/"
         pattern = "nonmatching"
 
-        result = active(request, pattern)
+        result = lopokulu_extras.active(request, pattern)
 
         self.assertEquals(result, "")
 
@@ -48,6 +48,36 @@ class TemplateTagsTestCase(TestCase):
         request.path = "/should/not/success/"
         pattern = "success"
 
-        result = active(request, pattern)
+        result = lopokulu_extras.active(request, pattern)
 
         self.assertEquals(result, "")
+
+    def test_addstr_concatenates_strings(self):
+        """addstr templatetag should concatenate two strings"""
+        input1 = "kissat"
+        input2 = "koiria"
+        expected = "kissatkoiria"
+
+        result = lopokulu_extras.addstr(input1, input2)
+
+        self.assertEquals(result, expected)
+
+    def test_addstr_concatenates_strings_2(self):
+        """addstr templatetag should concatenate two strings, test 2"""
+        input1 = "kissat"
+        input2 = "koiria"
+        expected = "koiriakissat"
+
+        result = lopokulu_extras.addstr(input2, input1)
+
+        self.assertEquals(result, expected)
+
+    def test_addstr_concatenates_ints(self):
+        """addstr templatetag should concatenate two ints (and not sum them)"""
+        input1 = 1
+        input2 = 2
+        expected = "12"
+
+        result = lopokulu_extras.addstr(input1, input2)
+
+        self.assertEquals(result, expected)
