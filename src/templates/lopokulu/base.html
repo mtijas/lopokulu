@@ -22,9 +22,12 @@
         <li>
           <a class="{% active request 'equipment' %}" href="{% url 'equipment:index' %}">Equipment</a>
         </li>
+        {% for app in MEASUREMENT_APPS %}
+        <!-- TODO: Integration test main menu loop... -->
         <li>
-          <a class="{% active request 'fillup' %}" href="{% url 'fillup:index' %}">Fillups</a>
+          <a class="{% active request app %}" href="{% url app|addstr:':index' %}">{{ app|capfirst|addstr:'s' }}</a>
         </li>
+        {% endfor %}
       </ul>
       <ul>
           <li><a href="{% url 'logout' %}">Log out</a></li>

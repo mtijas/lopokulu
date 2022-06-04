@@ -45,6 +45,10 @@ except ImproperlyConfigured:
 
 # Application definition
 
+INSTALLED_MEASUREMENT_APPS = [
+    'fillup',
+]
+
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -54,8 +58,10 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django_probes',
     'equipment',
-    'fillup',
 ]
+
+# Measurement apps are supposed to be regular Django apps as well
+INSTALLED_APPS += INSTALLED_MEASUREMENT_APPS
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -83,6 +89,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'lopokulu.context_processors.measurement_apps',
             ],
         },
     },

@@ -18,3 +18,8 @@ def active(request, pattern):
 @register.filter
 def get_dict_value(dictionary, key):
     return dictionary.get(key)
+
+#@TODO: Unit test addstr
+@register.filter
+def addstr(arg1, arg2):
+    return str(arg1) + str(arg2)
