@@ -1,4 +1,5 @@
 {% extends 'lopokulu/base.html' %}
+{% load static lopokulu_extras %}
 {% block content %}
 <article>
   <header>
@@ -17,20 +18,17 @@
     </nav>
   </header>
   <main>
-    <p>{{ equipment.name }}</p>
     <h6>Allowed measurement types</h6>
     <p>
-      <ul>
-      {% for type in equipment.allowed_measurements %}
-        <li>{{ type }}</li>
+      {% for allowed in equipment.allowed_measurements %}
+      <a href="{% url allowed|addstr:':index' %}" role="button">{{ allowed|capfirst|addstr:'s' }}</a>
       {% empty %}
         {% if perms.equipment.edit_equipment %}
-          <li>No measurements allowed (<a href="{% url 'equipment:edit' pk=equipment.id %}">edit to allow</a>)</li>
+          No measurements allowed (<a href="{% url 'equipment:edit' pk=equipment.id %}">edit to allow</a>)
         {% else %}
-          <li>No measurements allowed (and no permission to allow anything)</li>
+          No measurements allowed (and no permission to allow anything)
         {% endif %}
       {% endfor %}
-      </ul>
     </p>
     <h6>Measurement roles</h6>
     <table>
