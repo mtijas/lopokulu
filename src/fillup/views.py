@@ -40,7 +40,9 @@ def add_fillup(request, pk=None):
 
 @login_required
 def index(request):
-    equipmentusers = EquipmentUser.objects.filter(user=request.user)
+    equipmentusers = EquipmentUser.objects.filter(
+        user=request.user, equipment__allowed_measurements__contains="fillup"
+    )
     equipment = []
 
     for single_eu in equipmentusers:

@@ -1,4 +1,5 @@
 {% extends 'lopokulu/base.html' %}
+{% load static lopokulu_extras %}
 {% block content %}
 <article>
   <header>
@@ -12,16 +13,22 @@
     <table>
       <thead>
         <tr>
-          <th>Register number</th>
           <th>Name</th>
+          <th>Allowed measurements</th>
           <th>Actions</th>
         </tr>
       </thead>
       <tbody>
         {% for equipment in equipment_list %}
         <tr>
-          <td><a href="{% url 'equipment:detail' pk=equipment.id %}">{{ equipment.register_number }}</a></td>
-          <td><a href="{% url 'equipment:detail' pk=equipment.id %}">{{ equipment.name }}</a></td>
+          <td><a href="{% url 'equipment:detail' pk=equipment.id %}">{{ equipment }}</a></td>
+          <td>
+            {% for allowed in equipment.allowed_measurements %}
+              <a href="{% url allowed|addstr:':index' %}" role="button">{{ allowed|capfirst|addstr:'s' }}</a>
+            {% empty %}
+              No measurements allowed
+            {% endfor %}
+          </td>
           <td>
             {% if perms.equipment.edit_equipment %}
             <a href="{% url 'equipment:edit' pk=equipment.id %}" role="button">Edit</a>

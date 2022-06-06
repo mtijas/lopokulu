@@ -21,13 +21,13 @@ class FillupViewsBasicTestCase(TestCase):
             username="testuser@foo.bar", password="top_secret"
         )
         cls.equipment1 = Equipment.objects.create(
-            name="TestRO", register_number="TEST-RO"
+            name="TestRO", register_number="TEST-RO", allowed_measurements=["fillup"]
         )
         cls.equipment2 = Equipment.objects.create(
-            name="TestUSER", register_number="TEST-USER"
+            name="TestUSER", register_number="TEST-USER", allowed_measurements=["fillup"]
         )
         cls.equipment3 = Equipment.objects.create(
-            name="TestADMIN", register_number="TEST-ADMIN"
+            name="TestADMIN", register_number="TEST-ADMIN", allowed_measurements=["fillup"]
         )
         EquipmentUser.objects.create(
             user=cls.user, equipment=cls.equipment1, role="READ_ONLY"
@@ -125,6 +125,21 @@ class FillupViewsBasicTestCase(TestCase):
 
         self.assertContains(response, needle)
 
+    def test_equipment_without_allow_selection_not_listed(self):
+        """Equipment without fillup in allowed_measurements list should not be listed"""
+        equipment4 = Equipment.objects.create(
+            name="TestNotFound", register_number="TEST-NOT-FOUND", allowed_measurements=[]
+        )
+        self.client.login(username="testuser@foo.bar", password="top_secret")
+
+        response = self.client.get("/fillup/")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(str(self.equipment1), response.content.decode(), 1)
+        self.assertIn(str(self.equipment2), response.content.decode(), 1)
+        self.assertIn(str(self.equipment3), response.content.decode(), 1)
+        self.assertNotIn(str(equipment4), response.content.decode(), 1)
+
 
 class FillupViewsInputsTestCase(TestCase):
     @classmethod
@@ -133,13 +148,13 @@ class FillupViewsInputsTestCase(TestCase):
             username="testuser@foo.bar", password="top_secret"
         )
         cls.equipment1 = Equipment.objects.create(
-            name="TestRO", register_number="TEST-RO"
+            name="TestRO", register_number="TEST-RO", allowed_measurements=["fillup"]
         )
         cls.equipment2 = Equipment.objects.create(
-            name="TestUSER", register_number="TEST-USER"
+            name="TestUSER", register_number="TEST-USER", allowed_measurements=["fillup"]
         )
         cls.equipment3 = Equipment.objects.create(
-            name="TestADMIN", register_number="TEST-ADMIN"
+            name="TestADMIN", register_number="TEST-ADMIN", allowed_measurements=["fillup"]
         )
         EquipmentUser.objects.create(
             user=cls.user, equipment=cls.equipment1, role="READ_ONLY"
