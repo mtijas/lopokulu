@@ -116,6 +116,104 @@ class EquipmentViewsIntegrationTestCase(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertNotContains(response, "Add new equipment")
 
+    def test_equipment_index_has_edit_button_for_user_with_permission(self):
+        """Equipment index page should have edit button for user with permission"""
+        self.user1.user_permissions.add(self.permissions["edit"])
+        self.client.login(username="testuser1@foo.bar", password="top_secret1")
+
+        response = self.client.get("/equipment/")
+
+        self.assertEqual(response.status_code, 200)
+        for equipment in Equipment.objects.all():
+            expected_html = f"""
+                <a href="/equipment/{equipment.id}/edit/" role="button">
+                    Edit
+                </a>
+            """
+            self.assertInHTML(expected_html, response.content.decode(), 1)
+
+    def test_equipment_index_no_edit_button_for_user_with_no_permission(self):
+        """Equipment index page should not have edit button for user with no permission"""
+        self.client.login(username="testuser1@foo.bar", password="top_secret1")
+
+        response = self.client.get("/equipment/")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertNotContains(response, "Edit")
+
+    def test_equipment_index_has_delete_button_for_user_with_permission(self):
+        """Equipment index page should have delete button for user with permission"""
+        self.user1.user_permissions.add(self.permissions["delete"])
+        self.client.login(username="testuser1@foo.bar", password="top_secret1")
+
+        response = self.client.get("/equipment/")
+
+        self.assertEqual(response.status_code, 200)
+        for equipment in Equipment.objects.all():
+            expected_html = f"""
+                <a href="/equipment/{equipment.id}/delete/" class="secondary">
+                    Delete
+                </a>
+            """
+            self.assertInHTML(expected_html, response.content.decode(), 1)
+
+    def test_equipment_index_no_delete_button_for_user_with_no_permission(self):
+        """Equipment index page should not have edit button for user with no permission"""
+        self.client.login(username="testuser1@foo.bar", password="top_secret1")
+
+        response = self.client.get("/equipment/")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertNotContains(response, "Delete")
+
+    def test_equipment_detail_has_edit_button_for_user_with_permission(self):
+        """Equipment detail page should have edit button for user with permission"""
+        self.user1.user_permissions.add(self.permissions["edit"])
+        self.client.login(username="testuser1@foo.bar", password="top_secret1")
+
+        response = self.client.get(f"/equipment/{self.equipment1.id}/")
+
+        self.assertEqual(response.status_code, 200)
+        expected_html = f"""
+            <a href="/equipment/{self.equipment1.id}/edit/" role="button">
+                Edit
+            </a>
+        """
+        self.assertInHTML(expected_html, response.content.decode(), 1)
+
+    def test_equipment_detail_no_edit_button_for_user_with_no_permission(self):
+        """Equipment detail page should not have edit button for user with no permission"""
+        self.client.login(username="testuser1@foo.bar", password="top_secret1")
+
+        response = self.client.get(f"/equipment/{self.equipment1.id}/")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertNotContains(response, "Edit")
+
+    def test_equipment_detail_has_delete_button_for_user_with_permission(self):
+        """Equipment detail page should have delete button for user with permission"""
+        self.user1.user_permissions.add(self.permissions["delete"])
+        self.client.login(username="testuser1@foo.bar", password="top_secret1")
+
+        response = self.client.get(f"/equipment/{self.equipment1.id}/")
+
+        self.assertEqual(response.status_code, 200)
+        expected_html = f"""
+            <a href="/equipment/{self.equipment1.id}/delete/" class="secondary">
+                Delete
+            </a>
+        """
+        self.assertInHTML(expected_html, response.content.decode(), 1)
+
+    def test_equipment_detail_no_delete_button_for_user_with_no_permission(self):
+        """Equipment detail page should not have edit button for user with no permission"""
+        self.client.login(username="testuser1@foo.bar", password="top_secret1")
+
+        response = self.client.get(f"/equipment/{self.equipment1.id}/")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertNotContains(response, "Delete")
+
     def test_respond_with_200_for_get_equipment_add(self):
         """Response 200 should be given on get /equipment/add/"""
         self.user1.user_permissions.add(self.permissions["add"])
@@ -354,10 +452,54 @@ class EquipmentViewsIntegrationTestCase(TestCase):
             1,
         )
 
-    # @TODO: Test for add and edit buttons in index and detail views (permissions)
-    # @TODO: Test role edit permissions on edit form
-    # @TODO: Test role edit permissions on edit and add views
-    # @TODO: Test deletions
+    def test_delete_permission_allows_delete(self):
+        """User with delete permission should be able to delete Equipment"""
+        self.user3.user_permissions.add(self.permissions["delete"])
+        with self.assertNumQueries(1):
+            saved_equipment = Equipment.objects.create(
+                name="test-delete-1", register_number="T-DEL-1"
+            )
+
+        self.client.login(username="testuser3@foo.bar", password="top_secret3")
+        response = self.client.get(f"/equipment/{saved_equipment.id}/delete/")
+
+        self.assertRedirects(response, f"/equipment/")
+        self.assertFalse(Equipment.objects.filter(id=saved_equipment.id).exists())
+
+    def test_delete_permission_required(self):
+        """User with no perms should receive 403"""
+        self.client.login(username="testuser2@foo.bar", password="top_secret2")
+
+        response = self.client.get(f"/equipment/{self.equipment3.id}/delete/")
+
+        self.assertEqual(response.status_code, 403)
+        self.assertTrue(Equipment.objects.filter(id=self.equipment3.id).exists())
+
+    def test_edit_post_view_needs_permissions(self):
+        """POSTing to edit view should need permissions"""
+        saved_equipment = Equipment.objects.create(
+            name="test post not edited", register_number="T-NO-PERM"
+        )
+        data = {
+            "name": "edited...",
+            "register_number": "T-NO-PERM",
+        }
+        data[f"perm-{self.user1.id}"] = "NOACCESS"
+        data[f"perm-{self.user2.id}"] = "ADMIN"
+        data[f"perm-{self.user3.id}"] = "NOACCESS"
+
+        self.create_dummy_equipment_users(saved_equipment)
+
+        self.client.login(username="testuser1@foo.bar", password="top_secret1")
+        response = self.client.post(f"/equipment/{saved_equipment.id}/edit/", data=data)
+
+        # Update our equipment var with new data from form save
+        saved_equipment = Equipment.objects.get(register_number="T-NO-PERM")
+
+        self.assertEqual(response.status_code, 403)
+        self.assertEqual(saved_equipment.name, "test post not edited")
+
+    # @TODO: Test role edit permissions on edit and add views (only admins should be able to edit measurement-roles)
 
     def create_dummy_equipment_users(self, equipment):
         """Create dummy equipment users for equipment"""
