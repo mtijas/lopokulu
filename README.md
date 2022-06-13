@@ -9,8 +9,6 @@ SPDX-License-Identifier: CC0-1.0
 # lopokulu
 
 [![REUSE status](https://api.reuse.software/badge/github.com/mtijas/lopokulu)](https://api.reuse.software/info/github.com/mtijas/lopokulu)
-![MAIN branch status](https://jenkins.tiko2020.trade/job/lopokulu/job/main/badge/icon?subject=Main)
-![DEVELOPMENT branch status](https://jenkins.tiko2020.trade/job/lopokulu/job/development/badge/icon?subject=Development)
 
 This is a work-in-progress project to create a Django web application for
 vehicle fuel usage monitoring.
@@ -168,7 +166,7 @@ are automatically generated like `$(basename $PWD)_psql-data` and
 `$(basename $PWD)_staticfiles`.
 
 From here you can replace `$(basename $PWD)_lopokuluapp_1` with the literal
-container name. 
+container name.
 
 Run the Django migrations:
 ```

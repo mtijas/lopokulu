@@ -1,364 +1,236 @@
 # SPDX-FileCopyrightText: 2021 Jani Lehtinen
-# SPDX-FileCopyrightText: 2021 Markus Ijäs
+# SPDX-FileCopyrightText: 2022 Markus Ijäs
 # SPDX-FileCopyrightText: 2021 Markus Murto
 #
 # SPDX-License-Identifier: MIT
 
-from django.test import TestCase
-from django.test import Client
-from fillup.forms import FillupForm
-from fillup.models import Fillup
-from manager.models import Person, Vehicle, VehicleUser
 from decimal import Decimal
 
+from django.contrib.auth.models import Group, Permission, User
+from django.test import Client, TestCase
 
-class FillupViewsIntegrationTestCase(TestCase):
+from equipment.models import Equipment, EquipmentUser
+from fillup.forms import FillupForm
+from fillup.models import Fillup
+
+
+class FillupViewsBasicTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.user = Person.objects.create_user(email='testuser@foo.bar', password='top_secret')
-        cls.vehicle1 = Vehicle.objects.create(name='TestRO', register_number='TEST-RO')
-        cls.vehicle2 = Vehicle.objects.create(name='TestDR', register_number='TEST-DR')
-        cls.vehicle3 = Vehicle.objects.create(name='TestOW', register_number='TEST-OW')
-        VehicleUser.objects.create(
-            person=cls.user, vehicle=cls.vehicle1, role='RO')
-        VehicleUser.objects.create(
-            person=cls.user, vehicle=cls.vehicle2, role='DR')
-        VehicleUser.objects.create(
-            person=cls.user, vehicle=cls.vehicle3, role='OW')
+        cls.user = User.objects.create_user(
+            username="testuser@foo.bar", password="top_secret"
+        )
+        cls.equipment1 = Equipment.objects.create(
+            name="TestRO", register_number="TEST-RO", allowed_measurements=["fillup"]
+        )
+        cls.equipment2 = Equipment.objects.create(
+            name="TestUSER", register_number="TEST-USER", allowed_measurements=["fillup"]
+        )
+        cls.equipment3 = Equipment.objects.create(
+            name="TestADMIN", register_number="TEST-ADMIN", allowed_measurements=["fillup"]
+        )
+        EquipmentUser.objects.create(
+            user=cls.user, equipment=cls.equipment1, role="READ_ONLY"
+        )
+        EquipmentUser.objects.create(
+            user=cls.user, equipment=cls.equipment2, role="USER"
+        )
+        EquipmentUser.objects.create(
+            user=cls.user, equipment=cls.equipment3, role="ADMIN"
+        )
         Fillup.objects.create(
             price=Decimal(2.013),
             amount=42,
             distance=100,
-            vehicle=cls.vehicle3,
+            equipment=cls.equipment3,
         )
 
     def setUp(self):
         self.client = Client()
 
     def test_respond_with_200_for_url_fillup(self):
-        '''Response 200 should be given on url /fillup/'''
-        self.client.login(email='testuser@foo.bar', password='top_secret')
+        """Response 200 should be given on url /fillup/"""
+        self.client.login(username="testuser@foo.bar", password="top_secret")
 
-        response = self.client.get('/fillup/')
+        response = self.client.get("/fillup/")
 
         self.assertEqual(response.status_code, 200)
 
     def test_redirects_to_login_for_non_logged_in_user_on_fillup(self):
-        '''Non-logged-in users should get redirected to login on fillup view'''
-        response = self.client.get('/fillup/')
+        """Non-logged-in users should get redirected to login on fillup view"""
+        response = self.client.get("/fillup/")
 
-        self.assertRedirects(response, '/accounts/login/?next=/fillup/')
+        self.assertRedirects(response, "/accounts/login/?next=/fillup/")
 
-    def test_redirect_to_dashboard_after_successful_addition(self):
-        '''User should be redirected to dashboard after successful fillup addition'''
+    def test_redirect_to_index_after_successful_addition(self):
+        """User should be redirected to fillups index after successful fillup addition"""
         data = {
-            'price': 1,
-            'amount': 1,
-            'distance': 101,
-            'vehicle': Vehicle.objects.get(name='TestOW').id,
+            "price": 1,
+            "amount": 1,
+            "distance": 101,
+            "equipment": Equipment.objects.get(name="TestADMIN").id,
         }
-        self.client.login(email='testuser@foo.bar', password='top_secret')
+        self.client.login(username="testuser@foo.bar", password="top_secret")
 
-        response = self.client.post('/fillup/', data=data)
+        response = self.client.post("/fillup/add/", data=data)
 
-        self.assertRedirects(response, '/dashboard/')
+        self.assertRedirects(response, "/fillup/")
 
     def test_returned_to_fillupform_on_invalid_data(self):
-        '''User should be returned to add_fillup view on posting invalid data'''
+        """User should be returned to add_fillup view on posting invalid data"""
         data = {}
-        self.client.login(email='testuser@foo.bar', password='top_secret')
+        self.client.login(username="testuser@foo.bar", password="top_secret")
 
-        with self.assertTemplateUsed('fillup/add_fillup.html'):
-            response = self.client.post('/fillup/', data=data)
-
-        self.assertEqual(response.status_code, 200)
-
-    def test_respond_with_200_for_url_fillup_correct_pk(self):
-        '''Response 200 should be given on url /fillup/1'''
-        self.client.login(email='testuser@foo.bar', password='top_secret')
-
-        response = self.client.get('/fillup/1/')
+        with self.assertTemplateUsed("fillup/add_fillup.html"):
+            response = self.client.post("/fillup/add/", data=data)
 
         self.assertEqual(response.status_code, 200)
 
-    def test_vehicle_is_preselected_on_existing_vehicle_id(self):
-        '''Vehicle should be preselected on url /fillup/<id>'''
-        self.client.login(email='testuser@foo.bar', password='top_secret')
-        expected_html = (
-            f'''<div id="id_vehicle">
-                    <div><label for="id_vehicle_0">
-                        <input type="radio" name="vehicle" value="{self.vehicle2.id}" required id="id_vehicle_0" checked>
-                        {str(self.vehicle2)}</label>
-                    </div>
-                    <div><label for="id_vehicle_1">
-                        <input type="radio" name="vehicle" value="{self.vehicle3.id}" required id="id_vehicle_1">
-                        {str(self.vehicle3)}</label>
-                    </div>
-                </div>
-            '''
-        )
+    def test_redirects_to_login_for_non_logged_in_user_on_specific_equipment(self):
+        """Non-logged-in users should get redirected to login on equipment view"""
+        response = self.client.get("/fillup/equipment/1/")
 
-        response = self.client.get(f'/fillup/{self.vehicle2.id}/')
+        self.assertRedirects(response, "/accounts/login/?next=/fillup/equipment/1/")
 
-        self.assertEqual(response.status_code, 200)
-        self.assertInHTML(expected_html, response.content.decode(), 1)
+    def test_respond_with_200_for_url_equipment_single(self):
+        """Response 200 should be given on url /equipment/<id>"""
+        self.client.login(username="testuser@foo.bar", password="top_secret")
 
-    def test_vehicle_is_preselected_on_existing_vehicle_id_test_2(self):
-        '''Vehicle should be preselected on url /fillup/<id>, test 2'''
-        self.client.login(email='testuser@foo.bar', password='top_secret')
-        expected_html = (
-            f'''<div id="id_vehicle">
-                    <div><label for="id_vehicle_0">
-                        <input type="radio" name="vehicle" value="{self.vehicle2.id}" required id="id_vehicle_0">
-                        {str(self.vehicle2)}</label>
-                    </div>
-                    <div><label for="id_vehicle_1">
-                        <input type="radio" name="vehicle" value="{self.vehicle3.id}" required id="id_vehicle_1" checked>
-                        {str(self.vehicle3)}</label>
-                    </div>
-                </div>
-            '''
-        )
-
-        response = self.client.get(f'/fillup/{self.vehicle3.id}/')
-
-        self.assertEqual(response.status_code, 200)
-        self.assertInHTML(expected_html, response.content.decode(), 1)
-
-    def test_vehicle_is_preselected_by_default(self):
-        '''Vehicle should be preselected on url /fillup/'''
-        self.client.login(email='testuser@foo.bar', password='top_secret')
-        expected_html = (
-            f'''<div id="id_vehicle">
-                    <div><label for="id_vehicle_0">
-                        <input type="radio" name="vehicle" value="{self.vehicle2.id}" required id="id_vehicle_0" checked>
-                        {str(self.vehicle2)}</label>
-                    </div>
-                    <div><label for="id_vehicle_1">
-                        <input type="radio" name="vehicle" value="{self.vehicle3.id}" required id="id_vehicle_1">
-                        {str(self.vehicle3)}</label>
-                    </div>
-                </div>
-            '''
-        )
-
-        response = self.client.get('/fillup/')
-
-        self.assertEqual(response.status_code, 200)
-        self.assertInHTML(expected_html, response.content.decode(), 1)
-
-
-class DashboardViewsIntegrationTestCase(TestCase):
-    @classmethod
-    def setUpTestData(cls):
-        cls.user = Person.objects.create_user(email='testuser@foo.bar', password='top_secret')
-        cls.vehicle1 = Vehicle.objects.create(name='TestRO', register_number='TEST-RO')
-        cls.vehicle2 = Vehicle.objects.create(name='TestDR', register_number='TEST-DR')
-        cls.vehicle3 = Vehicle.objects.create(name='TestOW', register_number='TEST-OW')
-        VehicleUser.objects.create(
-            person=cls.user, vehicle=cls.vehicle1, role='RO')
-        VehicleUser.objects.create(
-            person=cls.user, vehicle=cls.vehicle2, role='DR')
-        VehicleUser.objects.create(
-            person=cls.user, vehicle=cls.vehicle3, role='OW')
-        Fillup.objects.create(
-            price=Decimal(2.013),
-            amount=42,
-            distance=100,
-            vehicle=cls.vehicle3,
-        )
-
-    def setUp(self):
-        self.client = Client()
-
-    def test_redirects_to_login_for_non_logged_in_user_on_dashboard(self):
-        '''Non-logged-in users should get redirected to login on dashboard view'''
-        response = self.client.get('/dashboard/')
-
-        self.assertRedirects(response, '/accounts/login/?next=/dashboard/')
-
-    def test_vehicle_has_add_fillup_btn_for_owner(self):
-        '''Vehicle should have add fillup button for owner'''
-        self.client.login(email='testuser@foo.bar', password='top_secret')
-        expected_html = (
-            f'<a href="/fillup/{self.vehicle3.id}/" role="button">Add fillup</a>'
-        )
-
-        response = self.client.get('/dashboard/')
-
-        self.assertEqual(response.status_code, 200)
-        self.assertInHTML(expected_html, response.content.decode(), 1)
-
-    def test_vehicle_has_add_fillup_btn_for_driver(self):
-        '''Vehicle should have add fillup button for driver'''
-        self.client.login(email='testuser@foo.bar', password='top_secret')
-        expected_html = (
-            f'<a href="/fillup/{self.vehicle2.id}/" role="button">Add fillup</a>'
-        )
-
-        response = self.client.get('/dashboard/')
-
-        self.assertEqual(response.status_code, 200)
-        self.assertInHTML(expected_html, response.content.decode(), 1)
-
-    def test_vehicle_does_not_have_add_fillup_btn_for_readonly(self):
-        '''Vehicle should have add fillup button for driver'''
-        self.client.login(email='testuser@foo.bar', password='top_secret')
-        needle = (
-            f'<a href="/fillup/{self.vehicle1.id}/" role="button">Add fillup</a>'
-        )
-
-        response = self.client.get('/dashboard/')
-
-        self.assertEqual(response.status_code, 200)
-        self.assertNotIn(needle, response.content.decode(), 1)
-
-class VehicleViewsIntegrationTestCase(TestCase):
-    @classmethod
-    def setUpTestData(cls):
-        cls.user = Person.objects.create_user(email='testuser@foo.bar', password='top_secret')
-        cls.vehicle1 = Vehicle.objects.create(name='TestRO', register_number='TEST-RO')
-        cls.vehicle2 = Vehicle.objects.create(name='TestDR', register_number='TEST-DR')
-        cls.vehicle3 = Vehicle.objects.create(name='TestOW', register_number='TEST-OW')
-        VehicleUser.objects.create(
-            person=cls.user, vehicle=cls.vehicle1, role='RO')
-        VehicleUser.objects.create(
-            person=cls.user, vehicle=cls.vehicle2, role='DR')
-        VehicleUser.objects.create(
-            person=cls.user, vehicle=cls.vehicle3, role='OW')
-        Fillup.objects.create(
-            price=Decimal(2.013),
-            amount=42,
-            distance=100,
-            vehicle=cls.vehicle3,
-        )
-
-    def setUp(self):
-        self.client = Client()
-
-    def test_redirects_to_login_for_non_logged_in_user_on_vehicle(self):
-        '''Non-logged-in users should get redirected to login on vehicle view'''
-        response = self.client.get('/vehicle/')
-
-        self.assertRedirects(response, '/accounts/login/?next=/vehicle/')
-
-    def test_respond_with_200_for_url_vehicle(self):
-        '''Response 200 should be given on url /vehicle/'''
-        self.client.login(email='testuser@foo.bar', password='top_secret')
-
-        response = self.client.get('/vehicle/')
+        response = self.client.get(f"/fillup/equipment/{self.equipment1.id}/")
 
         self.assertEqual(response.status_code, 200)
 
-    def test_vehicle_has_add_fillup_btn_for_owner(self):
-        '''Vehicle should have add fillup button for owner'''
-        self.client.login(email='testuser@foo.bar', password='top_secret')
-        expected_html = (
-            f'<a href="/fillup/{self.vehicle3.id}/" role="button">Add fillup</a>'
-        )
+    def test_return_404_on_incorrect_equipment_id(self):
+        """404 should be returned to user on missing equipment"""
+        self.client.login(username="testuser@foo.bar", password="top_secret")
 
-        response = self.client.get('/vehicle/')
-
-        self.assertEqual(response.status_code, 200)
-        self.assertInHTML(expected_html, response.content.decode(), 1)
-
-    def test_vehicle_has_add_fillup_btn_for_driver(self):
-        '''Vehicle should have add fillup button for driver'''
-        self.client.login(email='testuser@foo.bar', password='top_secret')
-        expected_html = (
-            f'<a href="/fillup/{self.vehicle2.id}/" role="button">Add fillup</a>'
-        )
-
-        response = self.client.get('/vehicle/')
-
-        self.assertEqual(response.status_code, 200)
-        self.assertInHTML(expected_html, response.content.decode(), 1)
-
-    def test_vehicle_does_not_have_add_fillup_btn_for_readonly(self):
-        '''Vehicle should have add fillup button for driver'''
-        self.client.login(email='testuser@foo.bar', password='top_secret')
-        needle = (
-            f'<a href="/fillup/{self.vehicle1.id}/" role="button">Add fillup</a>'
-        )
-
-        response = self.client.get('/vehicle/')
-
-        self.assertEqual(response.status_code, 200)
-        self.assertNotIn(needle, response.content.decode(), 1)
-
-    def test_redirects_to_login_for_non_logged_in_user_on_specific_vehicle(self):
-        '''Non-logged-in users should get redirected to login on vehicle view'''
-        response = self.client.get('/vehicle/1/')
-
-        self.assertRedirects(response, '/accounts/login/?next=/vehicle/1/')
-
-    def test_respond_with_200_for_url_vehicle_single(self):
-        '''Response 200 should be given on url /vehicle/<id>'''
-        self.client.login(email='testuser@foo.bar', password='top_secret')
-
-        response = self.client.get(f'/vehicle/{self.vehicle1.id}/')
-
-        self.assertEqual(response.status_code, 200)
-
-    def test_return_404_on_incorrect_vehicle_id(self):
-        '''404 should be returned to user on missing vehicle'''
-        self.client.login(email='testuser@foo.bar', password='top_secret')
-
-        response = self.client.get('/vehicle/9999/')
+        response = self.client.get("/fillup/equipment/9999/")
 
         self.assertEqual(response.status_code, 404)
 
+    def test_fillups_listed_on_single_equipment_page(self):
+        """Single equipment page should have fillups listed when there are any"""
+        self.client.login(username="testuser@foo.bar", password="top_secret")
 
-    def test_single_vehicle_page_has_add_fillup_btn_for_owner(self):
-        '''Single vehicle page should have add fillup button for owner'''
-        self.client.login(email='testuser@foo.bar', password='top_secret')
-        expected_html = (
-            f'<a href="/fillup/{self.vehicle3.id}/" role="button">Add fillup</a>'
+        response = self.client.get(f"/fillup/equipment/{self.equipment3.id}/")
+
+        self.assertNotContains(response, "No results...")
+
+    def test_no_fillups_listed_on_single_equipment_page_when_empty(self):
+        """Single equipment page should not have fillups listed when there aren't any"""
+        self.client.login(username="testuser@foo.bar", password="top_secret")
+        needle = "No results..."
+
+        response = self.client.get(f"/fillup/equipment/{self.equipment1.id}/")
+
+        self.assertContains(response, needle)
+
+    def test_equipment_without_allow_selection_not_listed(self):
+        """Equipment without fillup in allowed_measurements list should not be listed"""
+        equipment4 = Equipment.objects.create(
+            name="TestNotFound", register_number="TEST-NOT-FOUND", allowed_measurements=[]
+        )
+        self.client.login(username="testuser@foo.bar", password="top_secret")
+
+        response = self.client.get("/fillup/")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(str(self.equipment1), response.content.decode(), 1)
+        self.assertIn(str(self.equipment2), response.content.decode(), 1)
+        self.assertIn(str(self.equipment3), response.content.decode(), 1)
+        self.assertNotIn(str(equipment4), response.content.decode(), 1)
+
+
+class FillupViewsInputsTestCase(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.user = User.objects.create_user(
+            username="testuser@foo.bar", password="top_secret"
+        )
+        cls.equipment1 = Equipment.objects.create(
+            name="TestRO", register_number="TEST-RO", allowed_measurements=["fillup"]
+        )
+        cls.equipment2 = Equipment.objects.create(
+            name="TestUSER", register_number="TEST-USER", allowed_measurements=["fillup"]
+        )
+        cls.equipment3 = Equipment.objects.create(
+            name="TestADMIN", register_number="TEST-ADMIN", allowed_measurements=["fillup"]
+        )
+        EquipmentUser.objects.create(
+            user=cls.user, equipment=cls.equipment1, role="READ_ONLY"
+        )
+        EquipmentUser.objects.create(
+            user=cls.user, equipment=cls.equipment2, role="USER"
+        )
+        EquipmentUser.objects.create(
+            user=cls.user, equipment=cls.equipment3, role="ADMIN"
+        )
+        Fillup.objects.create(
+            price=Decimal(2.013),
+            amount=42,
+            distance=100,
+            equipment=cls.equipment3,
         )
 
-        response = self.client.get(f'/vehicle/{self.vehicle3.id}/')
+    def setUp(self):
+        self.client = Client()
+
+    def test_equipment_has_add_fillup_btn_for_admin(self):
+        """Equipment should have add fillup button for admin"""
+        self.client.login(username="testuser@foo.bar", password="top_secret")
+        expected_html = f'<a href="/fillup/add/equipment/{self.equipment3.id}/" role="button">Add fillup</a>'
+
+        response = self.client.get("/fillup/")
 
         self.assertEqual(response.status_code, 200)
         self.assertInHTML(expected_html, response.content.decode(), 1)
 
-    def test_single_vehicle_page_has_add_fillup_btn_for_driver(self):
-        '''Single vehicle page should have add fillup button for driver'''
-        self.client.login(email='testuser@foo.bar', password='top_secret')
-        expected_html = (
-            f'<a href="/fillup/{self.vehicle2.id}/" role="button">Add fillup</a>'
-        )
+    def test_equipment_has_add_fillup_btn_for_equipment_user(self):
+        """Equipment should have add fillup button for equipment_user"""
+        self.client.login(username="testuser@foo.bar", password="top_secret")
+        expected_html = f'<a href="/fillup/add/equipment/{self.equipment2.id}/" role="button">Add fillup</a>'
 
-        response = self.client.get(f'/vehicle/{self.vehicle2.id}/')
+        response = self.client.get("/fillup/")
 
         self.assertEqual(response.status_code, 200)
         self.assertInHTML(expected_html, response.content.decode(), 1)
 
-    def test_single_vehicle_page_does_not_have_add_fillup_btn_for_readonly(self):
-        '''Single vehicle page should have add fillup button for driver'''
-        self.client.login(email='testuser@foo.bar', password='top_secret')
-        needle = (
-            f'<a href="/fillup/{self.vehicle1.id}/" role="button">Add fillup</a>'
-        )
+    def test_equipment_does_not_have_add_fillup_btn_for_readonly(self):
+        """Equipment should have add fillup button for equipment_user"""
+        self.client.login(username="testuser@foo.bar", password="top_secret")
+        needle = f'<a href="/fillup/add/equipment/{self.equipment1.id}/" role="button">Add fillup</a>'
 
-        response = self.client.get(f'/vehicle/{self.vehicle1.id}/')
+        response = self.client.get("/fillup/")
 
         self.assertEqual(response.status_code, 200)
         self.assertNotIn(needle, response.content.decode(), 1)
 
-    def test_fillups_listed_on_single_vehicle_page(self):
-        '''Single vehicle page should have fillups listed when there are any'''
-        self.client.login(email='testuser@foo.bar', password='top_secret')
-        needle = 'No results...'
+    def test_single_equipment_page_has_add_fillup_btn_for_admin(self):
+        """Single equipment page should have add fillup button for admin"""
+        self.client.login(username="testuser@foo.bar", password="top_secret")
+        expected_html = f'<a href="/fillup/add/equipment/{self.equipment3.id}/" role="button">Add fillup</a>'
 
-        response = self.client.get(f'/vehicle/{self.vehicle3.id}/')
+        response = self.client.get(f"/fillup/equipment/{self.equipment3.id}/")
 
-        self.assertNotContains(response, needle)
+        self.assertEqual(response.status_code, 200)
+        self.assertInHTML(expected_html, response.content.decode(), 1)
 
-    def test_no_fillups_listed_on_single_vehicle_page_when_empty(self):
-        '''Single vehicle page should not have fillups listed when there aren't any'''
-        self.client.login(email='testuser@foo.bar', password='top_secret')
-        needle = 'No results...'
+    def test_single_equipment_page_has_add_fillup_btn_for_equipment_user(self):
+        """Single equipment page should have add fillup button for equipment_user"""
+        self.client.login(username="testuser@foo.bar", password="top_secret")
+        expected_html = f'<a href="/fillup/add/equipment/{self.equipment2.id}/" role="button">Add fillup</a>'
 
-        response = self.client.get(f'/vehicle/{self.vehicle1.id}/')
+        response = self.client.get(f"/fillup/equipment/{self.equipment2.id}/")
 
-        self.assertContains(response, needle)
+        self.assertEqual(response.status_code, 200)
+        self.assertInHTML(expected_html, response.content.decode(), 1)
+
+    def test_single_equipment_page_does_not_have_add_fillup_btn_for_readonly(self):
+        """Single equipment page should have add fillup button for equipment_user"""
+        self.client.login(username="testuser@foo.bar", password="top_secret")
+        needle = f'<a href="/fillup/add/equipment/{self.equipment1.id}/" role="button">Add fillup</a>'
+
+        response = self.client.get(f"/fillup/equipment/{self.equipment1.id}/")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertNotIn(needle, response.content.decode(), 1)

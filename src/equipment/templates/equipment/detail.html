@@ -1,0 +1,66 @@
+{% extends 'lopokulu/base.html' %}
+{% load static lopokulu_extras %}
+{% block content %}
+<article>
+  <header>
+    <nav>
+      <ul>
+        <li><strong>{{ equipment }}</strong></li>
+        {% if perms.equipment.edit_equipment %}
+      </ul>
+      <ul>
+        <li><a href="{% url 'equipment:edit' pk=equipment.id %}" role="button">Edit</a></li>
+        {% endif %}
+        {% if perms.equipment.delete_equipment %}
+        <li><a href="{% url 'equipment:delete' pk=equipment.id %}" class="secondary">Delete</a></li>
+        {% endif %}
+      </ul>
+    </nav>
+  </header>
+  <main>
+    <h6>Allowed measurement types</h6>
+    <p>
+      {% for allowed in equipment.allowed_measurements %}
+      <a href="{% url allowed|addstr:':index' %}" role="button">{{ allowed|capfirst|addstr:'s' }}</a>
+      {% empty %}
+        {% if perms.equipment.edit_equipment %}
+          No measurements allowed (<a href="{% url 'equipment:edit' pk=equipment.id %}">edit to allow</a>)
+        {% else %}
+          No measurements allowed (and no permission to allow anything)
+        {% endif %}
+      {% endfor %}
+    </p>
+    <h6>Measurement roles</h6>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          {% for role in roles %}
+            <th class="center">{{ role.label }}</th>
+          {% endfor %}
+        </tr>
+      </thead>
+      <tbody>
+        {% for user in equipment_users %}
+          <tr>
+            <td>
+              {{ user.user }}
+            </td>
+            {% for role in roles %}
+              <td class="center">
+                {% if role == user.role %}
+                  &check;
+                {% endif %}
+              </td>
+            {% endfor %}
+          </tr>
+        {% empty %}
+          <tr>
+            <td colspan="5">Nobody has access...</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </main>
+</article>
+{% endblock %}

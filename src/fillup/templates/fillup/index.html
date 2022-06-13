@@ -8,15 +8,20 @@ SPDX-License-Identifier: MIT
 
 {% extends 'lopokulu/base.html' %}
 {% block content %}
+{% for single_equipment in equipment %}
 <article>
   <header>
     <nav>
       <ul>
-        <li><strong>{{ vehicle }}</strong></li>
+        <li><strong>
+          <a href="{% url 'fillup:single_equipment' pk=single_equipment.equipment.id %}">
+            {{ single_equipment.equipment }}
+          </a>
+        </strong></li>
       </ul>
-      {% if vehicle in allowed_fillups %}
+      {% if single_equipment.role in fillup_allowed_roles %}
       <ul>
-        <li><a href="{% url 'add_fillup_for_vehicle' pk=vehicle.id %}" role="button">Add fillup</a></li>
+        <li><a href="{% url 'fillup:add_fillup_for_equipment' pk=single_equipment.equipment.id %}" role="button">Add fillup</a></li>
       </ul>
       {% endif %}
     </nav>
@@ -36,7 +41,7 @@ SPDX-License-Identifier: MIT
         </tr>
       </thead>
       <tbody>
-        {% for fillup in fillups %}
+        {% for fillup in single_equipment.fillups %}
         <tr>
           <td>{{ fillup.addition_date|date:'j.n G:i' }}</td>
           <td>{{ fillup.tank_full }}</td>
@@ -60,4 +65,5 @@ SPDX-License-Identifier: MIT
     </table>
   </main>
 </article>
+{% endfor %}
 {% endblock %}
