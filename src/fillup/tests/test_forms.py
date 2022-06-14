@@ -21,13 +21,19 @@ class FillupFormTestCase(TestCase):
             username="testuser@foo.bar", password="top_secret"
         )
         cls.equipment1 = Equipment.objects.create(
-            name="TestREAD_ONLY", register_number="TEST-READ_ONLY"
+            name="TestREAD_ONLY",
+            register_number="TEST-READ_ONLY",
+            allowed_measurements=["fillup"],
         )
         cls.equipment2 = Equipment.objects.create(
-            name="TestUSER", register_number="TEST-USER"
+            name="TestUSER",
+            register_number="TEST-USER",
+            allowed_measurements=["fillup"],
         )
         cls.equipment3 = Equipment.objects.create(
-            name="TestADMIN", register_number="TEST-ADMIN"
+            name="TestADMIN",
+            register_number="TEST-ADMIN",
+            allowed_measurements=["fillup"],
         )
         EquipmentUser.objects.create(
             user=cls.user, equipment=cls.equipment1, role="READ_ONLY"
@@ -52,6 +58,27 @@ class FillupFormTestCase(TestCase):
             "distance": 1,
             "equipment": None,
         }
+
+    def test_fillup_not_allowed_for_equipment_without_fillup_allowed(self):
+        """Fillup is not allowed for equipment without fillup allowed"""
+        expected = {
+            "equipment": [
+                "Select a valid choice. That choice is not one of the available choices."
+            ],
+        }
+        data = self.base_form_data
+        data["equipment"] = Equipment.objects.create(
+            name="TestNoFillup", register_number="TEST-NO-FILLUP"
+        )
+        EquipmentUser.objects.create(
+            user=self.user, equipment=data["equipment"], role="ADMIN"
+        )
+
+        form = FillupForm(self.user, data=data)
+
+        # We only want to test for expected key-value pairs
+        subset = {k: v for k, v in form.errors.items() if k in expected}
+        self.assertDictEqual(subset, expected)
 
     def test_fillup_not_allowed_for_equipment_readonly_user(self):
         """Fillup is not allowed for user with readonly status on a equipment"""

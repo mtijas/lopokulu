@@ -52,6 +52,7 @@ class FillupForm(forms.ModelForm):
 
     def get_allowed_equipment(self):
         return Equipment.objects.filter(
+            allowed_measurements__contains="fillup",
             equipmentuser__user_id=self.user.id,
             equipmentuser__role__in=["USER", "ADMIN"],
         )
