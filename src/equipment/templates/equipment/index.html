@@ -24,7 +24,9 @@
           <td><a href="{% url 'equipment:detail' pk=equipment.id %}">{{ equipment }}</a></td>
           <td>
             {% for allowed in equipment.allowed_measurements %}
-              <a href="{% url allowed|addstr:':index' %}" role="button">{{ allowed|capfirst|addstr:'s' }}</a>
+              <a href="{% url allowed|addstr:':detail' pk=equipment.id %}" role="button">
+                {{ allowed|capfirst|addstr:'s' }}
+              </a>
             {% empty %}
               No measurements allowed
             {% endfor %}

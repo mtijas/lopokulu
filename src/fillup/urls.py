@@ -14,5 +14,5 @@ urlpatterns = [
     path("", views.index, name="index"),
     path("add/", views.add_fillup, name="add_fillup"),
     path("add/equipment/<int:pk>/", views.add_fillup, name="add_fillup_for_equipment"),
-    path("equipment/<int:pk>/", views.single_equipment, name="single_equipment"),
+    path("equipment/<int:pk>/", views.single_equipment, name="detail"),
 ]
