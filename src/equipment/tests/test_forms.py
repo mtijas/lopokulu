@@ -2,6 +2,7 @@
 #
 # SPDX-License-Identifier: MIT
 
+from django.conf import settings
 from django.contrib.auth.models import User
 from django.test import TestCase
 
@@ -45,3 +46,11 @@ class EquipmentFormTestCase(TestCase):
             "name": "base name",
             "register_number": "base-register-num",
         }
+
+    def test_allowed_measurements_input_fields_generated_for_all_installed(self):
+        """All installed measurement apps should have checkboxes on allowed measurements form"""
+        form = EquipmentForm(self.user1)
+
+        for index, app in enumerate(settings.INSTALLED_MEASUREMENT_APPS):
+            needle = f'<input type="checkbox" name="allowed_measurements" value="{app}" id="id_allowed_measurements_{index}">'
+            self.assertInHTML(needle, str(form), 1)

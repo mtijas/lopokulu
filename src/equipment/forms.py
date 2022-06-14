@@ -15,7 +15,6 @@ for app in settings.INSTALLED_MEASUREMENT_APPS:
 
 
 class EquipmentForm(forms.ModelForm):
-    # @TODO: Unit tests
     allowed_measurements = forms.MultipleChoiceField(
         required=False,
         widget=forms.CheckboxSelectMultiple,
