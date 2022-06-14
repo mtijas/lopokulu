@@ -13,15 +13,22 @@
 }
 
 body {
-  background-image: url("/static/lopokulu/images/noisy-texture-100x100.png");
-  background-repeat: repeat;
   display: grid;
   grid-template-rows: auto 1fr auto;
   min-height: 100vh;
 }
 
 #site-header {
-  background-color: #08222d;
+  z-index: 99;
+  position: fixed;
+  top: 0;
+  right: 0;
+  left: 0;
+  backdrop-filter: saturate(100%) blur(20px);
+  background-color: var(--nav-background-color);
+  border-style: none none solid none;
+  border-width: 1px;
+  border-color: var(--primary);
 }
 
 #site-header #main-nav li {
@@ -51,8 +58,11 @@ body {
   border-bottom-right-radius: var(--border-radius);
 }
 
+body > main {
+  margin-top: 2rem;
+}
+
 body > footer {
-  background-color: #08222d;
   bottom: 0;
   margin-bottom: 0;
   padding: 0;
@@ -60,7 +70,6 @@ body > footer {
 }
 
 body > footer p {
-  color: #175d7a;
   margin-bottom: calc(var(--typography-spacing-vertical) * 0.5);
   margin-top: calc(var(--typography-spacing-vertical) * 0.5);
 }
