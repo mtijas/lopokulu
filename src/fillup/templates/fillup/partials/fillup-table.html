@@ -1,4 +1,4 @@
-<table>
+<table role="grid">
   <thead>
     <tr>
       <th>Date</th>
@@ -17,10 +17,8 @@
       </td>
       <td>
         {{ fillup.amount }} l
-        {% if fillup.tank_full %}
-          <small data-tooltip="The tank was filled completely">(Full)</small>
-        {% else %}
-          <small data-tooltip="The tank was partially filled">(Partial)</small>
+        {% if not fillup.tank_full %}
+          <em data-tooltip="The tank was partially filled">&half;</em>
         {% endif %}
       </td>
       {% if fillup.consumption != None %}
