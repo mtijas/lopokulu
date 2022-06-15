@@ -8,71 +8,83 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
+from django.views import View
+from django.views.generic import DetailView, ListView
+from django.utils.decorators import method_decorator
 
 from equipment.models import Equipment, EquipmentUser
 
-from .forms import FillupForm
-from .models import Fillup
+from fillup.forms import FillupForm
+from fillup.models import Fillup
 
 
-@login_required
-def add_fillup(request, pk=None):
-    if request.method == "POST":
+@method_decorator(login_required, name="dispatch")
+class FillupListView(ListView):
+    model = Fillup
+    template_name = "fillup/index.html"
+
+    def get(self, request, **kwargs):
+        equipmentusers = EquipmentUser.objects.filter(
+            user=request.user, equipment__allowed_measurements__contains="fillup"
+        )
+        equipment = []
+
+        for single_eu in equipmentusers:
+            equipment.append(
+                {
+                    "equipment": single_eu.equipment,
+                    "role": single_eu.role,
+                    "fillups": Fillup.objects.filter(equipment=single_eu.equipment)[:10],
+                }
+            )
+
+        content = {
+            "fillup_allowed_roles": ["USER", "ADMIN"],
+            "equipment": equipment,
+        }
+
+        return render(request, self.template_name, content)
+
+
+@method_decorator(login_required, name="dispatch")
+class FillupEquipmentDetailView(DetailView):
+    model = Fillup
+    template_name = "fillup/single_equipment.html"
+
+    def get(self, request, **kwargs):
+        equipmentusers = get_object_or_404(
+            EquipmentUser, user=request.user, equipment__pk=kwargs.get("pk")
+        )
+
+        content = {
+            "fillup_allowed_roles": ["USER", "ADMIN"],
+            "equipment": get_object_or_404(Equipment, pk=kwargs.get("pk")),
+            "fillups": Fillup.objects.filter(equipment__pk=kwargs.get("pk")),
+            "role": equipmentusers.role,
+        }
+
+        return render(request, "fillup/single_equipment.html", content)
+
+
+@method_decorator(login_required, name="dispatch")
+class FillupAddView(View):
+    model = Fillup
+    template_name = "fillup/add_fillup.html"
+
+    def get(self, request, **kwargs):
+        if "equipment_id" in self.kwargs:
+            initial_data = {"equipment": kwargs.get("pk")}
+            form = FillupForm(request.user, initial=initial_data)
+        else:
+            form = FillupForm(request.user)
+        return render(request, self.template_name, {"form": form})
+
+    def post(self, request, **kwargs):
         form = FillupForm(request.user, request.POST)
         if form.is_valid():
             fillup = form.save(commit=False)
             fillup.user = request.user
             fillup.save()
             fillup.update_next_consumption()
-            return redirect("fillup:index")
-
-    elif pk is not None:
-        initial_data = {"equipment": pk}
-        form = FillupForm(request.user, initial=initial_data)
-    else:
-        form = FillupForm(request.user)
-
-    content = {
-        "form": form,
-    }
-    return render(request, "fillup/add_fillup.html", content)
-
-
-@login_required
-def index(request):
-    equipmentusers = EquipmentUser.objects.filter(
-        user=request.user, equipment__allowed_measurements__contains="fillup"
-    )
-    equipment = []
-
-    for single_eu in equipmentusers:
-        equipment.append(
-            {
-                "equipment": single_eu.equipment,
-                "role": single_eu.role,
-                "fillups": Fillup.objects.filter(equipment=single_eu.equipment)[:10],
-            }
-        )
-
-    content = {
-        "fillup_allowed_roles": ["USER", "ADMIN"],
-        "equipment": equipment,
-    }
-
-    return render(request, "fillup/index.html", content)
-
-
-@login_required
-def single_equipment(request, pk):
-    equipmentusers = get_object_or_404(
-        EquipmentUser, user=request.user, equipment__pk=pk
-    )
-
-    content = {
-        "fillup_allowed_roles": ["USER", "ADMIN"],
-        "equipment": get_object_or_404(Equipment, pk=pk),
-        "fillups": Fillup.objects.filter(equipment__pk=pk),
-        "role": equipmentusers.role,
-    }
-
-    return render(request, "fillup/single_equipment.html", content)
+            return redirect("fillup:detail", fillup.equipment.id)
+        return render(request, self.template_name, {"form": form})

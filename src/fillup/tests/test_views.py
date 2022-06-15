@@ -68,7 +68,7 @@ class FillupViewsBasicTestCase(TestCase):
 
         self.assertRedirects(response, "/accounts/login/?next=/fillup/")
 
-    def test_redirect_to_index_after_successful_addition(self):
+    def test_redirect_to_detail_after_successful_addition(self):
         """User should be redirected to fillups index after successful fillup addition"""
         data = {
             "price": 1,
@@ -79,9 +79,9 @@ class FillupViewsBasicTestCase(TestCase):
         }
         self.client.login(username="testuser@foo.bar", password="top_secret")
 
-        response = self.client.post("/fillup/add/", data=data)
+        response = self.client.post("/fillup/add/", data=data, follow=True)
 
-        self.assertRedirects(response, "/fillup/")
+        self.assertContains(response, "15.6.22 12:00")
 
     def test_returned_to_fillupform_on_invalid_data(self):
         """User should be returned to add_fillup view on posting invalid data"""
@@ -114,6 +114,20 @@ class FillupViewsBasicTestCase(TestCase):
         response = self.client.get("/fillup/equipment/9999/")
 
         self.assertEqual(response.status_code, 404)
+
+    def test_redirects_non_logged_in_redirect_login_on_add_fillup_for_equipment(self):
+        """Non-logged-in users should get redirected to login on add fillup for equipment view"""
+        response = self.client.get("/fillup/add/equipment/1/")
+
+        self.assertRedirects(response, "/accounts/login/?next=/fillup/add/equipment/1/")
+
+    def test_respond_with_200_for_url_add_equipment_single(self):
+        """Response 200 should be given on url /add/equipment/<id>"""
+        self.client.login(username="testuser@foo.bar", password="top_secret")
+
+        response = self.client.get(f"/fillup/add/equipment/{self.equipment1.id}/")
+
+        self.assertEqual(response.status_code, 200)
 
     def test_fillups_listed_on_single_equipment_page(self):
         """Single equipment page should have fillups listed when there are any"""
