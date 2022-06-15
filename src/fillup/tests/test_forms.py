@@ -59,6 +59,13 @@ class FillupFormTestCase(TestCase):
             equipment=cls.equipment3,
             addition_date=datetime.fromisoformat("2022-06-15T16:00:00+02:00"),
         )
+        Fillup.objects.create(
+            price=Decimal(2.013),
+            amount=42,
+            distance=300,
+            equipment=cls.equipment3,
+            addition_date=datetime.fromisoformat("2022-06-15T17:00:00+02:00"),
+        )
 
     def setUp(self):
         self.base_form_data = {
@@ -243,9 +250,10 @@ class FillupFormTestCase(TestCase):
 
     def test_distance_cannot_be_less_than_on_previous_fillup(self):
         """New fillup distance cannot be less than distance of previous fillup"""
-        expected = {"distance": ["Distance should be more than 100.0"]}
+        expected = {"distance": ["Distance should be more than 300.0"]}
         data = self.base_form_data
         data["equipment"] = self.equipment3.id
+        data["addition_date"] = "2022-06-15 18:00:00+02:00"
         data["distance"] = 42
 
         form = FillupForm(self.user, data=data)
@@ -259,7 +267,7 @@ class FillupFormTestCase(TestCase):
         data = self.base_form_data
         data["equipment"] = self.equipment3.id
         data["distance"] = 175
-        data["addition_date"] = "2022-06-15 15:30:00"
+        data["addition_date"] = "2022-06-15 15:30:00+02:00"
 
         form = FillupForm(self.user, data=data)
 

@@ -55,7 +55,7 @@ class FillupForm(forms.ModelForm):
         # Get the next fillup for equipment in question
         next_fillup = Fillup.objects.filter(
             equipment=equipment, addition_date__gt=addition_date
-        ).first()
+        ).last()
 
         if next_fillup is not None:
             if distance >= next_fillup.distance:
