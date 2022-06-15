@@ -1,0 +1,41 @@
+<table>
+  <thead>
+    <tr>
+      <th>Date</th>
+      <th>Odometer</th>
+      <th>Amount</th>
+      <th>Consumption</th>
+      <th>Price</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for fillup in fillups %}
+    <tr>
+      <td>{{ fillup.addition_date|date:'j.n.y G:i' }}</td>
+      <td>{{ fillup.distance|floatformat:0 }} km
+        <sup>(+ {{ fillup.distance_delta|floatformat:0 }} km)</sup>
+      </td>
+      <td>
+        {{ fillup.amount }} l
+        {% if fillup.tank_full %}
+          <small data-tooltip="The tank was filled completely">(Full)</small>
+        {% else %}
+          <small data-tooltip="The tank was partially filled">(Partial)</small>
+        {% endif %}
+      </td>
+      {% if fillup.consumption != None %}
+        <td>{{ fillup.consumption|floatformat:1 }} l/100km</td>
+      {% else %}
+        <td>---</td>
+      {% endif %}
+      <td>{{ fillup.total_price }} €
+        <sup>({{ fillup.price }} €/l)</sup>
+      </td>
+    </tr>
+    {% empty %}
+    <tr>
+      <td colspan="5">No results...</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
