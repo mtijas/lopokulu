@@ -293,6 +293,14 @@ class FillupViewsIntegrationTestCase(TestCase):
             tank_full=True,
             addition_date=datetime.fromisoformat("2022-06-15T16:00:00+02:00"),
         )
+        cls.fillup3 = Fillup.objects.create(
+            price=Decimal(1.9),
+            amount=4,
+            distance=250,
+            equipment=cls.equipment3,
+            tank_full=True,
+            addition_date=datetime.fromisoformat("2022-06-15T17:00:00+02:00"),
+        )
 
     def setUp(self):
         self.client = Client()

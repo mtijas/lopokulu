@@ -93,7 +93,7 @@ class Fillup(models.Model):
             equipment_id=self.equipment.id,
             addition_date__gt=self.addition_date,
             tank_full=True,
-        ).first()
+        ).last()
         if next_full_fillup is not None:
             next_full_fillup.save()  # Saving should invoke calculation automatically
 
