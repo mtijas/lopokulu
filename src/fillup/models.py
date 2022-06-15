@@ -77,7 +77,7 @@ class Fillup(models.Model):
             partial_filled_sum = Fillup.objects.filter(
                 equipment_id=self.equipment.id,
                 addition_date__lt=self.addition_date,
-                pk__gt=previous_full_fillup.id,
+                addition_date__gt=previous_full_fillup.addition_date,
             ).aggregate(sum_amount=Sum("amount"))
 
             if partial_filled_sum["sum_amount"] is not None:
