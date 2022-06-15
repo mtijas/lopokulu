@@ -23,10 +23,10 @@ def validate_positive(value):
 
 class Fillup(models.Model):
     price = models.DecimalField(
-        "Price per unit", decimal_places=3, max_digits=5, validators=[validate_positive]
+        "Price per unit (€/l)", decimal_places=3, max_digits=5, validators=[validate_positive]
     )
-    amount = models.FloatField("Total filled up amount", validators=[validate_positive])
-    distance = models.FloatField("Total odometer")
+    amount = models.FloatField("Total filled up amount (litres)", validators=[validate_positive])
+    distance = models.FloatField("Odometer (km)")
     addition_date = models.DateTimeField(default=timezone.now)
     tank_full = models.BooleanField(default=True)
     distance_delta = models.FloatField("Distance delta", null=True)
