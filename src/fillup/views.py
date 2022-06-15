@@ -22,8 +22,8 @@ def add_fillup(request, pk=None):
         if form.is_valid():
             fillup = form.save(commit=False)
             fillup.user = request.user
-            fillup.addition_date = timezone.now()
             fillup.save()
+            fillup.update_next_consumption()
             return redirect("fillup:index")
 
     elif pk is not None:

@@ -87,6 +87,16 @@ class Fillup(models.Model):
 
         return None
 
+    def update_next_consumption(self):
+        """Tries to update next fillup's consumption in case there is one"""
+        next_full_fillup = Fillup.objects.filter(
+            equipment_id=self.equipment.id,
+            addition_date__gt=self.addition_date,
+            tank_full=True,
+        ).first()
+        if next_full_fillup is not None:
+            next_full_fillup.save()  # Saving should invoke calculation automatically
+
     def save(self, *args, **kwargs):
         self.distance_delta = self.calculate_distance_delta()
         self.total_price = self.calculate_total_price()
@@ -94,7 +104,7 @@ class Fillup(models.Model):
         super(Fillup, self).save(*args, **kwargs)
 
     class Meta:
-        ordering = ["-id"]
+        ordering = ["-addition_date"]
 
     def __str__(self):
-        return f"({self.equipment}) {self.distance}, {self.amount} @ {self.price}"
+        return f"({self.equipment}) {self.distance} [{self.distance_delta}], {self.amount} @ {self.price}, {self.consumption} l/100km, {self.tank_full}"

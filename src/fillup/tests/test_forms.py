@@ -4,6 +4,7 @@
 #
 # SPDX-License-Identifier: MIT
 
+from datetime import datetime
 from decimal import Decimal
 
 from django.contrib.auth.models import Group, Permission, User
@@ -47,8 +48,16 @@ class FillupFormTestCase(TestCase):
         Fillup.objects.create(
             price=Decimal(2.013),
             amount=42,
+            distance=50,
+            equipment=cls.equipment3,
+            addition_date=datetime.fromisoformat("2022-06-15T15:00:00+02:00"),
+        )
+        Fillup.objects.create(
+            price=Decimal(2.013),
+            amount=42,
             distance=100,
             equipment=cls.equipment3,
+            addition_date=datetime.fromisoformat("2022-06-15T16:00:00+02:00"),
         )
 
     def setUp(self):
@@ -56,7 +65,8 @@ class FillupFormTestCase(TestCase):
             "price": 1,
             "amount": 1,
             "distance": 1,
-            "equipment": None,
+            "equipment": self.equipment3.id,
+            "addition_date": "2022-06-15T17:00:00+02:00"
         }
 
     def test_fillup_not_allowed_for_equipment_without_fillup_allowed(self):
@@ -88,7 +98,7 @@ class FillupFormTestCase(TestCase):
             ],
         }
         data = self.base_form_data
-        data["equipment"] = Equipment.objects.get(name="TestREAD_ONLY")
+        data["equipment"] = self.equipment1.id
 
         form = FillupForm(self.user, data=data)
 
@@ -99,7 +109,7 @@ class FillupFormTestCase(TestCase):
     def test_fillup_allowed_for_equipment_driver(self):
         """Fillup is allowed for user with driver status on a equipment"""
         data = self.base_form_data
-        data["equipment"] = Equipment.objects.get(name="TestUSER")
+        data["equipment"] = self.equipment2.id
 
         form = FillupForm(self.user, data=data)
 
@@ -109,7 +119,7 @@ class FillupFormTestCase(TestCase):
     def test_fillup_allowed_for_equipment_owner(self):
         """Fillup is allowed for user with owner status on a equipment"""
         data = self.base_form_data
-        data["equipment"] = Equipment.objects.get(name="TestADMIN")
+        data["equipment"] = self.equipment3.id
 
         form = FillupForm(self.user, data=data)
 
@@ -136,6 +146,7 @@ class FillupFormTestCase(TestCase):
         """Filled amount should not be negative"""
         expected = {"amount": ["Value should be over zero"]}
         data = self.base_form_data
+        data["equipment"] = self.equipment2
         data["amount"] = -1
 
         form = FillupForm(self.user, data=data)
@@ -201,16 +212,18 @@ class FillupFormTestCase(TestCase):
         expected = {"distance": ["Distance should be zero or more"]}
         data = self.base_form_data
         data["distance"] = -1
+        data["equipment"] = self.equipment2
 
         form = FillupForm(self.user, data=data)
 
         subset = {k: v for k, v in form.errors.items() if k in expected}
         self.assertDictEqual(subset, expected)
 
-    def test_zero_distance_is_not_allowed(self):
-        """Filled distance should not be zero"""
+    def test_zero_distance_is_allowed(self):
+        """Zero filled distance should be allowed"""
         data = self.base_form_data
         data["distance"] = 0
+        data["equipment"] = self.equipment2
 
         form = FillupForm(self.user, data=data)
 
@@ -221,6 +234,7 @@ class FillupFormTestCase(TestCase):
         """Positive number allowed for filled distance"""
         data = self.base_form_data
         data["distance"] = 0.1
+        data["equipment"] = self.equipment2
 
         form = FillupForm(self.user, data=data)
 
@@ -231,8 +245,21 @@ class FillupFormTestCase(TestCase):
         """New fillup distance cannot be less than distance of previous fillup"""
         expected = {"distance": ["Distance should be more than 100.0"]}
         data = self.base_form_data
-        data["equipment"] = Equipment.objects.get(name="TestADMIN")
+        data["equipment"] = self.equipment3.id
         data["distance"] = 42
+
+        form = FillupForm(self.user, data=data)
+
+        subset = {k: v for k, v in form.errors.items() if k in expected}
+        self.assertDictEqual(subset, expected)
+
+    def test_distance_must_be_less_than_on_next_fillup(self):
+        """New fillup distance must be less than distance of next fillup"""
+        expected = {"distance": ["Distance should be less than 100.0"]}
+        data = self.base_form_data
+        data["equipment"] = self.equipment3.id
+        data["distance"] = 175
+        data["addition_date"] = "2022-06-15 15:30:00"
 
         form = FillupForm(self.user, data=data)
 

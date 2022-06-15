@@ -4,6 +4,7 @@
 #
 # SPDX-License-Identifier: MIT
 
+from datetime import datetime
 from decimal import Decimal
 
 from django.contrib.auth.models import Group, Permission, User
@@ -24,10 +25,14 @@ class FillupViewsBasicTestCase(TestCase):
             name="TestRO", register_number="TEST-RO", allowed_measurements=["fillup"]
         )
         cls.equipment2 = Equipment.objects.create(
-            name="TestUSER", register_number="TEST-USER", allowed_measurements=["fillup"]
+            name="TestUSER",
+            register_number="TEST-USER",
+            allowed_measurements=["fillup"],
         )
         cls.equipment3 = Equipment.objects.create(
-            name="TestADMIN", register_number="TEST-ADMIN", allowed_measurements=["fillup"]
+            name="TestADMIN",
+            register_number="TEST-ADMIN",
+            allowed_measurements=["fillup"],
         )
         EquipmentUser.objects.create(
             user=cls.user, equipment=cls.equipment1, role="READ_ONLY"
@@ -43,6 +48,7 @@ class FillupViewsBasicTestCase(TestCase):
             amount=42,
             distance=100,
             equipment=cls.equipment3,
+            addition_date=datetime.fromisoformat("2022-06-15T00:00:00+02:00"),
         )
 
     def setUp(self):
@@ -68,7 +74,8 @@ class FillupViewsBasicTestCase(TestCase):
             "price": 1,
             "amount": 1,
             "distance": 101,
-            "equipment": Equipment.objects.get(name="TestADMIN").id,
+            "addition_date": "2022-06-15 12:00:00",
+            "equipment": self.equipment3.id,
         }
         self.client.login(username="testuser@foo.bar", password="top_secret")
 
@@ -128,7 +135,9 @@ class FillupViewsBasicTestCase(TestCase):
     def test_equipment_without_allow_selection_not_listed(self):
         """Equipment without fillup in allowed_measurements list should not be listed"""
         equipment4 = Equipment.objects.create(
-            name="TestNotFound", register_number="TEST-NOT-FOUND", allowed_measurements=[]
+            name="TestNotFound",
+            register_number="TEST-NOT-FOUND",
+            allowed_measurements=[],
         )
         self.client.login(username="testuser@foo.bar", password="top_secret")
 
@@ -151,10 +160,14 @@ class FillupViewsInputsTestCase(TestCase):
             name="TestRO", register_number="TEST-RO", allowed_measurements=["fillup"]
         )
         cls.equipment2 = Equipment.objects.create(
-            name="TestUSER", register_number="TEST-USER", allowed_measurements=["fillup"]
+            name="TestUSER",
+            register_number="TEST-USER",
+            allowed_measurements=["fillup"],
         )
         cls.equipment3 = Equipment.objects.create(
-            name="TestADMIN", register_number="TEST-ADMIN", allowed_measurements=["fillup"]
+            name="TestADMIN",
+            register_number="TEST-ADMIN",
+            allowed_measurements=["fillup"],
         )
         EquipmentUser.objects.create(
             user=cls.user, equipment=cls.equipment1, role="READ_ONLY"
@@ -234,3 +247,97 @@ class FillupViewsInputsTestCase(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertNotIn(needle, response.content.decode(), 1)
+
+
+class FillupViewsIntegrationTestCase(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.user = User.objects.create_user(
+            username="testuser@foo.bar", password="top_secret"
+        )
+        cls.equipment1 = Equipment.objects.create(
+            name="TestRO", register_number="TEST-RO", allowed_measurements=["fillup"]
+        )
+        cls.equipment2 = Equipment.objects.create(
+            name="TestUSER",
+            register_number="TEST-USER",
+            allowed_measurements=["fillup"],
+        )
+        cls.equipment3 = Equipment.objects.create(
+            name="TestADMIN",
+            register_number="TEST-ADMIN",
+            allowed_measurements=["fillup"],
+        )
+        EquipmentUser.objects.create(
+            user=cls.user, equipment=cls.equipment1, role="READ_ONLY"
+        )
+        EquipmentUser.objects.create(
+            user=cls.user, equipment=cls.equipment2, role="USER"
+        )
+        EquipmentUser.objects.create(
+            user=cls.user, equipment=cls.equipment3, role="ADMIN"
+        )
+        cls.fillup1 = Fillup.objects.create(
+            price=Decimal(1.8),
+            amount=5,
+            distance=100,
+            equipment=cls.equipment3,
+            tank_full=True,
+            addition_date=datetime.fromisoformat("2022-06-15T15:00:00+02:00"),
+        )
+        cls.fillup2 = Fillup.objects.create(
+            price=Decimal(1.9),
+            amount=2,
+            distance=200,
+            equipment=cls.equipment3,
+            tank_full=True,
+            addition_date=datetime.fromisoformat("2022-06-15T16:00:00+02:00"),
+        )
+
+    def setUp(self):
+        self.client = Client()
+
+    def test_consumption_calculated_on_insert_between_existing_fillups(self):
+        """Consumption should be calculated for new fillup on
+        inserting new fillup between two full fillups"""
+        data = {
+            "price": 1.8,
+            "amount": 3.9,
+            "distance": 160,
+            "equipment": self.equipment3.id,
+            "addition_date": "2022-06-15T15:30:00+02:00",
+            "tank_full": "1",
+        }
+        self.client.login(username="testuser@foo.bar", password="top_secret")
+
+        response = self.client.post("/fillup/add/", data=data)
+
+        updated_fillup = Fillup.objects.filter(
+            distance=160, equipment=self.equipment3.id
+        ).first()
+
+        self.assertAlmostEqual(float(updated_fillup.consumption), 6.5, places=3)
+
+    def test_consumption_and_dist_delta_calculated_for_next_fillup_on_insert(self):
+        """Consumption and distance delta should be calculated for next fillup on
+        inserting new fillup between two full fillups"""
+        data = {
+            "price": 1.8,
+            "amount": 3.9,
+            "distance": 160,
+            "equipment": self.equipment3.id,
+            "addition_date": "2022-06-15T15:30:00+02:00",
+            "tank_full": "1",
+        }
+        self.client.login(username="testuser@foo.bar", password="top_secret")
+
+        response = self.client.post("/fillup/add/", data=data)
+
+        updated_fillup = Fillup.objects.filter(
+            distance=200, equipment=self.equipment3.id
+        ).first()
+
+        self.assertAlmostEqual(float(self.fillup2.consumption), 2.0, places=3)
+        self.assertAlmostEqual(float(self.fillup2.distance_delta), 100.0, places=1)
+        self.assertAlmostEqual(float(updated_fillup.consumption), 5.0, places=3)
+        self.assertAlmostEqual(float(updated_fillup.distance_delta), 40.0, places=1)

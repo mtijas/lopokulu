@@ -28,7 +28,7 @@ class FillupModelTestCase(TestCase):
             distance=100,
             equipment=equipment,
         )
-        expected = f"({equipment}) 100, 42 @ 2.013"
+        expected = f"({equipment}) 100 [None], 42 @ 2.013, None l/100km, True"
 
         result = str(fillup)
 

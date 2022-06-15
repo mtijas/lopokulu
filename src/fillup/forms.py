@@ -31,24 +31,39 @@ class FillupForm(forms.ModelForm):
         cleaned_data = super().clean()
         distance = cleaned_data.get("distance")
         equipment = cleaned_data.get("equipment")
+        addition_date = cleaned_data.get("addition_date")
 
-        if equipment is None:
+        if "equipment" in self.errors or "addition_date" in self.errors:
             return
 
-        # Get the latest fillup for equipment in question
+        # Get the previous fillup for equipment in question
         previous_fillup = Fillup.objects.filter(
-            equipment_id=equipment.id,
+            equipment=equipment, addition_date__lt=addition_date
         ).first()
 
-        if previous_fillup is None:
-            return  # It's ok to not have any fillups yet
+        if distance is None:
+            return
 
-        if distance <= previous_fillup.distance:
-            self.add_error(
-                "distance",
-                _("Distance should be more than %(dist)s")
-                % {"dist": previous_fillup.distance},
-            )
+        if previous_fillup is not None:
+            if distance <= previous_fillup.distance:
+                self.add_error(
+                    "distance",
+                    _("Distance should be more than %(dist)s")
+                    % {"dist": previous_fillup.distance},
+                )
+
+        # Get the next fillup for equipment in question
+        next_fillup = Fillup.objects.filter(
+            equipment=equipment, addition_date__gt=addition_date
+        ).first()
+
+        if next_fillup is not None:
+            if distance >= next_fillup.distance:
+                self.add_error(
+                    "distance",
+                    _("Distance should be less than %(dist)s")
+                    % {"dist": next_fillup.distance},
+                )
 
     def get_allowed_equipment(self):
         return Equipment.objects.filter(
@@ -60,6 +75,20 @@ class FillupForm(forms.ModelForm):
     class Meta:
         model = Fillup
         widgets = {"equipment": forms.RadioSelect}
-        fields = ["price", "amount", "distance", "equipment", "tank_full"]
+        fields = [
+            "price",
+            "amount",
+            "distance",
+            "equipment",
+            "tank_full",
+            "addition_date",
+        ]
 
-    field_order = ["equipment", "distance", "amount", "price", "tank_full"]
+    field_order = [
+        "equipment",
+        "addition_date",
+        "distance",
+        "amount",
+        "price",
+        "tank_full",
+    ]
