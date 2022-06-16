@@ -6,6 +6,7 @@
       <th>Amount</th>
       <th>Consumption</th>
       <th>Price</th>
+      <th></th>
     </tr>
   </thead>
   <tbody>
@@ -29,10 +30,17 @@
       <td>{{ fillup.total_price }} €
         <sup>({{ fillup.price }} €/l)</sup>
       </td>
+      <td>
+        {% if fillup.user_id == user.id and role == "USER" %}
+        <a href="{% url 'fillup:edit' pk=fillup.id %}">Edit</a>
+        {% elif role == "ADMIN" %}
+        <a href="{% url 'fillup:edit' pk=fillup.id %}">Edit</a>
+        {% endif %}
+      </td>
     </tr>
     {% empty %}
     <tr>
-      <td colspan="5">No results...</td>
+      <td colspan="6">No results...</td>
     </tr>
     {% endfor %}
   </tbody>

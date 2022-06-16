@@ -19,7 +19,7 @@
     </nav>
   </header>
   <main>
-    {% include 'fillup/partials/fillup-table.html' with fillups=single_equipment.fillups %}
+    {% include 'fillup/partials/fillup-table.html' with fillups=single_equipment.fillups role=single_equipment.role %}
   </main>
 </article>
 {% endfor %}

@@ -1,0 +1,18 @@
+{% extends 'lopokulu/base.html' %}
+{% load static %}
+
+{% block header %}
+<link rel="stylesheet" href="{% static 'fillup/css/form.css' %}" />
+{% endblock %}
+
+{% block content %}
+<article>
+  <header>
+    <h2>Edit fillup {{ fillup }}</h2>
+  </header>
+  <form action="/fillup/{{fillup.id}}/edit/" method="post">
+    {% csrf_token %} {{ form.as_p }}
+    <input type="submit" value="Save" />
+  </form>
+</article>
+{% endblock %}

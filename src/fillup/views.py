@@ -69,7 +69,7 @@ class FillupEquipmentDetailView(DetailView):
 @method_decorator(login_required, name="dispatch")
 class FillupAddView(View):
     model = Fillup
-    template_name = "fillup/add_fillup.html"
+    template_name = "fillup/add.html"
 
     def get(self, request, **kwargs):
         if "equipment_id" in self.kwargs:
@@ -88,3 +88,28 @@ class FillupAddView(View):
             fillup.update_next_consumption()
             return redirect("fillup:detail", fillup.equipment.id)
         return render(request, self.template_name, {"form": form})
+
+
+@method_decorator(login_required, name="dispatch")
+class FillupEditView(View):
+    model = Fillup
+    template_name = "fillup/edit.html"
+
+    def get(self, request, **kwargs):
+        content = dict()
+        content["fillup"] = Fillup.objects.get(id=kwargs.get("pk"))
+        content["form"] = FillupForm(request.user, instance=content["fillup"])
+        return render(request, self.template_name, content)
+
+    def post(self, request, **kwargs):
+        content = dict()
+        content["fillup"] = Fillup.objects.get(id=kwargs.get("pk"))
+        form = FillupForm(request.user, request.POST, instance=content["fillup"])
+        content["form"] = form
+        if form.is_valid():
+            fillup = form.save(commit=False)
+            fillup.user = request.user
+            fillup.save()
+            fillup.update_next_consumption()
+            return redirect("fillup:detail", fillup.equipment.id)
+        return render(request, self.template_name, content)

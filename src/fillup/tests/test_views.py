@@ -22,10 +22,19 @@ class FillupViewsAuthTestCase(TestCase):
             username="testuser@foo.bar", password="top_secret"
         )
         cls.equipment1 = Equipment.objects.create(
-            name="TestRO", register_number="TEST-RO", allowed_measurements=["fillup"]
+            name="TestADMIN",
+            register_number="TEST-ADMIN",
+            allowed_measurements=["fillup"],
         )
         EquipmentUser.objects.create(
-            user=cls.user, equipment=cls.equipment1, role="READ_ONLY"
+            user=cls.user, equipment=cls.equipment1, role="ADMIN"
+        )
+        cls.fillup = Fillup.objects.create(
+            price=Decimal(2.013),
+            amount=42,
+            distance=100,
+            equipment=cls.equipment1,
+            addition_date=datetime.fromisoformat("2022-06-15T00:00:00+02:00"),
         )
 
     def setUp(self):
@@ -83,9 +92,28 @@ class FillupViewsAuthTestCase(TestCase):
 
     def test_redirects_non_logged_in_redirect_login_on_add_fillup_for_equipment(self):
         """Non-logged-in users should get redirected to login on add fillup for equipment view"""
-        response = self.client.get("/fillup/add/equipment/1/")
+        response = self.client.get(f"/fillup/add/equipment/{self.equipment1.id}/")
 
-        self.assertRedirects(response, "/accounts/login/?next=/fillup/add/equipment/1/")
+        self.assertRedirects(
+            response,
+            f"/accounts/login/?next=/fillup/add/equipment/{self.equipment1.id}/",
+        )
+
+    def test_logged_in_user_should_be_able_to_see_edit_form(self):
+        """Response 200 should be given on url /edit/"""
+        self.client.login(username="testuser@foo.bar", password="top_secret")
+
+        response = self.client.get(f"/fillup/{self.fillup.id}/edit/")
+
+        self.assertEqual(response.status_code, 200)
+
+    def test_redirects_non_logged_in_redirect_login_on_add_fillup(self):
+        """Non-logged-in users should get redirected to login on add fillup view"""
+        response = self.client.get(f"/fillup/{self.fillup.id}/edit/")
+
+        self.assertRedirects(
+            response, f"/accounts/login/?next=/fillup/{self.fillup.id}/edit/"
+        )
 
 
 class FillupViewsBasicTestCase(TestCase):
@@ -147,7 +175,7 @@ class FillupViewsBasicTestCase(TestCase):
         data = {}
         self.client.login(username="testuser@foo.bar", password="top_secret")
 
-        with self.assertTemplateUsed("fillup/add_fillup.html"):
+        with self.assertTemplateUsed("fillup/add.html"):
             response = self.client.post("/fillup/add/", data=data)
 
         self.assertEqual(response.status_code, 200)
@@ -198,8 +226,14 @@ class FillupViewsBasicTestCase(TestCase):
 class FillupViewsInputsTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.user = User.objects.create_user(
-            username="testuser@foo.bar", password="top_secret"
+        cls.admin_user = User.objects.create_user(
+            username="admin_user@foo.bar", password="top_secret"
+        )
+        cls.ro_user = User.objects.create_user(
+            username="ro_user@foo.bar", password="top_secret"
+        )
+        cls.user_user = User.objects.create_user(
+            username="user_user@foo.bar", password="top_secret"
         )
         cls.equipment1 = Equipment.objects.create(
             name="TestRO", register_number="TEST-RO", allowed_measurements=["fillup"]
@@ -215,19 +249,47 @@ class FillupViewsInputsTestCase(TestCase):
             allowed_measurements=["fillup"],
         )
         EquipmentUser.objects.create(
-            user=cls.user, equipment=cls.equipment1, role="READ_ONLY"
+            user=cls.ro_user, equipment=cls.equipment1, role="READ_ONLY"
         )
         EquipmentUser.objects.create(
-            user=cls.user, equipment=cls.equipment2, role="USER"
+            user=cls.user_user, equipment=cls.equipment2, role="USER"
         )
         EquipmentUser.objects.create(
-            user=cls.user, equipment=cls.equipment3, role="ADMIN"
+            user=cls.ro_user, equipment=cls.equipment3, role="READ_ONLY"
         )
-        Fillup.objects.create(
-            price=Decimal(2.013),
-            amount=42,
-            distance=100,
-            equipment=cls.equipment3,
+        EquipmentUser.objects.create(
+            user=cls.user_user, equipment=cls.equipment3, role="USER"
+        )
+        EquipmentUser.objects.create(
+            user=cls.admin_user, equipment=cls.equipment3, role="ADMIN"
+        )
+        cls.fillups = list()
+        cls.fillups.append(
+            Fillup.objects.create(
+                price=Decimal(2.013),
+                amount=42,
+                distance=100,
+                equipment=cls.equipment3,
+                user=cls.admin_user,
+            )
+        )
+        cls.fillups.append(
+            Fillup.objects.create(
+                price=Decimal(2.013),
+                amount=43,
+                distance=200,
+                equipment=cls.equipment3,
+                user=cls.user_user,
+            )
+        )
+        cls.fillups.append(
+            Fillup.objects.create(
+                price=Decimal(2.013),
+                amount=44,
+                distance=300,
+                equipment=cls.equipment3,
+                user=cls.admin_user,
+            )
         )
 
     def setUp(self):
@@ -235,7 +297,7 @@ class FillupViewsInputsTestCase(TestCase):
 
     def test_equipment_has_add_fillup_btn_for_admin(self):
         """Equipment should have add fillup button for admin"""
-        self.client.login(username="testuser@foo.bar", password="top_secret")
+        self.client.login(username="admin_user@foo.bar", password="top_secret")
         expected_html = f'<a href="/fillup/add/equipment/{self.equipment3.id}/" role="button">Add fillup</a>'
 
         response = self.client.get("/fillup/")
@@ -245,7 +307,7 @@ class FillupViewsInputsTestCase(TestCase):
 
     def test_equipment_has_add_fillup_btn_for_equipment_user(self):
         """Equipment should have add fillup button for equipment_user"""
-        self.client.login(username="testuser@foo.bar", password="top_secret")
+        self.client.login(username="user_user@foo.bar", password="top_secret")
         expected_html = f'<a href="/fillup/add/equipment/{self.equipment2.id}/" role="button">Add fillup</a>'
 
         response = self.client.get("/fillup/")
@@ -255,7 +317,7 @@ class FillupViewsInputsTestCase(TestCase):
 
     def test_equipment_does_not_have_add_fillup_btn_for_readonly(self):
         """Equipment should have add fillup button for equipment_user"""
-        self.client.login(username="testuser@foo.bar", password="top_secret")
+        self.client.login(username="ro_user@foo.bar", password="top_secret")
         needle = f'<a href="/fillup/add/equipment/{self.equipment1.id}/" role="button">Add fillup</a>'
 
         response = self.client.get("/fillup/")
@@ -265,7 +327,7 @@ class FillupViewsInputsTestCase(TestCase):
 
     def test_single_equipment_page_has_add_fillup_btn_for_admin(self):
         """Single equipment page should have add fillup button for admin"""
-        self.client.login(username="testuser@foo.bar", password="top_secret")
+        self.client.login(username="admin_user@foo.bar", password="top_secret")
         expected_html = f'<a href="/fillup/add/equipment/{self.equipment3.id}/" role="button">Add fillup</a>'
 
         response = self.client.get(f"/fillup/equipment/{self.equipment3.id}/")
@@ -275,7 +337,7 @@ class FillupViewsInputsTestCase(TestCase):
 
     def test_single_equipment_page_has_add_fillup_btn_for_equipment_user(self):
         """Single equipment page should have add fillup button for equipment_user"""
-        self.client.login(username="testuser@foo.bar", password="top_secret")
+        self.client.login(username="user_user@foo.bar", password="top_secret")
         expected_html = f'<a href="/fillup/add/equipment/{self.equipment2.id}/" role="button">Add fillup</a>'
 
         response = self.client.get(f"/fillup/equipment/{self.equipment2.id}/")
@@ -285,13 +347,40 @@ class FillupViewsInputsTestCase(TestCase):
 
     def test_single_equipment_page_does_not_have_add_fillup_btn_for_readonly(self):
         """Single equipment page should have add fillup button for equipment_user"""
-        self.client.login(username="testuser@foo.bar", password="top_secret")
+        self.client.login(username="ro_user@foo.bar", password="top_secret")
         needle = f'<a href="/fillup/add/equipment/{self.equipment1.id}/" role="button">Add fillup</a>'
 
         response = self.client.get(f"/fillup/equipment/{self.equipment1.id}/")
 
         self.assertEqual(response.status_code, 200)
         self.assertNotIn(needle, response.content.decode(), 1)
+
+    def test_readonly_should_not_see_edit_fillup_buttons(self):
+        """READ_ONLY user should not see edit fillup buttons"""
+        self.client.login(username="ro_user@foo.bar", password="top_secret")
+
+        response = self.client.get(f"/fillup/equipment/{self.equipment3.id}/")
+
+        self.assertEqual(response.status_code, 200)
+
+        for fillup in self.fillups:
+            needle = f'<a href="/fillup/{fillup.id}/edit/">Edit</a>'
+            self.assertNotIn(needle, response.content.decode(), 1)
+
+    def test_useruser_should_see_edit_fillup_buttons_for_own_fillups(self):
+        """USER user should see edit fillup buttons on their own fillups"""
+        self.client.login(username="user_user@foo.bar", password="top_secret")
+
+        response = self.client.get(f"/fillup/equipment/{self.equipment3.id}/")
+
+        self.assertEqual(response.status_code, 200)
+
+        for fillup in self.fillups:
+            needle = f'<a href="/fillup/{fillup.id}/edit/">Edit</a>'
+            if fillup.user_id == self.user_user.id:
+                self.assertIn(needle, response.content.decode(), 1)
+            else:
+                self.assertNotIn(needle, response.content.decode(), 1)
 
 
 class FillupViewsIntegrationTestCase(TestCase):
@@ -394,3 +483,6 @@ class FillupViewsIntegrationTestCase(TestCase):
         self.assertAlmostEqual(float(self.fillup2.distance_delta), 100.0, places=1)
         self.assertAlmostEqual(float(updated_fillup.consumption), 5.0, places=3)
         self.assertAlmostEqual(float(updated_fillup.distance_delta), 40.0, places=1)
+
+    # @TODO Test edit form prepopulation
+    # @TODO Test edit form consumption calculation
