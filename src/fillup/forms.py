@@ -18,7 +18,8 @@ class FillupForm(forms.ModelForm):
         self.user = user
         super(FillupForm, self).__init__(*args, **kwargs)
         self.fields["equipment"].queryset = self.get_allowed_equipment()
-        self.fields["equipment"].initial = self.fields["equipment"].queryset[0].id
+        if self.fields["equipment"].queryset:
+            self.fields["equipment"].initial = self.fields["equipment"].queryset[0].id
 
     def clean_distance(self):
         data = self.cleaned_data["distance"]

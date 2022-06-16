@@ -15,6 +15,79 @@ from fillup.forms import FillupForm
 from fillup.models import Fillup
 
 
+class FillupViewsAuthTestCase(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.user = User.objects.create_user(
+            username="testuser@foo.bar", password="top_secret"
+        )
+        cls.equipment1 = Equipment.objects.create(
+            name="TestRO", register_number="TEST-RO", allowed_measurements=["fillup"]
+        )
+        EquipmentUser.objects.create(
+            user=cls.user, equipment=cls.equipment1, role="READ_ONLY"
+        )
+
+    def setUp(self):
+        self.client = Client()
+
+    def test_logged_in_users_see_fillup(self):
+        """Response 200 should be given on url /fillup/"""
+        self.client.login(username="testuser@foo.bar", password="top_secret")
+
+        response = self.client.get("/fillup/")
+
+        self.assertEqual(response.status_code, 200)
+
+    def test_redirects_to_login_for_non_logged_in_user_on_fillup(self):
+        """Non-logged-in users should get redirected to login on fillup view"""
+        response = self.client.get("/fillup/")
+
+        self.assertRedirects(response, "/accounts/login/?next=/fillup/")
+
+    def test_logged_in_user_sees_single_equipment_fillup_view(self):
+        """Response 200 should be given on url /equipment/<id>"""
+        self.client.login(username="testuser@foo.bar", password="top_secret")
+
+        response = self.client.get(f"/fillup/equipment/{self.equipment1.id}/")
+
+        self.assertEqual(response.status_code, 200)
+
+    def test_redirects_to_login_for_non_logged_in_user_on_specific_equipment(self):
+        """Non-logged-in users should get redirected to login on equipment view"""
+        response = self.client.get("/fillup/equipment/1/")
+
+        self.assertRedirects(response, "/accounts/login/?next=/fillup/equipment/1/")
+
+    def test_logged_in_user_should_be_able_to_see_add_new_form(self):
+        """Response 200 should be given on url /add/"""
+        self.client.login(username="testuser@foo.bar", password="top_secret")
+
+        response = self.client.get(f"/fillup/add/")
+
+        self.assertEqual(response.status_code, 200)
+
+    def test_redirects_non_logged_in_redirect_login_on_add_fillup(self):
+        """Non-logged-in users should get redirected to login on add fillup view"""
+        response = self.client.get("/fillup/add/")
+
+        self.assertRedirects(response, "/accounts/login/?next=/fillup/add/")
+
+    def test_logged_in_user_should_be_able_to_see_add_new_form_test_2(self):
+        """Response 200 should be given on url /add/equipment/<id>"""
+        self.client.login(username="testuser@foo.bar", password="top_secret")
+
+        response = self.client.get(f"/fillup/add/equipment/{self.equipment1.id}/")
+
+        self.assertEqual(response.status_code, 200)
+
+    def test_redirects_non_logged_in_redirect_login_on_add_fillup_for_equipment(self):
+        """Non-logged-in users should get redirected to login on add fillup for equipment view"""
+        response = self.client.get("/fillup/add/equipment/1/")
+
+        self.assertRedirects(response, "/accounts/login/?next=/fillup/add/equipment/1/")
+
+
 class FillupViewsBasicTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
@@ -54,20 +127,6 @@ class FillupViewsBasicTestCase(TestCase):
     def setUp(self):
         self.client = Client()
 
-    def test_respond_with_200_for_url_fillup(self):
-        """Response 200 should be given on url /fillup/"""
-        self.client.login(username="testuser@foo.bar", password="top_secret")
-
-        response = self.client.get("/fillup/")
-
-        self.assertEqual(response.status_code, 200)
-
-    def test_redirects_to_login_for_non_logged_in_user_on_fillup(self):
-        """Non-logged-in users should get redirected to login on fillup view"""
-        response = self.client.get("/fillup/")
-
-        self.assertRedirects(response, "/accounts/login/?next=/fillup/")
-
     def test_redirect_to_detail_after_successful_addition(self):
         """User should be redirected to fillups index after successful fillup addition"""
         data = {
@@ -93,20 +152,6 @@ class FillupViewsBasicTestCase(TestCase):
 
         self.assertEqual(response.status_code, 200)
 
-    def test_redirects_to_login_for_non_logged_in_user_on_specific_equipment(self):
-        """Non-logged-in users should get redirected to login on equipment view"""
-        response = self.client.get("/fillup/equipment/1/")
-
-        self.assertRedirects(response, "/accounts/login/?next=/fillup/equipment/1/")
-
-    def test_respond_with_200_for_url_equipment_single(self):
-        """Response 200 should be given on url /equipment/<id>"""
-        self.client.login(username="testuser@foo.bar", password="top_secret")
-
-        response = self.client.get(f"/fillup/equipment/{self.equipment1.id}/")
-
-        self.assertEqual(response.status_code, 200)
-
     def test_return_404_on_incorrect_equipment_id(self):
         """404 should be returned to user on missing equipment"""
         self.client.login(username="testuser@foo.bar", password="top_secret")
@@ -114,20 +159,6 @@ class FillupViewsBasicTestCase(TestCase):
         response = self.client.get("/fillup/equipment/9999/")
 
         self.assertEqual(response.status_code, 404)
-
-    def test_redirects_non_logged_in_redirect_login_on_add_fillup_for_equipment(self):
-        """Non-logged-in users should get redirected to login on add fillup for equipment view"""
-        response = self.client.get("/fillup/add/equipment/1/")
-
-        self.assertRedirects(response, "/accounts/login/?next=/fillup/add/equipment/1/")
-
-    def test_respond_with_200_for_url_add_equipment_single(self):
-        """Response 200 should be given on url /add/equipment/<id>"""
-        self.client.login(username="testuser@foo.bar", password="top_secret")
-
-        response = self.client.get(f"/fillup/add/equipment/{self.equipment1.id}/")
-
-        self.assertEqual(response.status_code, 200)
 
     def test_fillups_listed_on_single_equipment_page(self):
         """Single equipment page should have fillups listed when there are any"""
