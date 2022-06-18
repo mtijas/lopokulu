@@ -110,6 +110,9 @@ class FillupEditView(View):
             fillup = form.save(commit=False)
             fillup.user = request.user
             fillup.save()
+            # Stats will need to be updated since stats are originally calculated
+            # before the edited Fillup gets saved (thus giving wrong results initially)
+            Fillup.objects.get(pk=fillup.id).update_stats()
             fillup.update_next_consumption()
             return redirect("fillup:detail", fillup.equipment.id)
         return render(request, self.template_name, content)

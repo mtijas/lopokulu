@@ -18,6 +18,9 @@ class Equipment(models.Model):
     # See https://docs.djangoproject.com/en/dev/ref/models/fields/#jsonfield
     allowed_measurements = models.JSONField(default=list)
 
+    class Meta:
+        ordering = ["name"]
+
     def __str__(self):
         return f"({self.register_number}) {self.name}"
 

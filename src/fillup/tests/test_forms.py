@@ -50,21 +50,21 @@ class FillupFormTestCase(TestCase):
             amount=42,
             distance=50,
             equipment=cls.equipment3,
-            addition_date=datetime.fromisoformat("2022-06-15T15:00:00+02:00"),
+            addition_date=datetime.fromisoformat("2022-06-15T15:00:00+00:00"),
         )
         Fillup.objects.create(
             price=Decimal(2.013),
             amount=42,
             distance=100,
             equipment=cls.equipment3,
-            addition_date=datetime.fromisoformat("2022-06-15T16:00:00+02:00"),
+            addition_date=datetime.fromisoformat("2022-06-15T16:00:00+00:00"),
         )
         Fillup.objects.create(
             price=Decimal(2.013),
             amount=42,
             distance=300,
             equipment=cls.equipment3,
-            addition_date=datetime.fromisoformat("2022-06-15T17:00:00+02:00"),
+            addition_date=datetime.fromisoformat("2022-06-15T17:00:00+00:00"),
         )
 
     def setUp(self):
@@ -73,7 +73,7 @@ class FillupFormTestCase(TestCase):
             "amount": 1,
             "distance": 1,
             "equipment": self.equipment3.id,
-            "addition_date": "2022-06-15T17:00:00+02:00"
+            "addition_date": "2022-06-15T17:00:00+00:00"
         }
 
     def test_fillup_not_allowed_for_equipment_without_fillup_allowed(self):
@@ -253,7 +253,7 @@ class FillupFormTestCase(TestCase):
         expected = {"distance": ["Distance should be more than 300.0"]}
         data = self.base_form_data
         data["equipment"] = self.equipment3.id
-        data["addition_date"] = "2022-06-15 18:00:00+02:00"
+        data["addition_date"] = "2022-06-15 18:00:00+00:00"
         data["distance"] = 42
 
         form = FillupForm(self.user, data=data)
@@ -267,7 +267,7 @@ class FillupFormTestCase(TestCase):
         data = self.base_form_data
         data["equipment"] = self.equipment3.id
         data["distance"] = 175
-        data["addition_date"] = "2022-06-15 15:30:00+02:00"
+        data["addition_date"] = "2022-06-15 15:30:00+00:00"
 
         form = FillupForm(self.user, data=data)
 
@@ -334,8 +334,8 @@ class FillupFormTestCase(TestCase):
         initial_data = {
             "equipment": self.equipment2.id,
         }
-        expected_html_0 = f'<input type="radio" name="equipment" value="{self.equipment2.id}" required id="id_equipment_0" checked>'
-        expected_html_1 = f'<input type="radio" name="equipment" value="{self.equipment3.id}" required id="id_equipment_1">'
+        expected_html_0 = f'<input type="radio" name="equipment" value="{self.equipment3.id}" required id="id_equipment_0">'
+        expected_html_1 = f'<input type="radio" name="equipment" value="{self.equipment2.id}" required id="id_equipment_1" checked>'
 
         form = FillupForm(self.user, initial=initial_data)
 
@@ -347,8 +347,8 @@ class FillupFormTestCase(TestCase):
         initial_data = {
             "equipment": self.equipment3.id,
         }
-        expected_html_0 = f'<input type="radio" name="equipment" value="{self.equipment2.id}" required id="id_equipment_0">'
-        expected_html_1 = f'<input type="radio" name="equipment" value="{self.equipment3.id}" required id="id_equipment_1" checked>'
+        expected_html_0 = f'<input type="radio" name="equipment" value="{self.equipment3.id}" required id="id_equipment_0" checked>'
+        expected_html_1 = f'<input type="radio" name="equipment" value="{self.equipment2.id}" required id="id_equipment_1">'
 
         form = FillupForm(self.user, initial=initial_data)
 
@@ -360,8 +360,8 @@ class FillupFormTestCase(TestCase):
         initial_data = {
             "equipment": 9877676,
         }
-        expected_html_0 = f'<input type="radio" name="equipment" value="{self.equipment2.id}" required id="id_equipment_0">'
-        expected_html_1 = f'<input type="radio" name="equipment" value="{self.equipment3.id}" required id="id_equipment_1">'
+        expected_html_0 = f'<input type="radio" name="equipment" value="{self.equipment3.id}" required id="id_equipment_0">'
+        expected_html_1 = f'<input type="radio" name="equipment" value="{self.equipment2.id}" required id="id_equipment_1">'
 
         form = FillupForm(self.user, initial=initial_data)
 
@@ -370,8 +370,8 @@ class FillupFormTestCase(TestCase):
 
     def test_equipment_is_preselected_without_initial_data(self):
         """Equipment should be preselected without initial data"""
-        expected_html_0 = f'<input type="radio" name="equipment" value="{self.equipment2.id}" required id="id_equipment_0" checked>'
-        expected_html_1 = f'<input type="radio" name="equipment" value="{self.equipment3.id}" required id="id_equipment_1">'
+        expected_html_0 = f'<input type="radio" name="equipment" value="{self.equipment3.id}" required id="id_equipment_0" checked>'
+        expected_html_1 = f'<input type="radio" name="equipment" value="{self.equipment2.id}" required id="id_equipment_1">'
 
         form = FillupForm(self.user)
 

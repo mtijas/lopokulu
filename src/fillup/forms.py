@@ -38,7 +38,7 @@ class FillupForm(forms.ModelForm):
             return
 
         # Get the previous fillup for equipment in question
-        previous_fillup = Fillup.objects.filter(
+        previous_fillup = Fillup.objects.exclude(pk=self.instance.id).filter(
             equipment=equipment, addition_date__lt=addition_date
         ).first()
 
@@ -54,7 +54,7 @@ class FillupForm(forms.ModelForm):
                 )
 
         # Get the next fillup for equipment in question
-        next_fillup = Fillup.objects.filter(
+        next_fillup = Fillup.objects.exclude(pk=self.instance.id).filter(
             equipment=equipment, addition_date__gt=addition_date
         ).last()
 

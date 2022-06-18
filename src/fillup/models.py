@@ -97,6 +97,13 @@ class Fillup(models.Model):
         if next_full_fillup is not None:
             next_full_fillup.save()  # Saving should invoke calculation automatically
 
+    def update_stats(self):
+        """Force updating current fillup's stats"""
+        self.distance_delta = self.calculate_distance_delta()
+        self.total_price = self.calculate_total_price()
+        self.consumption = self.calculate_consumption()
+        self.save()
+
     def save(self, *args, **kwargs):
         self.distance_delta = self.calculate_distance_delta()
         self.total_price = self.calculate_total_price()

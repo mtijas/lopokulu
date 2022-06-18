@@ -7,8 +7,10 @@
 from datetime import datetime
 from decimal import Decimal
 
+from django.conf import settings
 from django.contrib.auth.models import Group, Permission, User
 from django.test import Client, TestCase
+from django.utils import timezone
 
 from equipment.models import Equipment, EquipmentUser
 from fillup.forms import FillupForm
@@ -34,7 +36,7 @@ class FillupViewsAuthTestCase(TestCase):
             amount=42,
             distance=100,
             equipment=cls.equipment1,
-            addition_date=datetime.fromisoformat("2022-06-15T00:00:00+02:00"),
+            addition_date=datetime.fromisoformat("2022-06-15T00:00:00+00:00"),
         )
 
     def setUp(self):
@@ -149,7 +151,7 @@ class FillupViewsBasicTestCase(TestCase):
             amount=42,
             distance=100,
             equipment=cls.equipment3,
-            addition_date=datetime.fromisoformat("2022-06-15T00:00:00+02:00"),
+            addition_date=datetime.fromisoformat("2022-06-15T00:00:00+00:00"),
         )
 
     def setUp(self):
@@ -417,7 +419,7 @@ class FillupViewsIntegrationTestCase(TestCase):
             distance=100,
             equipment=cls.equipment3,
             tank_full=True,
-            addition_date=datetime.fromisoformat("2022-06-15T15:00:00+02:00"),
+            addition_date=datetime.fromisoformat("2022-06-15T15:00:00+00:00"),
         )
         cls.fillup2 = Fillup.objects.create(
             price=Decimal(1.9),
@@ -425,7 +427,7 @@ class FillupViewsIntegrationTestCase(TestCase):
             distance=200,
             equipment=cls.equipment3,
             tank_full=True,
-            addition_date=datetime.fromisoformat("2022-06-15T16:00:00+02:00"),
+            addition_date=datetime.fromisoformat("2022-06-15T16:00:00+00:00"),
         )
         cls.fillup3 = Fillup.objects.create(
             price=Decimal(1.9),
@@ -433,7 +435,7 @@ class FillupViewsIntegrationTestCase(TestCase):
             distance=250,
             equipment=cls.equipment3,
             tank_full=True,
-            addition_date=datetime.fromisoformat("2022-06-15T17:00:00+02:00"),
+            addition_date=datetime.fromisoformat("2022-06-15T17:00:00+00:00"),
         )
 
     def setUp(self):
@@ -447,7 +449,7 @@ class FillupViewsIntegrationTestCase(TestCase):
             "amount": 3.9,
             "distance": 160,
             "equipment": self.equipment3.id,
-            "addition_date": "2022-06-15T15:30:00+02:00",
+            "addition_date": "2022-06-15T15:30:00+00:00",
             "tank_full": "1",
         }
         self.client.login(username="testuser@foo.bar", password="top_secret")
@@ -468,7 +470,7 @@ class FillupViewsIntegrationTestCase(TestCase):
             "amount": 3.9,
             "distance": 160,
             "equipment": self.equipment3.id,
-            "addition_date": "2022-06-15T15:30:00+02:00",
+            "addition_date": "2022-06-15T15:30:00+00:00",
             "tank_full": "1",
         }
         self.client.login(username="testuser@foo.bar", password="top_secret")
@@ -484,5 +486,114 @@ class FillupViewsIntegrationTestCase(TestCase):
         self.assertAlmostEqual(float(updated_fillup.consumption), 5.0, places=3)
         self.assertAlmostEqual(float(updated_fillup.distance_delta), 40.0, places=1)
 
-    # @TODO Test edit form prepopulation
-    # @TODO Test edit form consumption calculation
+    def test_edit_form_gets_prepopulated(self):
+        """Edit form should get pre-populated"""
+        expected_equipment = f'<input type="radio" name="equipment" value="{self.equipment3.id}" required id="id_equipment_0" checked>'
+        formatted_dt = timezone.localtime(self.fillup3.addition_date).strftime(
+            "%Y-%m-%d %H:%M:%S"
+        )
+        expected_addition_date = f'value="{formatted_dt}"'
+        expected_tank_full = (
+            '<input type="checkbox" name="tank_full" id="id_tank_full" checked>'
+        )
+
+        self.client.login(username="testuser@foo.bar", password="top_secret")
+        response = self.client.get(f"/fillup/{self.fillup3.id}/edit/")
+
+        self.assertInHTML(expected_equipment, response.content.decode(), 1)
+        self.assertInHTML(expected_tank_full, response.content.decode(), 1)
+        self.assertIn(expected_addition_date, response.content.decode())
+        self.assertIn("4.0", response.content.decode())
+        self.assertIn("250.0", response.content.decode())
+        self.assertIn("1.900", response.content.decode())
+
+    def test_consumption_and_dist_delta_calculated_for_edited_fillup(self):
+        """Consumption and distance delta should be calculated for edited fillup on
+        editing fillup between two full fillups"""
+        data = {
+            "price": 1.8,
+            "amount": 3.9,
+            "distance": 220,
+            "equipment": self.equipment3.id,
+            "addition_date": "2022-06-15T16:00:00+00:00",
+            "tank_full": "1",
+        }
+        self.client.login(username="testuser@foo.bar", password="top_secret")
+
+        response = self.client.post(f"/fillup/{self.fillup2.id}/edit/", data=data)
+
+        updated_fillup = Fillup.objects.get(pk=self.fillup2.id)
+
+        self.assertAlmostEqual(float(updated_fillup.consumption), 3.25, places=3)
+        self.assertAlmostEqual(float(updated_fillup.distance_delta), 120.0, places=1)
+
+    def test_consumption_and_dist_delta_calculated_for_edited_fillup_date_forward(self):
+        """Consumption and distance delta should be calculated for edited fillup on
+        editing fillup between two full fillups when addition_date moves forward"""
+        data = {
+            "price": 1.8,
+            "amount": 3.9,
+            "distance": 220,
+            "equipment": self.equipment3.id,
+            "addition_date": "2022-06-15T16:30:00+00:00",
+            "tank_full": "1",
+        }
+        self.client.login(username="testuser@foo.bar", password="top_secret")
+
+        response = self.client.post(
+            f"/fillup/{self.fillup2.id}/edit/", data=data
+        )
+
+        updated_fillup = Fillup.objects.get(pk=self.fillup2.id)
+
+        self.assertRedirects(response, f"/fillup/equipment/{updated_fillup.equipment_id}/")
+        self.assertAlmostEqual(float(updated_fillup.distance_delta), 120.0, places=1)
+        self.assertAlmostEqual(float(updated_fillup.consumption), 3.25, places=3)
+
+    def test_consumption_and_dist_delta_calculated_for_edited_fillup_date_backward(
+        self,
+    ):
+        """Consumption and distance delta should be calculated for edited fillup on
+        editing fillup between two full fillups when addition_date moves backward"""
+        data = {
+            "price": 1.8,
+            "amount": 3.9,
+            "distance": 220,
+            "equipment": self.equipment3.id,
+            "addition_date": "2022-06-15T15:30:00+00:00",
+            "tank_full": "1",
+        }
+        self.client.login(username="testuser@foo.bar", password="top_secret")
+
+        response = self.client.post(
+            f"/fillup/{self.fillup2.id}/edit/", data=data
+        )
+
+        updated_fillup = Fillup.objects.get(pk=self.fillup2.id)
+
+        self.assertRedirects(response, f"/fillup/equipment/{updated_fillup.equipment_id}/")
+        self.assertAlmostEqual(float(updated_fillup.distance_delta), 120.0, places=1)
+        self.assertAlmostEqual(float(updated_fillup.consumption), 3.25, places=3)
+
+    def test_consumption_and_dist_delta_calculated_for_next_fillup_on_edit(self):
+        """Consumption and distance delta should be calculated for next fillup on
+        editing fillup between two full fillups"""
+        data = {
+            "price": 1.8,
+            "amount": 3.9,
+            "distance": 220,
+            "equipment": self.equipment3.id,
+            "addition_date": "2022-06-15T15:30:00+00:00",
+            "tank_full": "1",
+        }
+        self.client.login(username="testuser@foo.bar", password="top_secret")
+
+        response = self.client.post(
+            f"/fillup/{self.fillup2.id}/edit/", data=data
+        )
+
+        updated_fillup = Fillup.objects.get(pk=self.fillup3.id)
+
+        self.assertRedirects(response, f"/fillup/equipment/{updated_fillup.equipment_id}/")
+        self.assertAlmostEqual(float(updated_fillup.distance_delta), 30.0, places=1)
+        self.assertAlmostEqual(float(updated_fillup.consumption), 13.333, places=3)
