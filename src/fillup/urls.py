@@ -9,6 +9,7 @@ from django.urls import path
 
 from fillup.views import (
     FillupAddView,
+    FillupDeleteView,
     FillupEditView,
     FillupEquipmentDetailView,
     FillupListView,
@@ -19,7 +20,7 @@ urlpatterns = [
     path("", FillupListView.as_view(), name="index"),
     path("equipment/<int:pk>/", FillupEquipmentDetailView.as_view(), name="detail"),
     path("<int:pk>/edit/", FillupEditView.as_view(), name="edit"),
-    # path("<int:pk>/delete/", FillupDeleteView.as_view(), name="delete"),
+    path("<int:pk>/delete/", FillupDeleteView.as_view(), name="delete"),
     path("add/", FillupAddView.as_view(), name="add"),
     path(
         "add/equipment/<int:pk>/",

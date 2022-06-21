@@ -116,3 +116,13 @@ class FillupEditView(View):
             fillup.update_next_consumption()
             return redirect("fillup:detail", fillup.equipment.id)
         return render(request, self.template_name, content)
+
+@method_decorator(login_required, name="dispatch")
+class FillupDeleteView(View):
+    model = Fillup
+
+    def get(self, request, **kwargs):
+        fillup = Fillup.objects.get(id=kwargs.get("pk"))
+        fillup.delete() # Delete first to prevent impacting stats calculations
+        fillup.update_next_consumption()
+        return redirect("fillup:detail", fillup.equipment.id)

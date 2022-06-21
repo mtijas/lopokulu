@@ -32,9 +32,11 @@
       </td>
       <td>
         {% if fillup.user_id == user.id and role == "USER" %}
-        <a href="{% url 'fillup:edit' pk=fillup.id %}">Edit</a>
+        <a href="{% url 'fillup:edit' pk=fillup.id %}" role="button">Edit</a>
+        <a href="{% url 'fillup:delete' pk=fillup.id %}" class="secondary" data-confirm>Delete</a>
         {% elif role == "ADMIN" %}
-        <a href="{% url 'fillup:edit' pk=fillup.id %}">Edit</a>
+        <a href="{% url 'fillup:edit' pk=fillup.id %}" role="button">Edit</a>
+        <a href="{% url 'fillup:delete' pk=fillup.id %}" class="secondary" data-confirm>Delete</a>
         {% endif %}
       </td>
     </tr>

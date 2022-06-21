@@ -12,7 +12,7 @@
         <li><a href="{% url 'equipment:edit' pk=equipment.id %}" role="button">Edit</a></li>
         {% endif %}
         {% if perms.equipment.delete_equipment %}
-        <li><a href="{% url 'equipment:delete' pk=equipment.id %}" class="secondary">Delete</a></li>
+        <li><a href="{% url 'equipment:delete' pk=equipment.id %}" class="secondary" data-confirm>Delete</a></li>
         {% endif %}
       </ul>
     </nav>

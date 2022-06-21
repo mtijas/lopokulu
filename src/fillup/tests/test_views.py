@@ -121,7 +121,9 @@ class FillupViewsAuthTestCase(TestCase):
         """Non-logged-in users should get redirected to login on delete fillup view"""
         response = self.client.get(f"/fillup/{self.fillup.id}/delete/")
 
-        self.assertRedirects(response, f"/accounts/login/?next=/fillup/{self.fillup.id}/delete/")
+        self.assertRedirects(
+            response, f"/accounts/login/?next=/fillup/{self.fillup.id}/delete/"
+        )
 
 
 class FillupViewsBasicTestCase(TestCase):
@@ -402,6 +404,45 @@ class FillupViewsInputsTestCase(TestCase):
             needle = f'<a href="/fillup/{fillup.id}/edit/" role="button">Edit</a>'
             self.assertIn(needle, response.content.decode(), 1)
 
+    def test_readonly_should_not_see_delete_fillup_buttons(self):
+        """READ_ONLY user should not see delete fillup buttons"""
+        self.client.login(username="ro_user@foo.bar", password="top_secret")
+
+        response = self.client.get(f"/fillup/equipment/{self.equipment3.id}/")
+
+        self.assertEqual(response.status_code, 200)
+
+        for fillup in self.fillups:
+            needle = f'<a href="/fillup/{fillup.id}/delete/" class="secondary" data-confirm>Delete</a>'
+            self.assertNotIn(needle, response.content.decode(), 1)
+
+    def test_useruser_should_see_delete_fillup_buttons_for_own_fillups(self):
+        """USER user should see delete fillup buttons on their own fillups"""
+        self.client.login(username="user_user@foo.bar", password="top_secret")
+
+        response = self.client.get(f"/fillup/equipment/{self.equipment3.id}/")
+
+        self.assertEqual(response.status_code, 200)
+
+        for fillup in self.fillups:
+            needle = f'<a href="/fillup/{fillup.id}/delete/" class="secondary" data-confirm>Delete</a>'
+            if fillup.user_id == self.user_user.id:
+                self.assertIn(needle, response.content.decode(), 1)
+            else:
+                self.assertNotIn(needle, response.content.decode(), 1)
+
+    def test_admin_should_see_delete_fillup_buttons_for_all_fillups(self):
+        """ADMIN user should see delete fillup buttons for all fillups"""
+        self.client.login(username="admin_user@foo.bar", password="top_secret")
+
+        response = self.client.get(f"/fillup/equipment/{self.equipment3.id}/")
+
+        self.assertEqual(response.status_code, 200)
+
+        for fillup in self.fillups:
+            needle = f'<a href="/fillup/{fillup.id}/delete/" class="secondary" data-confirm>Delete</a>'
+            self.assertIn(needle, response.content.decode(), 1)
+
 
 class FillupViewsIntegrationTestCase(TestCase):
     @classmethod
@@ -558,13 +599,13 @@ class FillupViewsIntegrationTestCase(TestCase):
         }
         self.client.login(username="testuser@foo.bar", password="top_secret")
 
-        response = self.client.post(
-            f"/fillup/{self.fillup2.id}/edit/", data=data
-        )
+        response = self.client.post(f"/fillup/{self.fillup2.id}/edit/", data=data)
 
         updated_fillup = Fillup.objects.get(pk=self.fillup2.id)
 
-        self.assertRedirects(response, f"/fillup/equipment/{updated_fillup.equipment_id}/")
+        self.assertRedirects(
+            response, f"/fillup/equipment/{updated_fillup.equipment_id}/"
+        )
         self.assertAlmostEqual(float(updated_fillup.distance_delta), 120.0, places=1)
         self.assertAlmostEqual(float(updated_fillup.consumption), 3.25, places=3)
 
@@ -583,13 +624,13 @@ class FillupViewsIntegrationTestCase(TestCase):
         }
         self.client.login(username="testuser@foo.bar", password="top_secret")
 
-        response = self.client.post(
-            f"/fillup/{self.fillup2.id}/edit/", data=data
-        )
+        response = self.client.post(f"/fillup/{self.fillup2.id}/edit/", data=data)
 
         updated_fillup = Fillup.objects.get(pk=self.fillup2.id)
 
-        self.assertRedirects(response, f"/fillup/equipment/{updated_fillup.equipment_id}/")
+        self.assertRedirects(
+            response, f"/fillup/equipment/{updated_fillup.equipment_id}/"
+        )
         self.assertAlmostEqual(float(updated_fillup.distance_delta), 120.0, places=1)
         self.assertAlmostEqual(float(updated_fillup.consumption), 3.25, places=3)
 
@@ -606,12 +647,27 @@ class FillupViewsIntegrationTestCase(TestCase):
         }
         self.client.login(username="testuser@foo.bar", password="top_secret")
 
-        response = self.client.post(
-            f"/fillup/{self.fillup2.id}/edit/", data=data
-        )
+        response = self.client.post(f"/fillup/{self.fillup2.id}/edit/", data=data)
 
         updated_fillup = Fillup.objects.get(pk=self.fillup3.id)
 
-        self.assertRedirects(response, f"/fillup/equipment/{updated_fillup.equipment_id}/")
+        self.assertRedirects(
+            response, f"/fillup/equipment/{updated_fillup.equipment_id}/"
+        )
         self.assertAlmostEqual(float(updated_fillup.distance_delta), 30.0, places=1)
         self.assertAlmostEqual(float(updated_fillup.consumption), 13.333, places=3)
+
+    def test_consumption_and_dist_delta_calculated_for_next_fillup_on_delete(self):
+        """Consumption and distance delta should be calculated for next fillup on
+        deleting fillup between two full fillups"""
+        self.client.login(username="testuser@foo.bar", password="top_secret")
+
+        response = self.client.get(f"/fillup/{self.fillup2.id}/delete/")
+
+        updated_fillup = Fillup.objects.get(pk=self.fillup3.id)
+
+        self.assertRedirects(
+            response, f"/fillup/equipment/{self.fillup2.equipment_id}/"
+        )
+        self.assertAlmostEqual(float(updated_fillup.distance_delta), 150.0, places=1)
+        self.assertAlmostEqual(float(updated_fillup.consumption), 2.667, places=3)

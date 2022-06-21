@@ -151,7 +151,7 @@ class EquipmentViewsIntegrationTestCase(TestCase):
         self.assertEqual(response.status_code, 200)
         for equipment in Equipment.objects.all():
             expected_html = f"""
-                <a href="/equipment/{equipment.id}/delete/" class="secondary">
+                <a href="/equipment/{equipment.id}/delete/" class="secondary" data-confirm>
                     Delete
                 </a>
             """
@@ -199,7 +199,7 @@ class EquipmentViewsIntegrationTestCase(TestCase):
 
         self.assertEqual(response.status_code, 200)
         expected_html = f"""
-            <a href="/equipment/{self.equipment1.id}/delete/" class="secondary">
+            <a href="/equipment/{self.equipment1.id}/delete/" class="secondary" data-confirm>
                 Delete
             </a>
         """
