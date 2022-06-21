@@ -117,6 +117,12 @@ class FillupViewsAuthTestCase(TestCase):
             response, f"/accounts/login/?next=/fillup/{self.fillup.id}/edit/"
         )
 
+    def test_redirects_non_logged_in_redirect_login_on_delete_fillup(self):
+        """Non-logged-in users should get redirected to login on delete fillup view"""
+        response = self.client.get(f"/fillup/{self.fillup.id}/delete/")
+
+        self.assertRedirects(response, f"/accounts/login/?next=/fillup/{self.fillup.id}/delete/")
+
 
 class FillupViewsBasicTestCase(TestCase):
     @classmethod
@@ -366,7 +372,7 @@ class FillupViewsInputsTestCase(TestCase):
         self.assertEqual(response.status_code, 200)
 
         for fillup in self.fillups:
-            needle = f'<a href="/fillup/{fillup.id}/edit/">Edit</a>'
+            needle = f'<a href="/fillup/{fillup.id}/edit/" role="button">Edit</a>'
             self.assertNotIn(needle, response.content.decode(), 1)
 
     def test_useruser_should_see_edit_fillup_buttons_for_own_fillups(self):
@@ -378,11 +384,23 @@ class FillupViewsInputsTestCase(TestCase):
         self.assertEqual(response.status_code, 200)
 
         for fillup in self.fillups:
-            needle = f'<a href="/fillup/{fillup.id}/edit/">Edit</a>'
+            needle = f'<a href="/fillup/{fillup.id}/edit/" role="button">Edit</a>'
             if fillup.user_id == self.user_user.id:
                 self.assertIn(needle, response.content.decode(), 1)
             else:
                 self.assertNotIn(needle, response.content.decode(), 1)
+
+    def test_admin_should_see_edit_fillup_buttons_for_all_fillups(self):
+        """ADMIN user should see edit fillup buttons for all fillups"""
+        self.client.login(username="admin_user@foo.bar", password="top_secret")
+
+        response = self.client.get(f"/fillup/equipment/{self.equipment3.id}/")
+
+        self.assertEqual(response.status_code, 200)
+
+        for fillup in self.fillups:
+            needle = f'<a href="/fillup/{fillup.id}/edit/" role="button">Edit</a>'
+            self.assertIn(needle, response.content.decode(), 1)
 
 
 class FillupViewsIntegrationTestCase(TestCase):
