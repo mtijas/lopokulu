@@ -11,8 +11,10 @@ from django.utils import timezone
 from django.views import View
 from django.views.generic import DetailView, ListView
 from django.utils.decorators import method_decorator
+from django.core.exceptions import PermissionDenied
 
 from equipment.models import Equipment, EquipmentUser
+from equipment.utils import user_has_role_for_equipment
 
 from fillup.forms import FillupForm
 from fillup.models import Fillup
@@ -24,6 +26,11 @@ class FillupListView(ListView):
     template_name = "fillup/index.html"
 
     def get(self, request, **kwargs):
+        if not user_has_role_for_equipment(
+            request.user.id, "fillup", allowed_roles=["READ_ONLY", "USER", "ADMIN"]
+        ):
+            raise PermissionDenied()
+
         equipmentusers = EquipmentUser.objects.filter(
             user=request.user, equipment__allowed_measurements__contains="fillup"
         )
@@ -34,7 +41,9 @@ class FillupListView(ListView):
                 {
                     "equipment": single_eu.equipment,
                     "role": single_eu.role,
-                    "fillups": Fillup.objects.filter(equipment=single_eu.equipment)[:10],
+                    "fillups": Fillup.objects.filter(equipment=single_eu.equipment)[
+                        :10
+                    ],
                 }
             )
 
@@ -52,6 +61,11 @@ class FillupEquipmentDetailView(DetailView):
     template_name = "fillup/single_equipment.html"
 
     def get(self, request, **kwargs):
+        if not user_has_role_for_equipment(
+            request.user.id, "fillup", allowed_roles=["READ_ONLY", "USER", "ADMIN"]
+        ):
+            raise PermissionDenied()
+
         equipmentusers = get_object_or_404(
             EquipmentUser, user=request.user, equipment__pk=kwargs.get("pk")
         )
@@ -72,14 +86,17 @@ class FillupAddView(View):
     template_name = "fillup/add.html"
 
     def get(self, request, **kwargs):
-        if "equipment_id" in self.kwargs:
-            initial_data = {"equipment": kwargs.get("pk")}
-            form = FillupForm(request.user, initial=initial_data)
-        else:
-            form = FillupForm(request.user)
+        if not user_has_role_for_equipment(request.user.id, "fillup", kwargs.get("pk")):
+            raise PermissionDenied()
+
+        initial_data = {"equipment": kwargs.get("pk")}
+        form = FillupForm(request.user, initial=initial_data)
         return render(request, self.template_name, {"form": form})
 
     def post(self, request, **kwargs):
+        if not user_has_role_for_equipment(request.user.id, "fillup", kwargs.get("pk")):
+            raise PermissionDenied()
+
         form = FillupForm(request.user, request.POST)
         if form.is_valid():
             fillup = form.save(commit=False)
@@ -96,12 +113,18 @@ class FillupEditView(View):
     template_name = "fillup/edit.html"
 
     def get(self, request, **kwargs):
+        if not user_has_role_for_equipment(request.user.id, "fillup"):
+            raise PermissionDenied()
+
         content = dict()
         content["fillup"] = Fillup.objects.get(id=kwargs.get("pk"))
         content["form"] = FillupForm(request.user, instance=content["fillup"])
         return render(request, self.template_name, content)
 
     def post(self, request, **kwargs):
+        if not user_has_role_for_equipment(request.user.id, "fillup"):
+            raise PermissionDenied()
+
         content = dict()
         content["fillup"] = Fillup.objects.get(id=kwargs.get("pk"))
         form = FillupForm(request.user, request.POST, instance=content["fillup"])
@@ -117,12 +140,16 @@ class FillupEditView(View):
             return redirect("fillup:detail", fillup.equipment.id)
         return render(request, self.template_name, content)
 
+
 @method_decorator(login_required, name="dispatch")
 class FillupDeleteView(View):
     model = Fillup
 
     def get(self, request, **kwargs):
+        if not user_has_role_for_equipment(request.user.id, "fillup"):
+            raise PermissionDenied()
+
         fillup = Fillup.objects.get(id=kwargs.get("pk"))
-        fillup.delete() # Delete first to prevent impacting stats calculations
+        fillup.delete()  # Delete first to prevent impacting stats calculations
         fillup.update_next_consumption()
         return redirect("fillup:detail", fillup.equipment.id)
