@@ -42,7 +42,7 @@ class EquipmentAddViewAuthTestCase(TestCase):
     def setUp(self):
         self.client = Client()
 
-    def test_respond_with_200_for_get_equipment_add(self):
+    def test_permissioned_user_allowed_get(self):
         """Response 200 should be given on get /equipment/add/"""
         self.user1.user_permissions.add(self.permissions["add"])
         self.client.login(username="testuser1@foo.bar", password="top_secret1")
@@ -51,11 +51,44 @@ class EquipmentAddViewAuthTestCase(TestCase):
 
         self.assertEqual(response.status_code, 200)
 
+    def test_logged_in_disallowed_from_get_add(self):
+        """Non-permissioned logged in user not allowed to get /equipment/add/"""
+        self.client.login(username="testuser1@foo.bar", password="top_secret1")
+
+        response = self.client.get("/equipment/add/")
+
+        self.assertEqual(response.status_code, 403)
+
     def test_redirects_to_login_for_non_logged_in_user_on_equipment_add(self):
         """Non-logged-in users should get redirected to login on equipment/add view"""
         response = self.client.get("/equipment/add/")
 
         self.assertRedirects(response, "/accounts/login/?next=/equipment/add/")
+
+    def test_post_not_allowed_for_nonpermissioned_user(self):
+        """Posting to add should not be allowed for nonpermissioned user"""
+        data = {
+            "name": "New...",
+            "register_number": "TEST",
+        }
+        self.client.login(username="testuser1@foo.bar", password="top_secret1")
+
+        response = self.client.post("/equipment/add/", data=data)
+
+        self.assertEqual(response.status_code, 403)
+
+    def test_post_not_allowed_for_logged_out_user(self):
+        """Posting to add should not be allowed for logged out user"""
+        data = {
+            "name": "New...",
+            "register_number": "TEST",
+        }
+
+        response = self.client.post("/equipment/add/", data=data)
+
+        self.assertRedirects(response, "/accounts/login/?next=/equipment/add/")
+
+    # Logged in correctly permissioned user will be tested on test case below
 
 class EquipmentAddViewBasicTestCase(TestCase):
     @classmethod
@@ -131,8 +164,9 @@ class EquipmentAddViewBasicTestCase(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "equipment/add.html")
 
-    def test_permissions_saved_on_form_save(self):
-        """Permissions should be saved when a new Equipment is added"""
+    def test_permissions_saved_on_form_save_and_user_promoted(self):
+        """Permissions should be saved when a new Equipment is added, with current
+        user promoted to admin if no other is"""
         self.user1.user_permissions.add(self.permissions["add"])
         data = {
             "name": "test-1",
@@ -155,6 +189,30 @@ class EquipmentAddViewBasicTestCase(TestCase):
                     user=self.user3, equipment=saved_equipment, role="READ_ONLY"
                 )
             ),
+            str(
+                EquipmentUser(user=self.user1, equipment=saved_equipment, role="ADMIN")
+            ),
+        ]
+
+        self.assertQuerysetEqual(list(saved_perms), expected_perms, transform=str)
+
+    def test_permissions_saved_on_form_save_and_user_promoted_test_2(self):
+        """Permissions should be saved when a new Equipment is added, with current
+        user promoted to admin if no permissions gotten with post"""
+        self.user1.user_permissions.add(self.permissions["add"])
+        data = {
+            "name": "test-1",
+            "register_number": "REG-T1",
+        }
+
+        self.client.login(username="testuser1@foo.bar", password="top_secret1")
+        response = self.client.post("/equipment/add/", data=data)
+
+        saved_equipment = Equipment.objects.get(register_number="REG-T1")
+        saved_perms = EquipmentUser.objects.filter(equipment=saved_equipment)
+
+        # Login user should get ADMIN privs since no admin is assigned at post data.
+        expected_perms = [
             str(
                 EquipmentUser(user=self.user1, equipment=saved_equipment, role="ADMIN")
             ),

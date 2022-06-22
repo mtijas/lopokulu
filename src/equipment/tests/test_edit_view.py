@@ -10,6 +10,7 @@ from django.test import Client, TestCase
 
 from equipment.models import Equipment, EquipmentUser
 
+
 class EquipmentEditViewAuthTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
@@ -60,7 +61,7 @@ class EquipmentEditViewAuthTestCase(TestCase):
     def setUp(self):
         self.client = Client()
 
-    def test_edit_permission_allows_edit(self):
+    def test_edit_permission_allows_getting_edit_form(self):
         """Response 200 should be given on url /equipment/<pk>/edit/ for ADMIN"""
         self.user3.user_permissions.add(self.permissions["edit"])
         self.client.login(username="testuser3@foo.bar", password="top_secret3")
@@ -69,7 +70,7 @@ class EquipmentEditViewAuthTestCase(TestCase):
 
         self.assertEqual(response.status_code, 200)
 
-    def test_edit_permission_required(self):
+    def test_edit_permission_required_for_get(self):
         """User with no perms should receive 403"""
         self.client.login(username="testuser2@foo.bar", password="top_secret2")
 
@@ -77,11 +78,16 @@ class EquipmentEditViewAuthTestCase(TestCase):
 
         self.assertEqual(response.status_code, 403)
 
-    def test_edit_post_view_needs_permissions(self):
-        """POSTing to edit view should need permissions"""
-        saved_equipment = Equipment.objects.create(
-            name="test post not edited", register_number="T-NO-PERM"
+    def test_logged_out_user_gets_redirected_on_get_edit_form(self):
+        """Non logged in user should get redirected on get"""
+        response = self.client.get(f"/equipment/{self.equipment1.id}/edit/")
+
+        self.assertRedirects(
+            response, f"/accounts/login/?next=/equipment/{self.equipment1.id}/edit/"
         )
+
+    def test_posting_to_edit_without_perms_should_not_actually_edit(self):
+        """POSTing to edit view should need permissions"""
         data = {
             "name": "edited...",
             "register_number": "T-NO-PERM",
@@ -90,26 +96,23 @@ class EquipmentEditViewAuthTestCase(TestCase):
         data[f"perm-{self.user2.id}"] = "ADMIN"
         data[f"perm-{self.user3.id}"] = "NOACCESS"
 
-        self.create_dummy_equipment_users(saved_equipment)
-
         self.client.login(username="testuser1@foo.bar", password="top_secret1")
-        response = self.client.post(f"/equipment/{saved_equipment.id}/edit/", data=data)
-
-        # Update our equipment var with new data from form save
-        saved_equipment = Equipment.objects.get(register_number="T-NO-PERM")
+        response = self.client.post(f"/equipment/{self.equipment1.id}/edit/", data=data)
 
         self.assertEqual(response.status_code, 403)
-        self.assertEqual(saved_equipment.name, "test post not edited")
+        self.assertEqual(self.equipment1.name, "TestRO")
 
-    def create_dummy_equipment_users(self, equipment):
-        """Create dummy equipment users for equipment"""
-        EquipmentUser.objects.create(
-            user=self.user1, equipment=equipment, role="READ_ONLY"
+    def test_posting_to_edit_should_get_logged_out_user_redirected(self):
+        """POSTing to edit view should get logged out user redirected"""
+        response = self.client.post(
+            f"/equipment/{self.equipment1.id}/edit/", data=dict()
         )
-        EquipmentUser.objects.create(user=self.user2, equipment=equipment, role="ADMIN")
-        EquipmentUser.objects.create(
-            user=self.user3, equipment=equipment, role="READ_ONLY"
+
+        self.assertRedirects(
+            response, f"/accounts/login/?next=/equipment/{self.equipment1.id}/edit/"
         )
+
+    # Working edit permission is tested in case below
 
 
 class EquipmentEditViewBasicTestCase(TestCase):

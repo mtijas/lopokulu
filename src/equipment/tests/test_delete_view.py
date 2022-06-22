@@ -39,20 +39,6 @@ class EquipmentDeleteViewAuthTestCase(TestCase):
     def setUp(self):
         self.client = Client()
 
-    def test_delete_permission_allows_delete(self):
-        """User with delete permission should be able to delete Equipment"""
-        self.user1.user_permissions.add(self.permissions["delete"])
-        with self.assertNumQueries(1):
-            saved_equipment = Equipment.objects.create(
-                name="test-delete-1", register_number="T-DEL-1"
-            )
-
-        self.client.login(username="testuser1@foo.bar", password="top_secret1")
-        response = self.client.get(f"/equipment/{saved_equipment.id}/delete/")
-
-        self.assertRedirects(response, f"/equipment/")
-        self.assertFalse(Equipment.objects.filter(id=saved_equipment.id).exists())
-
     def test_delete_permission_required(self):
         """User with no perms should receive 403"""
         self.client.login(username="testuser1@foo.bar", password="top_secret1")
@@ -61,6 +47,14 @@ class EquipmentDeleteViewAuthTestCase(TestCase):
 
         self.assertEqual(response.status_code, 403)
         self.assertTrue(Equipment.objects.filter(id=self.equipment1.id).exists())
+
+    def test_logged_out_user_gets_redirected_on_get_(self):
+        """Logged out user should get redirected"""
+        response = self.client.get(f"/equipment/{self.equipment1.id}/delete/")
+
+        self.assertRedirects(
+            response, f"/accounts/login/?next=/equipment/{self.equipment1.id}/delete/"
+        )
 
 
 class EquipmentDeleteViewBasicTestCase(TestCase):
@@ -112,3 +106,17 @@ class EquipmentDeleteViewBasicTestCase(TestCase):
 
     def setUp(self):
         self.client = Client()
+
+    def test_delete_actually_deletes(self):
+        """User with delete permission should be able to delete Equipment"""
+        self.user1.user_permissions.add(self.permissions["delete"])
+        with self.assertNumQueries(1):
+            saved_equipment = Equipment.objects.create(
+                name="test-delete-1", register_number="T-DEL-1"
+            )
+
+        self.client.login(username="testuser1@foo.bar", password="top_secret1")
+        response = self.client.get(f"/equipment/{saved_equipment.id}/delete/")
+
+        self.assertRedirects(response, f"/equipment/")
+        self.assertFalse(Equipment.objects.filter(id=saved_equipment.id).exists())
