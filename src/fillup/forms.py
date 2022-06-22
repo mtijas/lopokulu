@@ -4,7 +4,7 @@
 #
 # SPDX-License-Identifier: MIT
 
-from django import forms
+from django.forms import ModelForm, RadioSelect, DateTimeInput
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.utils.translation import gettext as _
 
@@ -13,7 +13,7 @@ from equipment.models import Equipment
 from .models import Fillup
 
 
-class FillupForm(forms.ModelForm):
+class FillupForm(ModelForm):
     def __init__(self, user, *args, **kwargs):
         self.user = user
         super(FillupForm, self).__init__(*args, **kwargs)
@@ -38,9 +38,11 @@ class FillupForm(forms.ModelForm):
             return
 
         # Get the previous fillup for equipment in question
-        previous_fillup = Fillup.objects.exclude(pk=self.instance.id).filter(
-            equipment=equipment, addition_date__lt=addition_date
-        ).first()
+        previous_fillup = (
+            Fillup.objects.exclude(pk=self.instance.id)
+            .filter(equipment=equipment, addition_date__lt=addition_date)
+            .first()
+        )
 
         if distance is None:
             return
@@ -54,9 +56,11 @@ class FillupForm(forms.ModelForm):
                 )
 
         # Get the next fillup for equipment in question
-        next_fillup = Fillup.objects.exclude(pk=self.instance.id).filter(
-            equipment=equipment, addition_date__gt=addition_date
-        ).last()
+        next_fillup = (
+            Fillup.objects.exclude(pk=self.instance.id)
+            .filter(equipment=equipment, addition_date__gt=addition_date)
+            .last()
+        )
 
         if next_fillup is not None:
             if distance >= next_fillup.distance:
@@ -75,7 +79,16 @@ class FillupForm(forms.ModelForm):
 
     class Meta:
         model = Fillup
-        widgets = {"equipment": forms.RadioSelect}
+        widgets = {
+            "equipment": RadioSelect,
+            "addition_date": DateTimeInput(
+                attrs={
+                    "data-dtpicker": "",
+                    "data-dtpicker-enable-time": "",
+                    "data-dtpicker-time-24h": "",
+                }
+            ),
+        }
         fields = [
             "price",
             "amount",
