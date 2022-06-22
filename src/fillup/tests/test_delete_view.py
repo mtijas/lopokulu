@@ -174,3 +174,13 @@ class FillupViewsIntegrationTestCase(TestCase):
         )
         self.assertAlmostEqual(float(updated_fillup.distance_delta), 150.0, places=1)
         self.assertAlmostEqual(float(updated_fillup.consumption), 2.667, places=3)
+
+    def test_delete_actually_deletes(self):
+        """GETting delete for existing fillup with credentials should actually delete"""
+        self.client.login(username="testuser@foo.bar", password="top_secret")
+
+        response = self.client.get(f"/fillup/{self.fillup2.id}/delete/")
+
+        self.assertTrue(Fillup.objects.filter(id=self.fillup1.id).exists())
+        self.assertFalse(Fillup.objects.filter(id=self.fillup2.id).exists())
+        self.assertTrue(Fillup.objects.filter(id=self.fillup3.id).exists())
