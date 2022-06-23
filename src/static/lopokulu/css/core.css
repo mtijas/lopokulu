@@ -7,9 +7,13 @@
  */
 
 :root {
-  --spacing: 0.5rem;
+  --spacing: 0.25rem;
   --form-element-spacing-vertical: 0.25rem;
   --form-element-spacing-horizontal: 0.33rem;
+  --nav-link-spacing-vertical: 0.25rem;
+  --nav-link-spacing-horizontal: 0.33rem;
+  --nav-element-spacing-vertical: 0.67rem;
+  --nav-element-spacing-horizontal: 0.33rem;
 }
 
 body {
@@ -24,8 +28,7 @@ body {
   top: 0;
   right: 0;
   left: 0;
-  backdrop-filter: saturate(100%) blur(20px);
-  background-color: var(--nav-background-color);
+  background-color: var(--background-color);
   border-style: none none solid none;
   border-width: 1px;
   border-color: var(--primary);
@@ -39,8 +42,7 @@ body {
   background-color: var(--primary);
   border-radius: 0;
   color: var(--primary-inverse);
-  padding: calc(var(--spacing) * 0.2) calc(var(--spacing) * .3);
-  --spacing: 1em;
+  /*padding: calc(var(--spacing) * 0.2) calc(var(--spacing) * 0.3);*/
 }
 
 #site-header #main-nav a.active {
@@ -74,6 +76,21 @@ body > footer p {
   margin-top: calc(var(--typography-spacing-vertical) * 0.5);
 }
 
+article header li {
+  padding: calc(var(--nav-element-spacing-vertical) * 0.4) var(--nav-element-spacing-horizontal);
+}
+
+article.stats table {
+  margin-bottom: calc(var(--typography-spacing-vertical) * 0.25);
+}
+
 .center {
   text-align: center;
+}
+
+table a[role="button"],
+table a.secondary {
+  padding: calc(var(--form-element-spacing-vertical) * 0.1)
+    calc(var(--form-element-spacing-horizontal) * 0.25);
+  font-size: 0.9em;
 }
