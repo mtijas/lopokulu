@@ -80,7 +80,8 @@ article header li {
   padding: calc(var(--nav-element-spacing-vertical) * 0.4) var(--nav-element-spacing-horizontal);
 }
 
-article.stats table {
+article.stats table,
+table:last-child {
   margin-bottom: calc(var(--typography-spacing-vertical) * 0.25);
 }
 
