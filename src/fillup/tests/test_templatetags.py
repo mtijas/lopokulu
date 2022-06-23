@@ -1,0 +1,89 @@
+# SPDX-FileCopyrightText: 2022 Markus Ijäs
+#
+# SPDX-License-Identifier: MIT
+
+from datetime import timedelta
+from decimal import Decimal
+from unittest.mock import Mock
+
+from django.contrib.auth.models import Group, Permission, User
+from django.test import TestCase
+from django.utils.timezone import now
+
+from equipment.models import Equipment, EquipmentUser
+from fillup.models import Fillup
+from fillup.templatetags import fillup_partials
+
+
+class StatsCardTestCase(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.equipment = Equipment.objects.create(
+            name="TestEQ1",
+            register_number="TEST-EQ1",
+            allowed_measurements=["fillup"],
+        )
+        Fillup.objects.create(
+            price=Decimal(2.1),
+            amount=10,
+            distance=100,
+            equipment=cls.equipment,
+            addition_date=now() - timedelta(days=32),
+            tank_full=True,
+        )
+        Fillup.objects.create(
+            price=Decimal(2.2),
+            amount=15,
+            distance=200,
+            equipment=cls.equipment,
+            addition_date=now() - timedelta(days=8),
+            tank_full=True,
+        )
+        Fillup.objects.create(
+            price=Decimal(2.3),
+            amount=20,
+            distance=300,
+            equipment=cls.equipment,
+            addition_date=now() - timedelta(days=7),
+            tank_full=True,
+        )
+        Fillup.objects.create(
+            price=Decimal(2.4),
+            amount=20,
+            distance=350,
+            equipment=cls.equipment,
+            addition_date=now() - timedelta(days=7),
+            tank_full=False,
+        )
+        Fillup.objects.create(
+            price=Decimal(2.4),
+            amount=15,
+            distance=400,
+            equipment=cls.equipment,
+            addition_date=now() - timedelta(days=4),
+            tank_full=True,
+        )
+
+    def test_returns_31d_stats_for_equipment_as_default(self):
+        """31 day stats for single Equipment should be returned as default"""
+        response = fillup_partials.equipment_fillup_stats(self.equipment)
+
+        self.assertAlmostEqual(float(response["stats"]["consumption__avg"]), 23.333, places=3)
+        self.assertAlmostEqual(float(response["stats"]["distance_delta__sum"]), 300, places=1)
+        self.assertAlmostEqual(float(response["stats"]["total_price__sum"]), 163, places=1)
+
+    def test_returns_proper_stats_for_equipment_on_custom_days_limit(self):
+        """Time limit should be customizable, testing with 180 days"""
+        response = fillup_partials.equipment_fillup_stats(self.equipment, 180)
+
+        self.assertAlmostEqual(float(response["stats"]["consumption__avg"]), 23.333, places=3)
+        self.assertAlmostEqual(float(response["stats"]["distance_delta__sum"]), 400, places=1)
+        self.assertAlmostEqual(float(response["stats"]["total_price__sum"]), 184, places=1)
+
+    def test_returns_zeros_when_no_fillups_found(self):
+        """Time limit should be customizable, testing with 180 days"""
+        response = fillup_partials.equipment_fillup_stats(self.equipment, 1)
+
+        self.assertEqual(float(response["stats"]["distance_delta__sum"]), 0)
+        self.assertEqual(float(response["stats"]["consumption__avg"]), 0)
+        self.assertEqual(float(response["stats"]["total_price__sum"]), 0)

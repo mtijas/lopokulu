@@ -1,4 +1,5 @@
 {% extends 'lopokulu/base.html' %}
+{% load fillup_partials %}
 {% block content %}
 {% for single_equipment in equipment %}
 <article>
@@ -19,6 +20,10 @@
     </nav>
   </header>
   <main>
+    <div class="grid">
+      {% equipment_fillup_stats single_equipment.equipment.id 31 %}
+      {% equipment_fillup_stats single_equipment.equipment.id 180 %}
+    </div>
     {% include 'fillup/partials/fillup-table.html' with fillups=single_equipment.fillups role=single_equipment.role %}
   </main>
 </article>

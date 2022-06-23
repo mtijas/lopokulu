@@ -1,4 +1,5 @@
 {% extends 'lopokulu/base.html' %}
+{% load fillup_partials %}
 {% block content %}
 <article>
   <header>
@@ -14,6 +15,10 @@
     </nav>
   </header>
   <main>
+    <div class="grid">
+      {% equipment_fillup_stats equipment.id 31 %}
+      {% equipment_fillup_stats equipment.id 180 %}
+    </div>
     {% include 'fillup/partials/fillup-table.html' with fillups=fillups role=role %}
   </main>
 </article>

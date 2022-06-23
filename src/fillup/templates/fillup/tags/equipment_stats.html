@@ -1,0 +1,19 @@
+<article>
+  <header>Fillup statistics for last {{ days }} days</header>
+  <table>
+    <tbody>
+      <tr>
+        <td>Average consumption</td>
+        <td>{{ stats.consumption__avg|floatformat:1 }} l/100km</td>
+      </tr>
+      <tr>
+        <td>Distance travelled</td>
+        <td>{{ stats.distance_delta__sum|floatformat:0 }} km</td>
+      </tr>
+      <tr>
+        <td>Total cost</td>
+        <td>{{ stats.total_price__sum|floatformat:2 }} €</td>
+      </tr>
+    </tbody>
+  </table>
+</article>
