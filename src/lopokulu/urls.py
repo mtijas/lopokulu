@@ -24,11 +24,15 @@ from django.contrib import admin
 from django.contrib.auth import views
 from django.urls import include, path
 
+from dashboard.views import DashboardView
+
 urlpatterns = [
+    path("", DashboardView.as_view(), name="index"),
     path("admin/", admin.site.urls),
     path("accounts/login/", views.LoginView.as_view(), name="login"),
     path("accounts/logout/", views.LogoutView.as_view(), name="logout"),
     path("equipment/", include("equipment.urls")),
+    path("dashboard/", include("dashboard.urls")),
 ]
 
 # @TODO: Unit tests

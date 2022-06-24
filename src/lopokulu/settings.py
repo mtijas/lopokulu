@@ -57,6 +57,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "django_probes",
     "equipment",
+    "dashboard",
 ]
 
 # Measurement apps are supposed to be regular Django apps as well

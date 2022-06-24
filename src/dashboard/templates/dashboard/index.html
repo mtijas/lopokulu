@@ -1,0 +1,48 @@
+{% extends 'lopokulu/base.html' %}
+{% load fillup_partials lopokulu_extras %}
+{% block content %}
+{% for single_equipment in equipment %}
+<article>
+  <header>
+    <nav>
+      <ul>
+        <li><strong> {{ single_equipment }} </strong></li>
+      </ul>
+      {% for app in single_equipment.allowed_measurements %}
+      <ul>
+        <li>
+          <a
+            href="{% url app|addstr:':detail' pk=single_equipment.id %}"
+            role="button"
+          >
+            {{ app|capfirst|addstr:'s' }}
+          </a>
+        </li>
+      </ul>
+      {% endfor %}
+    </nav>
+  </header>
+  <div class="grid">
+    {% for measurement_type in single_equipment.allowed_measurements %}
+      {% if measurement_type == "fillup" %}
+        {% equipment_fillup_stats single_equipment.id 31 %}
+      {% endif %}
+    {% empty %}
+    <div>
+      <p>No measurements allowed.</p>
+    </div>
+    {% endfor %}
+  </div>
+</article>
+{% empty %}
+<article>
+  <p>No equipment...</p>
+  {% if perms.equipment.add_equipment %}
+  <p>
+    Add new equipment in
+    <a href="{% url 'equipment:index' %}">the Equipment page</a>
+  </p>
+  {% endif %}
+</article>
+{% endfor %}
+{% endblock %}

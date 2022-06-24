@@ -24,3 +24,11 @@ def user_has_role_for_equipment(
             equipmentuser__user_id=user_id,
             equipmentuser__role__in=allowed_roles,
         ).exists()
+
+def fetch_users_equipment(user):
+    """Fetches equipment user has access to. Fetches all equipment for superusers"""
+    # @TODO: Unit tests
+    if user.is_superuser:
+        return Equipment.objects.all()
+
+    return Equipment.objects.filter(equipmentuser__user_id=user.id)
