@@ -1,5 +1,5 @@
 {% extends 'lopokulu/base.html' %}
-{% load fillup_partials lopokulu_extras %}
+{% load lopokulu_extras fillup_partials %}
 {% block content %}
 {% for single_equipment in equipment %}
 <article>
@@ -25,7 +25,7 @@
   <div class="grid">
     {% for measurement_type in single_equipment.allowed_measurements %}
       {% if measurement_type == "fillup" %}
-        {% equipment_fillup_stats single_equipment.id 31 %}
+        {% fillup_equipment_stats single_equipment.id start_dt stop_dt %}
       {% endif %}
     {% empty %}
     <div>

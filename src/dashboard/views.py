@@ -2,9 +2,12 @@
 #
 # SPDX-License-Identifier: MIT
 
+from datetime import timedelta
+
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
 from django.utils.decorators import method_decorator
+from django.utils.timezone import now
 from django.views import View
 
 from equipment.models import Equipment
@@ -17,6 +20,8 @@ class DashboardView(View):
 
     def get(self, request):
         data = {
-            "equipment": fetch_users_equipment(request.user)
+            "equipment": fetch_users_equipment(request.user),
+            "start_dt": now() - timedelta(days=31),
+            "stop_dt": now(),
         }
         return render(request, self.template_name, data)

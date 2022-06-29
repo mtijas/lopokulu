@@ -85,7 +85,7 @@ TEMPLATES = [
         "OPTIONS": {
             "libraries": {
                 "lopokulu_extras": "lopokulu.templatetags.lopokulu_extras",
-                "fillup_partials": "fillup.templatetags.fillup_partials",
+                "fillup_partials": "fillup.templatetags.partials",
             },
             "context_processors": [
                 "django.template.context_processors.debug",

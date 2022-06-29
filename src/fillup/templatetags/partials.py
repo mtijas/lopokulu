@@ -14,11 +14,19 @@ register = template.Library()
 
 
 @register.inclusion_tag("fillup/tags/equipment_stats.html")
-def equipment_fillup_stats(equipment, days: int = 31):
-    """Collects fillup stats for n days before today for specific equipment"""
+def fillup_equipment_stats(equipment, start_dt=31, stop_dt=now(), mode: str = None):
+    """Collects fillup stats for datetime range for specific equipment"""
+    " TODO: Unit test mode"
+    if mode == "current year":
+        start_dt = now().replace(day=1, month=1)
+    elif type(start_dt) is int:
+        start_dt = now() - timedelta(days=start_dt)
+
     data = {
         "equipment": equipment,
-        "days": days,
+        "start_dt": start_dt,
+        "stop_dt": stop_dt,
+        "mode": mode,
         "stats": {
             "consumption__avg": 0,
             "total_price__sum": 0,
@@ -26,9 +34,11 @@ def equipment_fillup_stats(equipment, days: int = 31):
         },
     }
 
-    addition_date_limit = now() - timedelta(days=days)
+    start_dt = start_dt.replace(hour=0, minute=0, second=0, microsecond=0)
+    stop_dt = stop_dt.replace(hour=23, minute=59, second=59, microsecond=999999)
+
     fillups = Fillup.objects.filter(
-        addition_date__gte=addition_date_limit, equipment=equipment
+        addition_date__gte=start_dt, addition_date__lte=stop_dt, equipment=equipment
     )
 
     if not fillups:

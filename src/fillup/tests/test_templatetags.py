@@ -12,7 +12,7 @@ from django.utils.timezone import now
 
 from equipment.models import Equipment, EquipmentUser
 from fillup.models import Fillup
-from fillup.templatetags import fillup_partials
+from fillup.templatetags import partials
 
 
 class StatsCardTestCase(TestCase):
@@ -66,23 +66,38 @@ class StatsCardTestCase(TestCase):
 
     def test_returns_31d_stats_for_equipment_as_default(self):
         """31 day stats for single Equipment should be returned as default"""
-        response = fillup_partials.equipment_fillup_stats(self.equipment)
+        response = partials.fillup_equipment_stats(self.equipment)
 
         self.assertAlmostEqual(float(response["stats"]["consumption__avg"]), 23.333, places=3)
         self.assertAlmostEqual(float(response["stats"]["distance_delta__sum"]), 300, places=1)
         self.assertAlmostEqual(float(response["stats"]["total_price__sum"]), 163, places=1)
 
     def test_returns_proper_stats_for_equipment_on_custom_days_limit(self):
-        """Time limit should be customizable, testing with 180 days"""
-        response = fillup_partials.equipment_fillup_stats(self.equipment, 180)
+        """Start datetime should be customizable, testing with 180 days"""
+        start_dt = now() - timedelta(days=180)
+
+        response = partials.fillup_equipment_stats(self.equipment, start_dt)
 
         self.assertAlmostEqual(float(response["stats"]["consumption__avg"]), 23.333, places=3)
         self.assertAlmostEqual(float(response["stats"]["distance_delta__sum"]), 400, places=1)
         self.assertAlmostEqual(float(response["stats"]["total_price__sum"]), 184, places=1)
 
+    def test_returns_proper_stats_for_equipment_on_custom_days_limit_test_2(self):
+        """Stop datetime should be customizable"""
+        start_dt = now() - timedelta(days=35)
+        stop_dt = now() - timedelta(days=8)
+
+        response = partials.fillup_equipment_stats(self.equipment, start_dt, stop_dt)
+
+        self.assertAlmostEqual(float(response["stats"]["consumption__avg"]), 15, places=3)
+        self.assertAlmostEqual(float(response["stats"]["distance_delta__sum"]), 200, places=1)
+        self.assertAlmostEqual(float(response["stats"]["total_price__sum"]), 54, places=1)
+
     def test_returns_zeros_when_no_fillups_found(self):
-        """Time limit should be customizable, testing with 180 days"""
-        response = fillup_partials.equipment_fillup_stats(self.equipment, 1)
+        """Zeroes should be returned if no statistics found for given time range"""
+        start_dt = now() - timedelta(days=1)
+
+        response = partials.fillup_equipment_stats(self.equipment, start_dt)
 
         self.assertEqual(float(response["stats"]["distance_delta__sum"]), 0)
         self.assertEqual(float(response["stats"]["consumption__avg"]), 0)

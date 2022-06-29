@@ -1,5 +1,9 @@
 <article class="stats">
-  <header>Fillup statistics for last {{ days }} days</header>
+  {% if mode is not None %}
+  <header>Fillup statistics: {{ mode }}</header>
+  {% else %}
+  <header>Fillup statistics: {{ start_dt|date:'j.n.y' }} - {{ stop_dt|date:'j.n.y' }}</header>
+  {% endif %}
   <table>
     <tbody>
       <tr>
