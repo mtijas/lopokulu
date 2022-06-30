@@ -27,7 +27,6 @@ def user_has_role_for_equipment(
 
 def fetch_users_equipment(user):
     """Fetches equipment user has access to. Fetches all equipment for superusers"""
-    # @TODO: Unit tests
     if user.is_superuser:
         return Equipment.objects.all()
 

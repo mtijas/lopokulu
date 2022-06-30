@@ -6,10 +6,10 @@ from django.contrib.auth.models import Group, Permission, User
 from django.test import TestCase
 
 from equipment.models import Equipment, EquipmentUser
-from equipment.utils import user_has_role_for_equipment
+from equipment.utils import user_has_role_for_equipment, fetch_users_equipment
 
 
-class EquipmentUtilsTestCase(TestCase):
+class EquipmentUtilsUserHasRoleForEquipmentTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.nonauth_user = User.objects.create_user(
@@ -107,3 +107,73 @@ class EquipmentUtilsTestCase(TestCase):
         )
 
         self.assertTrue(result)
+
+
+class EquipmentUtilsFetchUsersEquipmentTestCase(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.nonauth_user = User.objects.create_user(
+            username="nonauth_user@foo.bar", password="top_secret"
+        )
+        cls.ro_user = User.objects.create_user(
+            username="ro_user@foo.bar", password="top_secret"
+        )
+        cls.user_user = User.objects.create_user(
+            username="user_user@foo.bar", password="top_secret"
+        )
+        cls.admin_user = User.objects.create_user(
+            username="admin_user@foo.bar", password="top_secret"
+        )
+        cls.superuser = User.objects.create_user(
+            username="super@user", password="superuser", is_superuser=True
+        )
+        cls.equipment_test = Equipment.objects.create(
+            name="TestEQ1",
+            register_number="TEST-EQ1",
+            allowed_measurements=["test"],
+        )
+        cls.equipment_na = Equipment.objects.create(
+            name="TestEQNA",
+            register_number="TEST-EQNA",
+        )
+        EquipmentUser.objects.create(
+            user=cls.ro_user, equipment=cls.equipment_test, role="READ_ONLY"
+        )
+        EquipmentUser.objects.create(
+            user=cls.ro_user, equipment=cls.equipment_na, role="READ_ONLY"
+        )
+        EquipmentUser.objects.create(
+            user=cls.user_user, equipment=cls.equipment_test, role="USER"
+        )
+        EquipmentUser.objects.create(
+            user=cls.admin_user, equipment=cls.equipment_test, role="ADMIN"
+        )
+
+    def test_superuser_should_get_all_equipment(self):
+        """Superuser should get all equipment returned"""
+        result = fetch_users_equipment(self.superuser)
+
+        self.assertQuerysetEqual(result, Equipment.objects.all())
+
+    def test_equipment_with_role_for_user_returned_test_1(self):
+        """Equipment with role for user should get returned, test 1"""
+        expected = [
+            str(self.equipment_test),
+            str(self.equipment_na),
+        ]
+        result = fetch_users_equipment(self.ro_user)
+
+        self.assertQuerysetEqual(
+            list(result), expected, ordered=False, transform=str
+        )
+
+    def test_equipment_with_role_for_user_returned_test_2(self):
+        """Equipment with role for user should get returned, test 2"""
+        expected = [
+            str(self.equipment_test),
+        ]
+        result = fetch_users_equipment(self.user_user)
+
+        self.assertQuerysetEqual(
+            list(result), expected, ordered=False, transform=str
+        )

@@ -324,3 +324,43 @@ class FillupViewsIntegrationTestCase(TestCase):
         )
         self.assertAlmostEqual(float(updated_fillup.distance_delta), 30.0, places=1)
         self.assertAlmostEqual(float(updated_fillup.consumption), 13.333, places=3)
+
+    def test_form_gets_prepopulated_on_invalid_form(self):
+        """Form should get prepopulated on invalid form"""
+        data = {
+            "price": 1.8,
+            "amount": 3.9,
+            "distance": 1,
+            "equipment": self.equipment3.id,
+            "addition_date": "2022-06-15T15:30:00+00:00",
+            "tank_full": "1",
+        }
+
+        self.client.login(username="testuser@foo.bar", password="top_secret")
+        response = self.client.post(f"/fillup/{self.fillup2.id}/edit/", data=data)
+
+        self.assertInHTML(
+            f'<input type="text" name="addition_date" value="2022-06-15T15:30:00+00:00" data-dtpicker="" data-dtpicker-enable-time="" data-dtpicker-time-24h="" required id="id_addition_date">',
+            response.content.decode(),
+            1,
+        )
+        self.assertInHTML(
+            f'<input type="number" name="distance" value="1" step="any" required="" id="id_distance">',
+            response.content.decode(),
+            1,
+        )
+        self.assertInHTML(
+            f'<input type="number" name="amount" value="3.9" step="any" required="" id="id_amount">',
+            response.content.decode(),
+            1,
+        )
+        self.assertInHTML(
+            f'<input type="number" name="price" value="1.8" step="0.001" required="" id="id_price">',
+            response.content.decode(),
+            1,
+        )
+        self.assertInHTML(
+            f'<input type="checkbox" name="tank_full" id="id_tank_full" checked="">',
+            response.content.decode(),
+            1,
+        )

@@ -35,6 +35,5 @@ urlpatterns = [
     path("dashboard/", include("dashboard.urls")),
 ]
 
-# @TODO: Unit tests
 for app in settings.INSTALLED_MEASUREMENT_APPS:
     urlpatterns.append(path(f"{app}/", include(f"{app}.urls")))

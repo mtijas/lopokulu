@@ -26,8 +26,8 @@ class EquipmentDeleteViewAuthTestCase(TestCase):
         cls.permissions["add"], _ = Permission.objects.get_or_create(
             codename="add_equipment", content_type=ct
         )
-        cls.permissions["edit"], _ = Permission.objects.get_or_create(
-            codename="edit_equipment", content_type=ct
+        cls.permissions["change"], _ = Permission.objects.get_or_create(
+            codename="change_equipment", content_type=ct
         )
         cls.permissions["view"], _ = Permission.objects.get_or_create(
             codename="view_equipment", content_type=ct
@@ -94,8 +94,8 @@ class EquipmentDeleteViewBasicTestCase(TestCase):
         cls.permissions["add"], _ = Permission.objects.get_or_create(
             codename="add_equipment", content_type=ct
         )
-        cls.permissions["edit"], _ = Permission.objects.get_or_create(
-            codename="edit_equipment", content_type=ct
+        cls.permissions["change"], _ = Permission.objects.get_or_create(
+            codename="change_equipment", content_type=ct
         )
         cls.permissions["view"], _ = Permission.objects.get_or_create(
             codename="view_equipment", content_type=ct

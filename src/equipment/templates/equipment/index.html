@@ -32,7 +32,7 @@
             {% endfor %}
           </td>
           <td>
-            {% if perms.equipment.edit_equipment %}
+            {% if perms.equipment.change_equipment %}
             <a href="{% url 'equipment:edit' pk=equipment.id %}" role="button">Edit</a>
             {% endif %}
             {% if perms.equipment.delete_equipment %}

@@ -377,3 +377,23 @@ class FillupFormTestCase(TestCase):
 
         self.assertInHTML(expected_html_0, str(form), 1)
         self.assertInHTML(expected_html_1, str(form), 1)
+
+    def test_equipment_initial_prepopulated_on_allowed_equipment(self):
+        """Equipment initial should get populated when allowed equipment exists"""
+        data = self.base_form_data
+        data["equipment"] = self.equipment1.id
+
+        form = FillupForm(self.user, data=data)
+
+        self.assertTrue(form.fields["equipment"].initial == self.equipment3.id)
+
+    def test_equipment_initial_not_prepopulated_on_non_existing_equipment(self):
+        """Equipment initial should get populated when allowed equipment exists"""
+        Equipment.objects.all().delete()
+        data = self.base_form_data
+        data["equipment"] = 999
+
+        form = FillupForm(self.user, data=data)
+
+        self.assertTrue(form.fields["equipment"].initial == None)
+

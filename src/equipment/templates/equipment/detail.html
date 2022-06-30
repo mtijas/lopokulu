@@ -6,9 +6,9 @@
     <nav>
       <ul>
         <li><strong>{{ equipment }}</strong></li>
-        {% if perms.equipment.edit_equipment %}
       </ul>
       <ul>
+        {% if perms.equipment.change_equipment %}
         <li><a href="{% url 'equipment:edit' pk=equipment.id %}" role="button">Edit</a></li>
         {% endif %}
         {% if perms.equipment.delete_equipment %}
@@ -21,15 +21,18 @@
     <h6>Allowed measurement types</h6>
     <p>
       {% for allowed in equipment.allowed_measurements %}
-      <a href="{% url allowed|addstr:':index' %}" role="button">{{ allowed|capfirst|addstr:'s' }}</a>
+      <a href="{% url allowed|addstr:':detail' pk=equipment.id %}" role="button">
+        {{ allowed|capfirst|addstr:'s' }}
+      </a>
       {% empty %}
-        {% if perms.equipment.edit_equipment %}
+        {% if perms.equipment.change_equipment %}
           No measurements allowed (<a href="{% url 'equipment:edit' pk=equipment.id %}">edit to allow</a>)
         {% else %}
           No measurements allowed (and no permission to allow anything)
         {% endif %}
       {% endfor %}
     </p>
+    {% if user.role == "ADMIN" or user.is_superuser %}
     <h6>Measurement roles</h6>
     <table>
       <thead>
@@ -61,6 +64,7 @@
         {% endfor %}
       </tbody>
     </table>
+    {% endif %}
   </main>
 </article>
 {% endblock %}

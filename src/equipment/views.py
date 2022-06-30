@@ -11,9 +11,11 @@ from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.generic import DetailView, ListView
+from django.core.exceptions import PermissionDenied
 
 from equipment.forms import EquipmentForm
 from equipment.models import Equipment, EquipmentUser
+from equipment import utils
 
 
 @method_decorator(login_required, name="dispatch")
@@ -21,19 +23,33 @@ class EquipmentListView(ListView):
     model = Equipment
     template_name = "equipment/index.html"
 
+    def get(self, request):
+        content = dict()
+        content["equipment_list"] = utils.fetch_users_equipment(request.user)
+        return render(request, self.template_name, content)
+
 
 @method_decorator(login_required, name="dispatch")
 class EquipmentDetailView(DetailView):
     model = Equipment
     template_name = "equipment/detail.html"
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["equipment_users"] = EquipmentUser.objects.filter(
-            equipment=context["equipment"]
+    def get(self, request, **kwargs):
+        is_allowed = EquipmentUser.objects.filter(
+            user_id=request.user.id,
+            equipment_id=kwargs.get("pk"),
+        ).exists()
+
+        if not is_allowed and not request.user.is_superuser:
+            raise PermissionDenied()
+
+        content = dict()
+        content["equipment"] = Equipment.objects.get(pk=kwargs.get("pk"))
+        content["equipment_users"] = EquipmentUser.objects.filter(
+            equipment=content["equipment"]
         )
-        context["roles"] = EquipmentUser.Role
-        return context
+        content["roles"] = EquipmentUser.Role
+        return render(request, self.template_name, content)
 
 
 @method_decorator(login_required, name="dispatch")
@@ -66,7 +82,7 @@ class EquipmentAddView(PermissionRequiredMixin, View):
 class EquipmentEditView(PermissionRequiredMixin, View):
     model = Equipment
     template_name = "equipment/edit.html"
-    permission_required = "equipment.edit_equipment"
+    permission_required = "equipment.change_equipment"
 
     def get(self, request, **kwargs):
         content = dict()

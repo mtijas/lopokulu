@@ -17,6 +17,9 @@ class EquipmentListViewAuthTestCase(TestCase):
         cls.user1 = User.objects.create_user(
             username="testuser1@foo.bar", password="top_secret1"
         )
+        cls.na_user = User.objects.create_user(
+            username="testuser_na@foo.bar", password="top_secret_na"
+        )
         cls.equipment1 = Equipment.objects.create(
             name="TestRO", register_number="TEST-RO"
         )
@@ -34,6 +37,14 @@ class EquipmentListViewAuthTestCase(TestCase):
         response = self.client.get(f"/equipment/{self.equipment1.id}/")
 
         self.assertEqual(response.status_code, 200)
+
+    def test_respond_with_403_for_user_without_role_for_equipment(self):
+        """Response 403 should be given for user without role"""
+        self.client.login(username="testuser_na@foo.bar", password="top_secret_na")
+
+        response = self.client.get(f"/equipment/{self.equipment1.id}/")
+
+        self.assertEqual(response.status_code, 403)
 
     def test_redirects_to_login_for_non_logged_in_user_on_equipment(self):
         """Non-logged-in users should get redirected to login on equipment view"""
@@ -63,8 +74,8 @@ class EquipmentViewsInputsTestCase(TestCase):
         cls.permissions["add"], _ = Permission.objects.get_or_create(
             codename="add_equipment", content_type=ct
         )
-        cls.permissions["edit"], _ = Permission.objects.get_or_create(
-            codename="edit_equipment", content_type=ct
+        cls.permissions["change"], _ = Permission.objects.get_or_create(
+            codename="change_equipment", content_type=ct
         )
         cls.permissions["view"], _ = Permission.objects.get_or_create(
             codename="view_equipment", content_type=ct
@@ -78,7 +89,7 @@ class EquipmentViewsInputsTestCase(TestCase):
 
     def test_equipment_detail_has_edit_button_for_user_with_permission(self):
         """Equipment detail page should have edit button for user with permission"""
-        self.user1.user_permissions.add(self.permissions["edit"])
+        self.user1.user_permissions.add(self.permissions["change"])
         self.client.login(username="testuser1@foo.bar", password="top_secret1")
 
         response = self.client.get(f"/equipment/{self.equipment1.id}/")

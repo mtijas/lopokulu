@@ -58,6 +58,12 @@ class EquipmentViewsInputsTestCase(TestCase):
         cls.equipmentuser1 = EquipmentUser.objects.create(
             user=cls.user1, equipment=cls.equipment1, role="READ_ONLY"
         )
+        cls.equipmentuser2 = EquipmentUser.objects.create(
+            user=cls.user1, equipment=cls.equipment2, role="USER"
+        )
+        cls.equipmentuser3 = EquipmentUser.objects.create(
+            user=cls.user1, equipment=cls.equipment3, role="ADMIN"
+        )
 
         # Create groups and permissions
         ct = ContentType.objects.get_for_model(Equipment)
@@ -65,8 +71,8 @@ class EquipmentViewsInputsTestCase(TestCase):
         cls.permissions["add"], _ = Permission.objects.get_or_create(
             codename="add_equipment", content_type=ct
         )
-        cls.permissions["edit"], _ = Permission.objects.get_or_create(
-            codename="edit_equipment", content_type=ct
+        cls.permissions["change"], _ = Permission.objects.get_or_create(
+            codename="change_equipment", content_type=ct
         )
         cls.permissions["view"], _ = Permission.objects.get_or_create(
             codename="view_equipment", content_type=ct
@@ -105,21 +111,21 @@ class EquipmentViewsInputsTestCase(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertNotContains(response, "Add new equipment")
 
-    def test_equipment_index_has_edit_button_for_user_with_permission(self):
-        """Equipment index page should have edit button for user with permission"""
-        self.user1.user_permissions.add(self.permissions["edit"])
+    def test_equipment_index_has_edit_button_for_user_with_admin_permission(self):
+        """Equipment index page should have edit button for user with ADMIN permission"""
+        self.user1.user_permissions.add(self.permissions["change"])
         self.client.login(username="testuser1@foo.bar", password="top_secret1")
 
         response = self.client.get("/equipment/")
 
         self.assertEqual(response.status_code, 200)
-        for equipment in Equipment.objects.all():
-            expected_html = f"""
-                <a href="/equipment/{equipment.id}/edit/" role="button">
-                    Edit
-                </a>
-            """
-            self.assertInHTML(expected_html, response.content.decode(), 1)
+
+        expected_html = f"""
+            <a href="/equipment/{self.equipment3.id}/edit/" role="button">
+                Edit
+            </a>
+        """
+        self.assertInHTML(expected_html, response.content.decode(), 1)
 
     def test_equipment_index_no_edit_button_for_user_with_no_permission(self):
         """Equipment index page should not have edit button for user with no permission"""

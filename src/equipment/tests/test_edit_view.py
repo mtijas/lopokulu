@@ -48,8 +48,8 @@ class EquipmentEditViewAuthTestCase(TestCase):
         cls.permissions["add"], _ = Permission.objects.get_or_create(
             codename="add_equipment", content_type=ct
         )
-        cls.permissions["edit"], _ = Permission.objects.get_or_create(
-            codename="edit_equipment", content_type=ct
+        cls.permissions["change"], _ = Permission.objects.get_or_create(
+            codename="change_equipment", content_type=ct
         )
         cls.permissions["view"], _ = Permission.objects.get_or_create(
             codename="view_equipment", content_type=ct
@@ -61,9 +61,9 @@ class EquipmentEditViewAuthTestCase(TestCase):
     def setUp(self):
         self.client = Client()
 
-    def test_edit_permission_allows_getting_edit_form(self):
+    def test_change_permission_allows_getting_edit_form(self):
         """Response 200 should be given on url /equipment/<pk>/edit/ for ADMIN"""
-        self.user3.user_permissions.add(self.permissions["edit"])
+        self.user3.user_permissions.add(self.permissions["change"])
         self.client.login(username="testuser3@foo.bar", password="top_secret3")
 
         response = self.client.get(f"/equipment/{self.equipment3.id}/edit/")
@@ -152,8 +152,8 @@ class EquipmentEditViewBasicTestCase(TestCase):
         cls.permissions["add"], _ = Permission.objects.get_or_create(
             codename="add_equipment", content_type=ct
         )
-        cls.permissions["edit"], _ = Permission.objects.get_or_create(
-            codename="edit_equipment", content_type=ct
+        cls.permissions["change"], _ = Permission.objects.get_or_create(
+            codename="change_equipment", content_type=ct
         )
         cls.permissions["view"], _ = Permission.objects.get_or_create(
             codename="view_equipment", content_type=ct
@@ -167,7 +167,7 @@ class EquipmentEditViewBasicTestCase(TestCase):
 
     def test_permissions_removed_only_for_current_equipment(self):
         """Permissions should be removed only from current equipment on save"""
-        self.user1.user_permissions.add(self.permissions["edit"])
+        self.user1.user_permissions.add(self.permissions["change"])
         data = {
             "name": "test-2",
             "register_number": "REG-T2",
@@ -190,7 +190,7 @@ class EquipmentEditViewBasicTestCase(TestCase):
 
     def test_permissions_updated_on_form_save(self):
         """Permissions should be updated when a Equipment is modified"""
-        self.user1.user_permissions.add(self.permissions["edit"])
+        self.user1.user_permissions.add(self.permissions["change"])
         data = {
             "name": "test-2",
             "register_number": "REG-T2",
@@ -224,7 +224,7 @@ class EquipmentEditViewBasicTestCase(TestCase):
 
     def test_old_permissions_deleted_on_form_save_and_admin_assigned(self):
         """Old permissions should be deleted when a Equipment is modified and ADMIN added"""
-        self.user1.user_permissions.add(self.permissions["edit"])
+        self.user1.user_permissions.add(self.permissions["change"])
         data = {
             "name": "test-2",
             "register_number": "REG-T2",
@@ -255,28 +255,31 @@ class EquipmentEditViewBasicTestCase(TestCase):
 
     def test_current_user_does_not_get_admin_if_admin_already_present(self):
         """Current user should not get automatic admin privs if another user has admins"""
-        self.user1.user_permissions.add(self.permissions["edit"])
+        self.user3.user_permissions.add(self.permissions["change"])
         data = {
             "name": "test-2",
             "register_number": "REG-T2",
         }
         data[f"perm-{self.user1.id}"] = "NOACCESS"
         data[f"perm-{self.user2.id}"] = "ADMIN"
-        data[f"perm-{self.user3.id}"] = "NOACCESS"
+        data[f"perm-{self.user3.id}"] = "USER"
 
         saved_equipment = Equipment.objects.create(
             name=data["name"], register_number=data["register_number"]
         )
         self.create_dummy_equipment_users(saved_equipment)
 
-        self.client.login(username="testuser1@foo.bar", password="top_secret1")
+        self.client.login(username="testuser3@foo.bar", password="top_secret3")
         response = self.client.post(f"/equipment/{saved_equipment.id}/edit/", data=data)
 
         # Update our equipment var with new data from form save
         saved_equipment = Equipment.objects.get(register_number="REG-T2")
         saved_perms = EquipmentUser.objects.filter(equipment=saved_equipment)
         expected_perms = [
-            str(EquipmentUser(user=self.user2, equipment=saved_equipment, role="ADMIN"))
+            str(
+                EquipmentUser(user=self.user2, equipment=saved_equipment, role="ADMIN")
+            ),
+            str(EquipmentUser(user=self.user3, equipment=saved_equipment, role="USER")),
         ]
 
         self.assertRedirects(response, f"/equipment/{saved_equipment.id}/")
@@ -286,7 +289,7 @@ class EquipmentEditViewBasicTestCase(TestCase):
 
     def test_permissions_get_prepopulated_on_edit(self):
         """Permission radio buttons should get prepopulated on edit"""
-        self.user1.user_permissions.add(self.permissions["edit"])
+        self.user1.user_permissions.add(self.permissions["change"])
         data = {
             "name": "test-2",
             "register_number": "REG-T2",
@@ -312,6 +315,27 @@ class EquipmentEditViewBasicTestCase(TestCase):
         )
         self.assertInHTML(
             f'<input type="radio" id="{self.user3.id}-READ_ONLY" name="perm-{self.user3.id}" value="READ_ONLY" checked>',
+            response.content.decode(),
+            1,
+        )
+
+    def test_form_gets_prepopulated_on_invalid_form(self):
+        """Form should get prepopulated on invalid form"""
+        self.user3.user_permissions.add(self.permissions["change"])
+        data = {
+            "name": "test-name-only",
+        }
+
+        self.client.login(username="testuser3@foo.bar", password="top_secret3")
+        response = self.client.post(f"/equipment/{self.equipment3.id}/edit/", data=data)
+
+        self.assertInHTML(
+            f'<input type="text" name="name" value="test-name-only" maxlength="256" required="" id="id_name">',
+            response.content.decode(),
+            1,
+        )
+        self.assertInHTML(
+            f'<input type="text" name="register_number" maxlength="256" required="" id="id_register_number">',
             response.content.decode(),
             1,
         )
