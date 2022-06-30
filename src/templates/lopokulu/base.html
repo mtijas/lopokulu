@@ -33,7 +33,7 @@
         {% endfor %}
       </ul>
       <ul>
-          <li><a href="{% url 'logout' %}">Log out</a></li>
+          <li><small>{{ user.username }} - <a href="{% url 'logout' %}">Log out</a></small></li>
       </ul>
       {% endif %}
     </nav>
