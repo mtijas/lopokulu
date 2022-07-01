@@ -44,6 +44,17 @@ except ImproperlyConfigured:
 
 AXES_COOLOFF_TIME = 0.25
 
+# SECURITY WARNING: Disable on production (enable ONLY to speed up unit tests)
+try:
+    USE_INSECURE_PASSWORDS = env.bool("USE_INSECURE_PASSWORDS")
+except ImproperlyConfigured:
+    USE_INSECURE_PASSWORDS = False
+
+if USE_INSECURE_PASSWORDS:
+    PASSWORD_HASHERS = [
+        'django.contrib.auth.hashers.MD5PasswordHasher',
+    ]
+
 try:
     ALLOWED_HOSTS = env.list("ALLOWED_HOSTS")
 except ImproperlyConfigured:

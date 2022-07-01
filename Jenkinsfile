@@ -142,5 +142,6 @@ pipeline {
     SECRET_KEY = credentials('lopokulu-django-secret-key')
     DEPLOY_TARGET = credentials('lopokulu-target-host')
     AXES_ENABLED = 'False'
+    USE_INSECURE_PASSWORDS = 'True'
   }
 }
