@@ -132,7 +132,7 @@ pipeline {
   }
 
   environment {
-    DEBUG = 1
+    DEBUG = 'True'
     POSTGRES_DB = 'lopokulu'
     POSTGRES_PORT = '5432'
     POSTGRES_HOST = 'postgres'
@@ -141,7 +141,7 @@ pipeline {
     POSTGRES_PASSWORD = credentials('lopokulu-postgres-password')
     SECRET_KEY = credentials('lopokulu-django-secret-key')
     DEPLOY_TARGET = credentials('lopokulu-target-host')
-    AXES_ENABLED = 0
-    USE_INSECURE_PASSWORDS = 1
+    AXES_ENABLED = 'False'
+    USE_INSECURE_PASSWORDS = 'True'
   }
 }
