@@ -57,7 +57,7 @@ pipeline {
         }
 
         stage('Publish production') {
-          when { 
+          when {
             branch 'main'
             buildingTag()
           }
@@ -95,7 +95,7 @@ pipeline {
         }
 
         stage('Deploy production') {
-          when { 
+          when {
             branch 'main'
             buildingTag()
           }
@@ -141,5 +141,6 @@ pipeline {
     POSTGRES_PASSWORD = credentials('lopokulu-postgres-password')
     SECRET_KEY = credentials('lopokulu-django-secret-key')
     DEPLOY_TARGET = credentials('lopokulu-target-host')
+    AXES_ENABLED = 'False'
   }
 }

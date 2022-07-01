@@ -1,5 +1,5 @@
 # SPDX-FileCopyrightText: 2021 Jani Lehtinen
-# SPDX-FileCopyrightText: 2021 Markus Ijäs
+# SPDX-FileCopyrightText: 2022 Markus Ijäs
 # SPDX-FileCopyrightText: 2021 Markus Murto
 #
 # SPDX-License-Identifier: CC0-1.0
@@ -9,3 +9,4 @@ Django==4.0
 psycopg2-binary
 django-environ
 django-probes
+django-axes

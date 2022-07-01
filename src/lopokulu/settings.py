@@ -36,6 +36,14 @@ SECRET_KEY = env("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env("DEBUG")
 
+# SECURITY WARNING: run with Axes enabled in production (it's brute force protection for auth)
+try:
+    AXES_ENABLED = env.bool("AXES_ENABLED")
+except ImproperlyConfigured:
+    AXES_ENABLED = True # Safer to assume True if env variable is missing
+
+AXES_COOLOFF_TIME = 0.25
+
 try:
     ALLOWED_HOSTS = env.list("ALLOWED_HOSTS")
 except ImproperlyConfigured:
@@ -56,6 +64,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "django_probes",
+    "axes",
     "equipment",
     "dashboard",
 ]
@@ -71,6 +80,12 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    # AxesMiddleware should be the last middleware in the MIDDLEWARE list.
+    # It only formats user lockout messages and renders Axes lockout responses
+    # on failed user authentication attempts from login views.
+    # If you do not want Axes to override the authentication response
+    # you can skip installing the middleware and use your own views.
+    "axes.middleware.AxesMiddleware",
 ]
 
 ROOT_URLCONF = "lopokulu.urls"
@@ -132,6 +147,12 @@ AUTH_PASSWORD_VALIDATORS = [
     {
         "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
     },
+]
+
+AUTHENTICATION_BACKENDS = [
+    # AxesBackend should be the first backend in the AUTHENTICATION_BACKENDS list.
+    "axes.backends.AxesBackend",
+    "django.contrib.auth.backends.ModelBackend",
 ]
 
 
