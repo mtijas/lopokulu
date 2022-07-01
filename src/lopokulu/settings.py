@@ -22,7 +22,9 @@ from pathlib import Path
 import environ
 from django.core.exceptions import ImproperlyConfigured
 
-env = environ.Env(DEBUG=(bool, False))
+env = environ.Env(
+    DEBUG=(bool, False), AXES_ENABLED=(bool, True), USE_INSECURE_PASSWORDS=(bool, False)
+)
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -37,22 +39,16 @@ SECRET_KEY = env("SECRET_KEY")
 DEBUG = env("DEBUG")
 
 # SECURITY WARNING: run with Axes enabled in production (it's brute force protection for auth)
-try:
-    AXES_ENABLED = env.bool("AXES_ENABLED")
-except ImproperlyConfigured:
-    AXES_ENABLED = True # Safer to assume True if env variable is missing
+AXES_ENABLED = env("AXES_ENABLED")
 
 AXES_COOLOFF_TIME = 0.25
 
 # SECURITY WARNING: Disable on production (enable ONLY to speed up unit tests)
-try:
-    USE_INSECURE_PASSWORDS = env.bool("USE_INSECURE_PASSWORDS")
-except ImproperlyConfigured:
-    USE_INSECURE_PASSWORDS = False
+USE_INSECURE_PASSWORDS = env.bool("USE_INSECURE_PASSWORDS")
 
 if USE_INSECURE_PASSWORDS:
     PASSWORD_HASHERS = [
-        'django.contrib.auth.hashers.MD5PasswordHasher',
+        "django.contrib.auth.hashers.MD5PasswordHasher",
     ]
 
 try:
