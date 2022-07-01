@@ -24,17 +24,6 @@ from django.core.exceptions import ImproperlyConfigured
 
 env = environ.Env(DEBUG=(bool, False))
 
-def get_env_boolean(name: str, default: bool = False) -> bool:
-    """Gets boolean environment variable. Returns False if the variable reasonably
-    translates to false, True otherwise. Returns default if variable doesn't exist."""
-    try:
-        variable = env(name)
-        if variable in ["False", "false", "0", False]:
-            return False
-        return True
-    except ImproperlyConfigured:
-        return default
-
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -48,12 +37,18 @@ SECRET_KEY = env("SECRET_KEY")
 DEBUG = env("DEBUG")
 
 # SECURITY WARNING: run with Axes enabled in production (it's brute force protection for auth)
-AXES_ENABLED = get_env_boolean("AXES_ENABLED", True)
+try:
+    AXES_ENABLED = env.bool("AXES_ENABLED")
+except ImproperlyConfigured:
+    AXES_ENABLED = True # Safer to assume True if env variable is missing
 
 AXES_COOLOFF_TIME = 0.25
 
 # SECURITY WARNING: Disable on production (enable ONLY to speed up unit tests)
-USE_INSECURE_PASSWORDS = get_env_boolean("USE_INSECURE_PASSWORDS", False)
+try:
+    USE_INSECURE_PASSWORDS = env.bool("USE_INSECURE_PASSWORDS")
+except ImproperlyConfigured:
+    USE_INSECURE_PASSWORDS = False
 
 if USE_INSECURE_PASSWORDS:
     PASSWORD_HASHERS = [
@@ -204,4 +199,3 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 LOGOUT_REDIRECT_URL = "login"
 LOGIN_REDIRECT_URL = "/equipment"
-
