@@ -23,7 +23,12 @@ import environ
 from django.core.exceptions import ImproperlyConfigured
 
 env = environ.Env(
-    DEBUG=(bool, False), AXES_ENABLED=(bool, True), USE_INSECURE_PASSWORDS=(bool, False)
+    DEBUG=(bool, False),
+    AXES_ENABLED=(bool, True),
+    USE_INSECURE_PASSWORDS=(bool, False),
+    AXES_PROXY_COUNT=(int, None),
+    AXES_PROXY_PREFER_X_FORWARDED_FOR=(bool, False),
+    AXES_COOLOFF_TIME=(float, 0.25),
 )
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -40,8 +45,13 @@ DEBUG = env("DEBUG")
 
 # SECURITY WARNING: run with Axes enabled in production (it's brute force protection for auth)
 AXES_ENABLED = env("AXES_ENABLED")
-
-AXES_COOLOFF_TIME = 0.25
+AXES_COOLOFF_TIME = env("AXES_COOLOFF_TIME")
+AXES_PROXY_COUNT = env("AXES_PROXY_COUNT")
+if env("AXES_PROXY_PREFER_X_FORWARDED_FOR"):
+    AXES_META_PRECEDENCE_ORDER = [
+        'HTTP_X_FORWARDED_FOR',
+        'REMOTE_ADDR',
+    ]
 
 # SECURITY WARNING: Disable on production (enable ONLY to speed up unit tests)
 USE_INSECURE_PASSWORDS = env("USE_INSECURE_PASSWORDS")
