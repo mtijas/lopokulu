@@ -22,7 +22,7 @@ FROM prebuild AS development
 
     COPY .coveragerc .
 
-    COPY ./entrypoint.sh .
+    COPY ./entrypoint-dev.sh ./entrypoint.sh
     RUN chmod +x ./entrypoint.sh
 
     COPY requirements.development.txt .
@@ -39,6 +39,9 @@ FROM prebuild AS development
 
 FROM prebuild AS production
 
+    COPY ./entrypoint-production.sh ./entrypoint.sh
+    RUN chmod +x ./entrypoint.sh
+
     COPY ./static ./static
     COPY ./src ./src
 
@@ -46,4 +49,4 @@ FROM prebuild AS production
 
     USER lopokulu
 
-    CMD ["gunicorn", "--chdir", "/lopokulu/src", "lopokulu.wsgi:application", "--bind", "0.0.0.0:8000"]
+    CMD ["/lopokulu/entrypoint.sh"]
