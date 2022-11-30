@@ -28,7 +28,7 @@ class StatsCardTestCase(TestCase):
             amount=10,
             distance=100,
             equipment=cls.equipment,
-            addition_date=now() - timedelta(days=32),
+            addition_date=now() - timedelta(days=100),
             tank_full=True,
         )
         Fillup.objects.create(
@@ -64,8 +64,8 @@ class StatsCardTestCase(TestCase):
             tank_full=True,
         )
 
-    def test_returns_31d_stats_for_equipment_as_default(self):
-        """31 day stats for single Equipment should be returned as default"""
+    def test_returns_92d_stats_for_equipment_as_default(self):
+        """92 day stats for single Equipment should be returned as default"""
         response = partials.fillup_equipment_stats(self.equipment)
 
         self.assertAlmostEqual(float(response["stats"]["consumption__avg"]), 23.333, places=3)
@@ -84,7 +84,7 @@ class StatsCardTestCase(TestCase):
 
     def test_returns_proper_stats_for_equipment_on_custom_days_limit_test_2(self):
         """Stop datetime should be customizable"""
-        start_dt = now() - timedelta(days=35)
+        start_dt = now() - timedelta(days=105)
         stop_dt = now() - timedelta(days=8)
 
         response = partials.fillup_equipment_stats(self.equipment, start_dt, stop_dt)
