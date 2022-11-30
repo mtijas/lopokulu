@@ -16,7 +16,7 @@ register = template.Library()
 
 
 @register.inclusion_tag("fillup/tags/equipment_stats.html")
-def fillup_equipment_stats(equipment, start_dt=31, stop_dt=None, mode: str = None):
+def fillup_equipment_stats(equipment, start_dt=92, stop_dt=None, mode: str = None):
     """Collects fillup stats for datetime range for specific equipment"""
     if stop_dt is None:
         stop_dt = now()
