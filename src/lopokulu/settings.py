@@ -29,6 +29,7 @@ env = environ.Env(
     AXES_PROXY_COUNT=(int, None),
     AXES_PROXY_PREFER_X_FORWARDED_FOR=(bool, False),
     AXES_COOLOFF_TIME=(float, 0.25),
+    CSRF_TRUSTED_ORIGINS=(list, ["http://localhost"]),
 )
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -55,6 +56,8 @@ if env("AXES_PROXY_PREFER_X_FORWARDED_FOR"):
 
 # SECURITY WARNING: Disable on production (enable ONLY to speed up unit tests)
 USE_INSECURE_PASSWORDS = env("USE_INSECURE_PASSWORDS")
+
+CSRF_TRUSTED_ORIGINS = env.list("CSRF_TRUSTED_ORIGINS")
 
 if USE_INSECURE_PASSWORDS:
     PASSWORD_HASHERS = [
