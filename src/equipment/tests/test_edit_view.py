@@ -6,11 +6,12 @@
 
 from django.contrib.auth.models import Group, Permission, User
 from django.contrib.contenttypes.models import ContentType
-from django.test import Client, TestCase
+from django.test import Client, TestCase, override_settings
 
 from equipment.models import Equipment, EquipmentUser
 
 
+@override_settings(AXES_ENABLED=False)
 class EquipmentEditViewAuthTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
@@ -97,7 +98,8 @@ class EquipmentEditViewAuthTestCase(TestCase):
         data[f"perm-{self.user3.id}"] = "NOACCESS"
 
         self.client.login(username="testuser1@foo.bar", password="top_secret1")
-        response = self.client.post(f"/equipment/{self.equipment1.id}/edit/", data=data)
+        response = self.client.post(
+            f"/equipment/{self.equipment1.id}/edit/", data=data)
 
         self.assertEqual(response.status_code, 403)
         self.assertEqual(self.equipment1.name, "TestRO")
@@ -115,6 +117,7 @@ class EquipmentEditViewAuthTestCase(TestCase):
     # Working edit permission is tested in case below
 
 
+@override_settings(AXES_ENABLED=False)
 class EquipmentEditViewBasicTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
@@ -181,12 +184,14 @@ class EquipmentEditViewBasicTestCase(TestCase):
         )
 
         self.client.login(username="testuser1@foo.bar", password="top_secret1")
-        response = self.client.post(f"/equipment/{saved_equipment.id}/edit/", data=data)
+        response = self.client.post(
+            f"/equipment/{saved_equipment.id}/edit/", data=data)
 
         saved_perms = EquipmentUser.objects.filter(equipment=self.equipment1)
         expected_perms = [str(self.equipmentuser1)]
 
-        self.assertQuerysetEqual(list(saved_perms), expected_perms, transform=str)
+        self.assertQuerysetEqual(
+            list(saved_perms), expected_perms, transform=str)
 
     def test_permissions_updated_on_form_save(self):
         """Permissions should be updated when a Equipment is modified"""
@@ -205,15 +210,18 @@ class EquipmentEditViewBasicTestCase(TestCase):
         self.create_dummy_equipment_users(saved_equipment)
 
         self.client.login(username="testuser1@foo.bar", password="top_secret1")
-        response = self.client.post(f"/equipment/{saved_equipment.id}/edit/", data=data)
+        response = self.client.post(
+            f"/equipment/{saved_equipment.id}/edit/", data=data)
 
         # Update our equipment var with new data from form save
         saved_equipment = Equipment.objects.get(register_number="REG-T2")
         saved_perms = EquipmentUser.objects.filter(equipment=saved_equipment)
         expected_perms = [
-            str(EquipmentUser(user=self.user1, equipment=saved_equipment, role="USER")),
+            str(EquipmentUser(user=self.user1,
+                equipment=saved_equipment, role="USER")),
             str(
-                EquipmentUser(user=self.user3, equipment=saved_equipment, role="ADMIN")
+                EquipmentUser(user=self.user3,
+                              equipment=saved_equipment, role="ADMIN")
             ),
         ]
 
@@ -239,13 +247,15 @@ class EquipmentEditViewBasicTestCase(TestCase):
         self.create_dummy_equipment_users(saved_equipment)
 
         self.client.login(username="testuser1@foo.bar", password="top_secret1")
-        response = self.client.post(f"/equipment/{saved_equipment.id}/edit/", data=data)
+        response = self.client.post(
+            f"/equipment/{saved_equipment.id}/edit/", data=data)
 
         # Update our equipment var with new data from form save
         saved_equipment = Equipment.objects.get(register_number="REG-T2")
         saved_perms = EquipmentUser.objects.filter(equipment=saved_equipment)
         expected_perms = [
-            str(EquipmentUser(user=self.user1, equipment=saved_equipment, role="ADMIN"))
+            str(EquipmentUser(user=self.user1,
+                equipment=saved_equipment, role="ADMIN"))
         ]
 
         self.assertRedirects(response, f"/equipment/{saved_equipment.id}/")
@@ -270,16 +280,19 @@ class EquipmentEditViewBasicTestCase(TestCase):
         self.create_dummy_equipment_users(saved_equipment)
 
         self.client.login(username="testuser3@foo.bar", password="top_secret3")
-        response = self.client.post(f"/equipment/{saved_equipment.id}/edit/", data=data)
+        response = self.client.post(
+            f"/equipment/{saved_equipment.id}/edit/", data=data)
 
         # Update our equipment var with new data from form save
         saved_equipment = Equipment.objects.get(register_number="REG-T2")
         saved_perms = EquipmentUser.objects.filter(equipment=saved_equipment)
         expected_perms = [
             str(
-                EquipmentUser(user=self.user2, equipment=saved_equipment, role="ADMIN")
+                EquipmentUser(user=self.user2,
+                              equipment=saved_equipment, role="ADMIN")
             ),
-            str(EquipmentUser(user=self.user3, equipment=saved_equipment, role="USER")),
+            str(EquipmentUser(user=self.user3,
+                equipment=saved_equipment, role="USER")),
         ]
 
         self.assertRedirects(response, f"/equipment/{saved_equipment.id}/")
@@ -327,15 +340,16 @@ class EquipmentEditViewBasicTestCase(TestCase):
         }
 
         self.client.login(username="testuser3@foo.bar", password="top_secret3")
-        response = self.client.post(f"/equipment/{self.equipment3.id}/edit/", data=data)
+        response = self.client.post(
+            f"/equipment/{self.equipment3.id}/edit/", data=data)
 
         self.assertInHTML(
-            f'<input type="text" name="name" value="test-name-only" maxlength="256" required="" id="id_name">',
+            f'<input type="text" name="name" value="test-name-only" maxlength="256" required id="id_name">',
             response.content.decode(),
             1,
         )
         self.assertInHTML(
-            f'<input type="text" name="register_number" maxlength="256" required="" id="id_register_number">',
+            f'<input type="text" name="register_number" maxlength="256" required aria-invalid="true" id="id_register_number">',
             response.content.decode(),
             1,
         )
@@ -345,7 +359,8 @@ class EquipmentEditViewBasicTestCase(TestCase):
         EquipmentUser.objects.create(
             user=self.user1, equipment=equipment, role="READ_ONLY"
         )
-        EquipmentUser.objects.create(user=self.user2, equipment=equipment, role="ADMIN")
+        EquipmentUser.objects.create(
+            user=self.user2, equipment=equipment, role="ADMIN")
         EquipmentUser.objects.create(
             user=self.user3, equipment=equipment, role="READ_ONLY"
         )

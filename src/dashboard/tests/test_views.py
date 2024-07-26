@@ -4,10 +4,12 @@
 
 from django.contrib.auth.models import Group, Permission, User
 from django.contrib.contenttypes.models import ContentType
-from django.test import Client, TestCase
+from django.test import Client, TestCase, override_settings
 
 from equipment.models import Equipment, EquipmentUser
 
+
+@override_settings(AXES_ENABLED=False)
 class DashboardViewAuthTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):

@@ -6,10 +6,12 @@
 
 from django.contrib.auth.models import Group, Permission, User
 from django.contrib.contenttypes.models import ContentType
-from django.test import Client, TestCase
+from django.test import Client, TestCase, override_settings
 
 from equipment.models import Equipment, EquipmentUser
 
+
+@override_settings(AXES_ENABLED=False)
 class EquipmentDeleteViewAuthTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
@@ -46,7 +48,8 @@ class EquipmentDeleteViewAuthTestCase(TestCase):
         response = self.client.get(f"/equipment/{self.equipment1.id}/delete/")
 
         self.assertEqual(response.status_code, 403)
-        self.assertTrue(Equipment.objects.filter(id=self.equipment1.id).exists())
+        self.assertTrue(Equipment.objects.filter(
+            id=self.equipment1.id).exists())
 
     def test_logged_out_user_gets_redirected_on_get_(self):
         """Logged out user should get redirected"""
@@ -57,6 +60,7 @@ class EquipmentDeleteViewAuthTestCase(TestCase):
         )
 
 
+@override_settings(AXES_ENABLED=False)
 class EquipmentDeleteViewBasicTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
@@ -119,4 +123,5 @@ class EquipmentDeleteViewBasicTestCase(TestCase):
         response = self.client.get(f"/equipment/{saved_equipment.id}/delete/")
 
         self.assertRedirects(response, f"/equipment/")
-        self.assertFalse(Equipment.objects.filter(id=saved_equipment.id).exists())
+        self.assertFalse(Equipment.objects.filter(
+            id=saved_equipment.id).exists())

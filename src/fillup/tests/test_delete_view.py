@@ -9,7 +9,7 @@ from decimal import Decimal
 
 from django.conf import settings
 from django.contrib.auth.models import Group, Permission, User
-from django.test import Client, TestCase
+from django.test import Client, TestCase, override_settings
 from django.utils import timezone
 
 from equipment.models import Equipment, EquipmentUser
@@ -17,6 +17,7 @@ from fillup.forms import FillupForm
 from fillup.models import Fillup
 
 
+@override_settings(AXES_ENABLED=False)
 class FillupDeleteViewAuthTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
@@ -61,7 +62,8 @@ class FillupDeleteViewAuthTestCase(TestCase):
         """Non-logged-in users should get redirected to login on delete fillup view"""
         response = self.client.get(f"/fillup/{self.fillup.id}/delete/")
 
-        self.assertRedirects(response, f"/accounts/login/?next=/fillup/{self.fillup.id}/delete/")
+        self.assertRedirects(
+            response, f"/accounts/login/?next=/fillup/{self.fillup.id}/delete/")
 
     def test_nonauth_user_should_get_403(self):
         """Non-permissioned user should be given 403"""
@@ -104,6 +106,7 @@ class FillupDeleteViewAuthTestCase(TestCase):
         self.assertEqual(response.status_code, 302)
 
 
+@override_settings(AXES_ENABLED=False)
 class FillupViewsIntegrationTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
@@ -172,8 +175,10 @@ class FillupViewsIntegrationTestCase(TestCase):
         self.assertRedirects(
             response, f"/fillup/equipment/{self.fillup2.equipment_id}/"
         )
-        self.assertAlmostEqual(float(updated_fillup.distance_delta), 150.0, places=1)
-        self.assertAlmostEqual(float(updated_fillup.consumption), 2.667, places=3)
+        self.assertAlmostEqual(
+            float(updated_fillup.distance_delta), 150.0, places=1)
+        self.assertAlmostEqual(
+            float(updated_fillup.consumption), 2.667, places=3)
 
     def test_delete_actually_deletes(self):
         """GETting delete for existing fillup with credentials should actually delete"""

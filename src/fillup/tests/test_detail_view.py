@@ -9,7 +9,7 @@ from decimal import Decimal
 
 from django.conf import settings
 from django.contrib.auth.models import Group, Permission, User
-from django.test import Client, TestCase
+from django.test import Client, TestCase, override_settings
 from django.utils import timezone
 
 from equipment.models import Equipment, EquipmentUser
@@ -17,6 +17,7 @@ from fillup.forms import FillupForm
 from fillup.models import Fillup
 
 
+@override_settings(AXES_ENABLED=False)
 class FillupEquipmentDetailViewAuthTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
@@ -54,7 +55,8 @@ class FillupEquipmentDetailViewAuthTestCase(TestCase):
         """Non-logged-in users should get redirected to login on list fillup view"""
         response = self.client.get(f"/fillup/equipment/{self.equipment.id}/")
 
-        self.assertRedirects(response, f"/accounts/login/?next=/fillup/equipment/{self.equipment.id}/")
+        self.assertRedirects(
+            response, f"/accounts/login/?next=/fillup/equipment/{self.equipment.id}/")
 
     def test_nonauth_user_should_get_403_on_list_for_equipment(self):
         """Non-permissioned user should be given 403 on list fillup for equipment"""
@@ -97,6 +99,7 @@ class FillupEquipmentDetailViewAuthTestCase(TestCase):
         self.assertEqual(response.status_code, 200)
 
 
+@override_settings(AXES_ENABLED=False)
 class FillupViewsBasicTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
@@ -162,6 +165,7 @@ class FillupViewsBasicTestCase(TestCase):
         self.assertContains(response, needle)
 
 
+@override_settings(AXES_ENABLED=False)
 class FillupViewsInputsTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):

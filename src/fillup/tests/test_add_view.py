@@ -9,7 +9,7 @@ from decimal import Decimal
 
 from django.conf import settings
 from django.contrib.auth.models import Group, Permission, User
-from django.test import Client, TestCase
+from django.test import Client, TestCase, override_settings
 from django.utils import timezone
 
 from equipment.models import Equipment, EquipmentUser
@@ -17,6 +17,7 @@ from fillup.forms import FillupForm
 from fillup.models import Fillup
 
 
+@override_settings(AXES_ENABLED=False)
 class FillupAddViewAuthTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
@@ -110,9 +111,11 @@ class FillupAddViewAuthTestCase(TestCase):
 
     def test_redirects_non_logged_in_redirect_login_on_add_fillup_for_equipment(self):
         """Non-logged-in users should get redirected to login on add fillup view"""
-        response = self.client.get(f"/fillup/add/equipment/{self.equipment.id}/")
+        response = self.client.get(
+            f"/fillup/add/equipment/{self.equipment.id}/")
 
-        self.assertRedirects(response, f"/accounts/login/?next=/fillup/add/equipment/{self.equipment.id}/")
+        self.assertRedirects(
+            response, f"/accounts/login/?next=/fillup/add/equipment/{self.equipment.id}/")
 
     def test_nonauth_user_should_get_403_on_add_for_equipment(self):
         """Non-permissioned user should be given 403 on add fillup for equipment"""
@@ -120,7 +123,8 @@ class FillupAddViewAuthTestCase(TestCase):
             username=self.nonauth_user.username, password="top_secret"
         )
 
-        response = self.client.get(f"/fillup/add/equipment/{self.equipment.id}/")
+        response = self.client.get(
+            f"/fillup/add/equipment/{self.equipment.id}/")
 
         self.assertEqual(response.status_code, 403)
 
@@ -130,7 +134,8 @@ class FillupAddViewAuthTestCase(TestCase):
             username=self.ro_user.username, password="top_secret"
         )
 
-        response = self.client.get(f"/fillup/add/equipment/{self.equipment.id}/")
+        response = self.client.get(
+            f"/fillup/add/equipment/{self.equipment.id}/")
 
         self.assertEqual(response.status_code, 403)
 
@@ -140,7 +145,8 @@ class FillupAddViewAuthTestCase(TestCase):
             username=self.user_user.username, password="top_secret"
         )
 
-        response = self.client.get(f"/fillup/add/equipment/{self.equipment.id}/")
+        response = self.client.get(
+            f"/fillup/add/equipment/{self.equipment.id}/")
 
         self.assertEqual(response.status_code, 200)
 
@@ -150,7 +156,8 @@ class FillupAddViewAuthTestCase(TestCase):
             username=self.admin_user.username, password="top_secret"
         )
 
-        response = self.client.get(f"/fillup/add/equipment/{self.equipment.id}/")
+        response = self.client.get(
+            f"/fillup/add/equipment/{self.equipment.id}/")
 
         self.assertEqual(response.status_code, 200)
 
@@ -188,7 +195,8 @@ class FillupAddViewAuthTestCase(TestCase):
 
         response = self.client.post("/fillup/add/", data=self.data)
 
-        self.assertRedirects(response, f"/fillup/equipment/{self.data['equipment']}/")
+        self.assertRedirects(
+            response, f"/fillup/equipment/{self.data['equipment']}/")
 
     def test_admin_user_should_get_200_on_post(self):
         """Admin user should be given 200 on post"""
@@ -198,13 +206,16 @@ class FillupAddViewAuthTestCase(TestCase):
 
         response = self.client.post("/fillup/add/", data=self.data)
 
-        self.assertRedirects(response, f"/fillup/equipment/{self.data['equipment']}/")
+        self.assertRedirects(
+            response, f"/fillup/equipment/{self.data['equipment']}/")
 
     def test_redirects_non_logged_in_redirect_login_on_add_fillup_for_equipment_on_post(self):
         """Non-logged-in users should get redirected to login on add fillup view on post"""
-        response = self.client.post(f"/fillup/add/equipment/{self.equipment.id}/", data=self.data)
+        response = self.client.post(
+            f"/fillup/add/equipment/{self.equipment.id}/", data=self.data)
 
-        self.assertRedirects(response, f"/accounts/login/?next=/fillup/add/equipment/{self.equipment.id}/")
+        self.assertRedirects(
+            response, f"/accounts/login/?next=/fillup/add/equipment/{self.equipment.id}/")
 
     def test_nonauth_user_should_get_403_on_add_for_equipment_on_post(self):
         """Non-permissioned user should be given 403 on add fillup for equipment on post"""
@@ -212,7 +223,8 @@ class FillupAddViewAuthTestCase(TestCase):
             username=self.nonauth_user.username, password="top_secret"
         )
 
-        response = self.client.post(f"/fillup/add/equipment/{self.equipment.id}/", data=self.data)
+        response = self.client.post(
+            f"/fillup/add/equipment/{self.equipment.id}/", data=self.data)
 
         self.assertEqual(response.status_code, 403)
 
@@ -222,7 +234,8 @@ class FillupAddViewAuthTestCase(TestCase):
             username=self.ro_user.username, password="top_secret"
         )
 
-        response = self.client.post(f"/fillup/add/equipment/{self.equipment.id}/", data=self.data)
+        response = self.client.post(
+            f"/fillup/add/equipment/{self.equipment.id}/", data=self.data)
 
         self.assertEqual(response.status_code, 403)
 
@@ -232,9 +245,11 @@ class FillupAddViewAuthTestCase(TestCase):
             username=self.user_user.username, password="top_secret"
         )
 
-        response = self.client.post(f"/fillup/add/equipment/{self.equipment.id}/", data=self.data)
+        response = self.client.post(
+            f"/fillup/add/equipment/{self.equipment.id}/", data=self.data)
 
-        self.assertRedirects(response, f"/fillup/equipment/{self.data['equipment']}/")
+        self.assertRedirects(
+            response, f"/fillup/equipment/{self.data['equipment']}/")
 
     def test_admin_user_should_be_redirected_on_add_for_equipment_on_post(self):
         """Admin user should be given 200 on add fillup for equipment on post"""
@@ -242,11 +257,14 @@ class FillupAddViewAuthTestCase(TestCase):
             username=self.admin_user.username, password="top_secret"
         )
 
-        response = self.client.post(f"/fillup/add/equipment/{self.equipment.id}/", data=self.data)
+        response = self.client.post(
+            f"/fillup/add/equipment/{self.equipment.id}/", data=self.data)
 
-        self.assertRedirects(response, f"/fillup/equipment/{self.data['equipment']}/")
+        self.assertRedirects(
+            response, f"/fillup/equipment/{self.data['equipment']}/")
 
 
+@override_settings(AXES_ENABLED=False)
 class FillupViewsBasicTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
@@ -291,6 +309,7 @@ class FillupViewsBasicTestCase(TestCase):
         self.assertEqual(response.status_code, 200)
 
 
+@override_settings(AXES_ENABLED=False)
 class FillupViewsIntegrationTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
@@ -366,7 +385,8 @@ class FillupViewsIntegrationTestCase(TestCase):
             distance=160, equipment=self.equipment3.id
         ).first()
 
-        self.assertAlmostEqual(float(updated_fillup.consumption), 6.5, places=3)
+        self.assertAlmostEqual(
+            float(updated_fillup.consumption), 6.5, places=3)
 
     def test_consumption_and_dist_delta_calculated_for_next_fillup_on_insert(self):
         """Consumption and distance delta should be calculated for next fillup on
@@ -388,6 +408,9 @@ class FillupViewsIntegrationTestCase(TestCase):
         ).first()
 
         self.assertAlmostEqual(float(self.fillup2.consumption), 2.0, places=3)
-        self.assertAlmostEqual(float(self.fillup2.distance_delta), 100.0, places=1)
-        self.assertAlmostEqual(float(updated_fillup.consumption), 5.0, places=3)
-        self.assertAlmostEqual(float(updated_fillup.distance_delta), 40.0, places=1)
+        self.assertAlmostEqual(
+            float(self.fillup2.distance_delta), 100.0, places=1)
+        self.assertAlmostEqual(
+            float(updated_fillup.consumption), 5.0, places=3)
+        self.assertAlmostEqual(
+            float(updated_fillup.distance_delta), 40.0, places=1)

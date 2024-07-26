@@ -6,10 +6,12 @@
 
 from django.contrib.auth.models import Group, Permission, User
 from django.contrib.contenttypes.models import ContentType
-from django.test import Client, TestCase
+from django.test import Client, TestCase, override_settings
 
 from equipment.models import Equipment, EquipmentUser
 
+
+@override_settings(AXES_ENABLED=False)
 class EquipmentAddViewAuthTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
@@ -90,6 +92,8 @@ class EquipmentAddViewAuthTestCase(TestCase):
 
     # Logged in correctly permissioned user will be tested on test case below
 
+
+@override_settings(AXES_ENABLED=False)
 class EquipmentAddViewBasicTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
@@ -190,11 +194,13 @@ class EquipmentAddViewBasicTestCase(TestCase):
                 )
             ),
             str(
-                EquipmentUser(user=self.user1, equipment=saved_equipment, role="ADMIN")
+                EquipmentUser(user=self.user1,
+                              equipment=saved_equipment, role="ADMIN")
             ),
         ]
 
-        self.assertQuerysetEqual(list(saved_perms), expected_perms, transform=str)
+        self.assertQuerysetEqual(
+            list(saved_perms), expected_perms, transform=str)
 
     def test_permissions_saved_on_form_save_and_user_promoted_test_2(self):
         """Permissions should be saved when a new Equipment is added, with current
@@ -214,8 +220,10 @@ class EquipmentAddViewBasicTestCase(TestCase):
         # Login user should get ADMIN privs since no admin is assigned at post data.
         expected_perms = [
             str(
-                EquipmentUser(user=self.user1, equipment=saved_equipment, role="ADMIN")
+                EquipmentUser(user=self.user1,
+                              equipment=saved_equipment, role="ADMIN")
             ),
         ]
 
-        self.assertQuerysetEqual(list(saved_perms), expected_perms, transform=str)
+        self.assertQuerysetEqual(
+            list(saved_perms), expected_perms, transform=str)

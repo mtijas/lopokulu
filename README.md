@@ -247,6 +247,8 @@ vehicle fillup data, but they cannot input any fillups.
 user.
 * Driver (`DR`) user role on a vehicle allows the user to view vehicle fillup
 data and add fillups for the vehicle.
+* Manager (`MN`) role allows user to view, add and edit fillup data, and edit
+the vehicle user has the role on.
 * (Not yet implemented) Owner (`OW`) user role on a vehicle will allow the user
 to view and add fillup data, and affiliate other users to the vehicle.
 

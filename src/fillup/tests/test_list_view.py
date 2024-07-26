@@ -9,7 +9,7 @@ from decimal import Decimal
 
 from django.conf import settings
 from django.contrib.auth.models import Group, Permission, User
-from django.test import Client, TestCase
+from django.test import Client, TestCase, override_settings
 from django.utils import timezone
 
 from equipment.models import Equipment, EquipmentUser
@@ -17,6 +17,7 @@ from fillup.forms import FillupForm
 from fillup.models import Fillup
 
 
+@override_settings(AXES_ENABLED=False)
 class FillupListViewAuthTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
@@ -97,6 +98,7 @@ class FillupListViewAuthTestCase(TestCase):
         self.assertEqual(response.status_code, 200)
 
 
+@override_settings(AXES_ENABLED=False)
 class FillupViewsBasicTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
@@ -163,6 +165,7 @@ class FillupViewsBasicTestCase(TestCase):
         self.assertIn(needle, response.content.decode(), 2)
 
 
+@override_settings(AXES_ENABLED=False)
 class FillupViewsInputsTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):

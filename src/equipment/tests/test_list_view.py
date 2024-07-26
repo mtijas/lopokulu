@@ -6,10 +6,12 @@
 
 from django.contrib.auth.models import Group, Permission, User
 from django.contrib.contenttypes.models import ContentType
-from django.test import Client, TestCase
+from django.test import Client, TestCase, override_settings
 
 from equipment.models import Equipment, EquipmentUser
 
+
+@override_settings(AXES_ENABLED=False)
 class EquipmentListViewAuthTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
@@ -40,6 +42,8 @@ class EquipmentListViewAuthTestCase(TestCase):
 
         self.assertRedirects(response, "/accounts/login/?next=/equipment/")
 
+
+@override_settings(AXES_ENABLED=False)
 class EquipmentViewsInputsTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):

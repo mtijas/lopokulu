@@ -6,11 +6,12 @@
 
 from django.contrib.auth.models import Group, Permission, User
 from django.contrib.contenttypes.models import ContentType
-from django.test import Client, TestCase
+from django.test import Client, TestCase, override_settings
 
 from equipment.models import Equipment, EquipmentUser
 
 
+@override_settings(AXES_ENABLED=False)
 class EquipmentListViewAuthTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
@@ -40,7 +41,8 @@ class EquipmentListViewAuthTestCase(TestCase):
 
     def test_respond_with_403_for_user_without_role_for_equipment(self):
         """Response 403 should be given for user without role"""
-        self.client.login(username="testuser_na@foo.bar", password="top_secret_na")
+        self.client.login(username="testuser_na@foo.bar",
+                          password="top_secret_na")
 
         response = self.client.get(f"/equipment/{self.equipment1.id}/")
 
@@ -55,6 +57,7 @@ class EquipmentListViewAuthTestCase(TestCase):
         )
 
 
+@override_settings(AXES_ENABLED=False)
 class EquipmentViewsInputsTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):

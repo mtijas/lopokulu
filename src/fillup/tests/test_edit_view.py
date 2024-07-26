@@ -9,7 +9,7 @@ from decimal import Decimal
 
 from django.conf import settings
 from django.contrib.auth.models import Group, Permission, User
-from django.test import Client, TestCase
+from django.test import Client, TestCase, override_settings
 from django.utils import timezone
 
 from equipment.models import Equipment, EquipmentUser
@@ -17,6 +17,7 @@ from fillup.forms import FillupForm
 from fillup.models import Fillup
 
 
+@override_settings(AXES_ENABLED=False)
 class FillupEditViewAuthTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
@@ -68,7 +69,8 @@ class FillupEditViewAuthTestCase(TestCase):
         """Non-logged-in users should get redirected to login on edit fillup view"""
         response = self.client.get(f"/fillup/{self.fillup.id}/edit/")
 
-        self.assertRedirects(response, f"/accounts/login/?next=/fillup/{self.fillup.id}/edit/")
+        self.assertRedirects(
+            response, f"/accounts/login/?next=/fillup/{self.fillup.id}/edit/")
 
     def test_nonauth_user_should_get_403(self):
         """Non-permissioned user should be given 403"""
@@ -112,9 +114,11 @@ class FillupEditViewAuthTestCase(TestCase):
 
     def test_redirects_non_logged_in_redirect_login_on_edit_fillup_on_post(self):
         """Non-logged-in users should get redirected to login on edit fillup view post"""
-        response = self.client.post(f"/fillup/{self.fillup.id}/edit/", data=self.data)
+        response = self.client.post(
+            f"/fillup/{self.fillup.id}/edit/", data=self.data)
 
-        self.assertRedirects(response, f"/accounts/login/?next=/fillup/{self.fillup.id}/edit/")
+        self.assertRedirects(
+            response, f"/accounts/login/?next=/fillup/{self.fillup.id}/edit/")
 
     def test_nonauth_user_should_get_403_on_post(self):
         """Non-permissioned user should be given 403 on post"""
@@ -122,7 +126,8 @@ class FillupEditViewAuthTestCase(TestCase):
             username=self.nonauth_user.username, password="top_secret"
         )
 
-        response = self.client.post(f"/fillup/{self.fillup.id}/edit/", data=self.data)
+        response = self.client.post(
+            f"/fillup/{self.fillup.id}/edit/", data=self.data)
 
         self.assertEqual(response.status_code, 403)
 
@@ -132,7 +137,8 @@ class FillupEditViewAuthTestCase(TestCase):
             username=self.ro_user.username, password="top_secret"
         )
 
-        response = self.client.post(f"/fillup/{self.fillup.id}/edit/", data=self.data)
+        response = self.client.post(
+            f"/fillup/{self.fillup.id}/edit/", data=self.data)
 
         self.assertEqual(response.status_code, 403)
 
@@ -142,9 +148,11 @@ class FillupEditViewAuthTestCase(TestCase):
             username=self.user_user.username, password="top_secret"
         )
 
-        response = self.client.post(f"/fillup/{self.fillup.id}/edit/", data=self.data)
+        response = self.client.post(
+            f"/fillup/{self.fillup.id}/edit/", data=self.data)
 
-        self.assertRedirects(response, f"/fillup/equipment/{self.data['equipment']}/")
+        self.assertRedirects(
+            response, f"/fillup/equipment/{self.data['equipment']}/")
 
     def test_admin_user_should_get_200_on_post(self):
         """Admin user should be given 200 on post"""
@@ -152,11 +160,14 @@ class FillupEditViewAuthTestCase(TestCase):
             username=self.admin_user.username, password="top_secret"
         )
 
-        response = self.client.post(f"/fillup/{self.fillup.id}/edit/", data=self.data)
+        response = self.client.post(
+            f"/fillup/{self.fillup.id}/edit/", data=self.data)
 
-        self.assertRedirects(response, f"/fillup/equipment/{self.data['equipment']}/")
+        self.assertRedirects(
+            response, f"/fillup/equipment/{self.data['equipment']}/")
 
 
+@override_settings(AXES_ENABLED=False)
 class FillupViewsIntegrationTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
@@ -247,12 +258,15 @@ class FillupViewsIntegrationTestCase(TestCase):
         }
         self.client.login(username="testuser@foo.bar", password="top_secret")
 
-        response = self.client.post(f"/fillup/{self.fillup2.id}/edit/", data=data)
+        response = self.client.post(
+            f"/fillup/{self.fillup2.id}/edit/", data=data)
 
         updated_fillup = Fillup.objects.get(pk=self.fillup2.id)
 
-        self.assertAlmostEqual(float(updated_fillup.consumption), 3.25, places=3)
-        self.assertAlmostEqual(float(updated_fillup.distance_delta), 120.0, places=1)
+        self.assertAlmostEqual(
+            float(updated_fillup.consumption), 3.25, places=3)
+        self.assertAlmostEqual(
+            float(updated_fillup.distance_delta), 120.0, places=1)
 
     def test_consumption_and_dist_delta_calculated_for_edited_fillup_date_forward(self):
         """Consumption and distance delta should be calculated for edited fillup on
@@ -267,15 +281,18 @@ class FillupViewsIntegrationTestCase(TestCase):
         }
         self.client.login(username="testuser@foo.bar", password="top_secret")
 
-        response = self.client.post(f"/fillup/{self.fillup2.id}/edit/", data=data)
+        response = self.client.post(
+            f"/fillup/{self.fillup2.id}/edit/", data=data)
 
         updated_fillup = Fillup.objects.get(pk=self.fillup2.id)
 
         self.assertRedirects(
             response, f"/fillup/equipment/{updated_fillup.equipment_id}/"
         )
-        self.assertAlmostEqual(float(updated_fillup.distance_delta), 120.0, places=1)
-        self.assertAlmostEqual(float(updated_fillup.consumption), 3.25, places=3)
+        self.assertAlmostEqual(
+            float(updated_fillup.distance_delta), 120.0, places=1)
+        self.assertAlmostEqual(
+            float(updated_fillup.consumption), 3.25, places=3)
 
     def test_consumption_and_dist_delta_calculated_for_edited_fillup_date_backward(
         self,
@@ -292,15 +309,18 @@ class FillupViewsIntegrationTestCase(TestCase):
         }
         self.client.login(username="testuser@foo.bar", password="top_secret")
 
-        response = self.client.post(f"/fillup/{self.fillup2.id}/edit/", data=data)
+        response = self.client.post(
+            f"/fillup/{self.fillup2.id}/edit/", data=data)
 
         updated_fillup = Fillup.objects.get(pk=self.fillup2.id)
 
         self.assertRedirects(
             response, f"/fillup/equipment/{updated_fillup.equipment_id}/"
         )
-        self.assertAlmostEqual(float(updated_fillup.distance_delta), 120.0, places=1)
-        self.assertAlmostEqual(float(updated_fillup.consumption), 3.25, places=3)
+        self.assertAlmostEqual(
+            float(updated_fillup.distance_delta), 120.0, places=1)
+        self.assertAlmostEqual(
+            float(updated_fillup.consumption), 3.25, places=3)
 
     def test_consumption_and_dist_delta_calculated_for_next_fillup_on_edit(self):
         """Consumption and distance delta should be calculated for next fillup on
@@ -315,15 +335,18 @@ class FillupViewsIntegrationTestCase(TestCase):
         }
         self.client.login(username="testuser@foo.bar", password="top_secret")
 
-        response = self.client.post(f"/fillup/{self.fillup2.id}/edit/", data=data)
+        response = self.client.post(
+            f"/fillup/{self.fillup2.id}/edit/", data=data)
 
         updated_fillup = Fillup.objects.get(pk=self.fillup3.id)
 
         self.assertRedirects(
             response, f"/fillup/equipment/{updated_fillup.equipment_id}/"
         )
-        self.assertAlmostEqual(float(updated_fillup.distance_delta), 30.0, places=1)
-        self.assertAlmostEqual(float(updated_fillup.consumption), 13.333, places=3)
+        self.assertAlmostEqual(
+            float(updated_fillup.distance_delta), 30.0, places=1)
+        self.assertAlmostEqual(
+            float(updated_fillup.consumption), 13.333, places=3)
 
     def test_form_gets_prepopulated_on_invalid_form(self):
         """Form should get prepopulated on invalid form"""
@@ -337,7 +360,9 @@ class FillupViewsIntegrationTestCase(TestCase):
         }
 
         self.client.login(username="testuser@foo.bar", password="top_secret")
-        response = self.client.post(f"/fillup/{self.fillup2.id}/edit/", data=data)
+
+        response = self.client.post(
+            f"/fillup/{self.fillup2.id}/edit/", data=data)
 
         self.assertInHTML(
             f'<input type="text" name="addition_date" value="2022-06-15T15:30:00+00:00" data-dtpicker="" data-dtpicker-enable-time="" data-dtpicker-time-24h="" required id="id_addition_date">',
@@ -345,17 +370,17 @@ class FillupViewsIntegrationTestCase(TestCase):
             1,
         )
         self.assertInHTML(
-            f'<input type="number" name="distance" value="1" step="any" required="" id="id_distance">',
+            f'<input type="number" name="distance" value="1" step="any" required aria-invalid="true" id="id_distance">',
             response.content.decode(),
             1,
         )
         self.assertInHTML(
-            f'<input type="number" name="amount" value="3.9" step="any" required="" id="id_amount">',
+            f'<input type="number" name="amount" value="3.9" step="any" required id="id_amount">',
             response.content.decode(),
             1,
         )
         self.assertInHTML(
-            f'<input type="number" name="price" value="1.8" step="0.001" required="" id="id_price">',
+            f'<input type="number" name="price" value="1.8" step="0.001" required id="id_price">',
             response.content.decode(),
             1,
         )

@@ -5,7 +5,7 @@
 # SPDX-License-Identifier: CC0-1.0
 
 gunicorn
-Django==4.0
+Django==5.0
 psycopg2-binary
 django-environ
 django-probes
