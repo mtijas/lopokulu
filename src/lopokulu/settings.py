@@ -26,7 +26,7 @@ env = environ.Env(
     DEBUG=(bool, False),
     AXES_ENABLED=(bool, True),
     USE_INSECURE_PASSWORDS=(bool, False),
-    AXES_PROXY_COUNT=(int, None),
+    AXES_IPWARE_PROXY_COUNT=(int, None),
     AXES_PROXY_PREFER_X_FORWARDED_FOR=(bool, False),
     AXES_COOLOFF_TIME=(float, 0.25),
     CSRF_TRUSTED_ORIGINS=(list, ["http://localhost"]),
@@ -47,7 +47,7 @@ DEBUG = env("DEBUG")
 # SECURITY WARNING: run with Axes enabled in production (it's brute force protection for auth)
 AXES_ENABLED = env("AXES_ENABLED")
 AXES_COOLOFF_TIME = env("AXES_COOLOFF_TIME")
-AXES_PROXY_COUNT = env("AXES_PROXY_COUNT")
+AXES_IPWARE_PROXY_COUNT = env("AXES_IPWARE_PROXY_COUNT")
 if env("AXES_PROXY_PREFER_X_FORWARDED_FOR"):
     AXES_META_PRECEDENCE_ORDER = [
         'HTTP_X_FORWARDED_FOR',
