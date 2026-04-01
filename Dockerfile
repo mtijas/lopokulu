@@ -21,6 +21,7 @@ FROM python:3.14-slim AS prebuild
 FROM prebuild AS development
 
     COPY .coveragerc .
+    COPY pytest.ini .
 
     COPY ./entrypoint-dev.sh ./entrypoint.sh
     RUN chmod +x ./entrypoint.sh
