@@ -4,7 +4,7 @@
 #
 # SPDX-License-Identifier: CC0-1.0
 
-FROM python:3.10-slim AS prebuild
+FROM python:3.14-slim AS prebuild
 
     EXPOSE 8000
 

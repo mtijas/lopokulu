@@ -199,7 +199,7 @@ class EquipmentAddViewBasicTestCase(TestCase):
             ),
         ]
 
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             list(saved_perms), expected_perms, transform=str)
 
     def test_permissions_saved_on_form_save_and_user_promoted_test_2(self):
@@ -225,5 +225,5 @@ class EquipmentAddViewBasicTestCase(TestCase):
             ),
         ]
 
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             list(saved_perms), expected_perms, transform=str)

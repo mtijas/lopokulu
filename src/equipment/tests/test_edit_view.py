@@ -190,7 +190,7 @@ class EquipmentEditViewBasicTestCase(TestCase):
         saved_perms = EquipmentUser.objects.filter(equipment=self.equipment1)
         expected_perms = [str(self.equipmentuser1)]
 
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             list(saved_perms), expected_perms, transform=str)
 
     def test_permissions_updated_on_form_save(self):
@@ -226,7 +226,7 @@ class EquipmentEditViewBasicTestCase(TestCase):
         ]
 
         self.assertRedirects(response, f"/equipment/{saved_equipment.id}/")
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             list(saved_perms), expected_perms, ordered=False, transform=str
         )
 
@@ -259,7 +259,7 @@ class EquipmentEditViewBasicTestCase(TestCase):
         ]
 
         self.assertRedirects(response, f"/equipment/{saved_equipment.id}/")
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             list(saved_perms), expected_perms, ordered=False, transform=str
         )
 
@@ -296,7 +296,7 @@ class EquipmentEditViewBasicTestCase(TestCase):
         ]
 
         self.assertRedirects(response, f"/equipment/{saved_equipment.id}/")
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             list(saved_perms), expected_perms, ordered=False, transform=str
         )
 

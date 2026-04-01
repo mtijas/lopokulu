@@ -153,7 +153,7 @@ class EquipmentUtilsFetchUsersEquipmentTestCase(TestCase):
         """Superuser should get all equipment returned"""
         result = fetch_users_equipment(self.superuser)
 
-        self.assertQuerysetEqual(result, Equipment.objects.all())
+        self.assertQuerySetEqual(result, Equipment.objects.all())
 
     def test_equipment_with_role_for_user_returned_test_1(self):
         """Equipment with role for user should get returned, test 1"""
@@ -163,7 +163,7 @@ class EquipmentUtilsFetchUsersEquipmentTestCase(TestCase):
         ]
         result = fetch_users_equipment(self.ro_user)
 
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             list(result), expected, ordered=False, transform=str
         )
 
@@ -174,6 +174,6 @@ class EquipmentUtilsFetchUsersEquipmentTestCase(TestCase):
         ]
         result = fetch_users_equipment(self.user_user)
 
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             list(result), expected, ordered=False, transform=str
         )

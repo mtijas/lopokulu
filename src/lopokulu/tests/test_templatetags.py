@@ -20,7 +20,7 @@ class TemplateTagsTestCase(TestCase):
 
         result = lopokulu_extras.active(request, pattern)
 
-        self.assertEquals(result, "active")
+        self.assertEqual(result, "active")
 
     def test_active_returns_active_on_matching_pattern_more_complex(self):
         """Active should return 'active' when pattern found in complex request.path"""
@@ -30,7 +30,7 @@ class TemplateTagsTestCase(TestCase):
 
         result = lopokulu_extras.active(request, pattern)
 
-        self.assertEquals(result, "active")
+        self.assertEqual(result, "active")
 
     def test_active_returns_empty_str_on_nonmatching_pattern(self):
         """Active should return '' when pattern not found in request.path"""
@@ -40,7 +40,7 @@ class TemplateTagsTestCase(TestCase):
 
         result = lopokulu_extras.active(request, pattern)
 
-        self.assertEquals(result, "")
+        self.assertEqual(result, "")
 
     def test_active_returns_empty_str_first_part_not_matching(self):
         """Active should return '' when pattern not found in request.path"""
@@ -50,7 +50,7 @@ class TemplateTagsTestCase(TestCase):
 
         result = lopokulu_extras.active(request, pattern)
 
-        self.assertEquals(result, "")
+        self.assertEqual(result, "")
 
     def test_addstr_concatenates_strings(self):
         """addstr templatetag should concatenate two strings"""
@@ -60,7 +60,7 @@ class TemplateTagsTestCase(TestCase):
 
         result = lopokulu_extras.addstr(input1, input2)
 
-        self.assertEquals(result, expected)
+        self.assertEqual(result, expected)
 
     def test_addstr_concatenates_strings_2(self):
         """addstr templatetag should concatenate two strings, test 2"""
@@ -70,7 +70,7 @@ class TemplateTagsTestCase(TestCase):
 
         result = lopokulu_extras.addstr(input2, input1)
 
-        self.assertEquals(result, expected)
+        self.assertEqual(result, expected)
 
     def test_addstr_concatenates_ints(self):
         """addstr templatetag should concatenate two ints (and not sum them)"""
@@ -80,4 +80,4 @@ class TemplateTagsTestCase(TestCase):
 
         result = lopokulu_extras.addstr(input1, input2)
 
-        self.assertEquals(result, expected)
+        self.assertEqual(result, expected)
