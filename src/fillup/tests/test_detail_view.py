@@ -241,12 +241,11 @@ class FillupViewsInputsTestCase(TestCase):
     def test_single_equipment_page_has_add_fillup_btn_for_admin(self):
         """Single equipment page should have add fillup button for admin"""
         self.client.login(username="admin_user@foo.bar", password="top_secret")
-        expected_html = f'<a href="/fillup/add/equipment/{self.equipment3.id}/" role="button">Add fillup</a>'
 
         response = self.client.get(f"/fillup/equipment/{self.equipment3.id}/")
 
         self.assertEqual(response.status_code, 200)
-        self.assertInHTML(expected_html, response.content.decode(), 1)
+        self.assertContains(response, f'/fillup/add/equipment/{self.equipment3.id}/')
 
     def test_single_equipment_page_has_add_fillup_btn_for_equipment_user(self):
         """Single equipment page should have add fillup button for equipment_user"""

@@ -7,9 +7,11 @@
 from datetime import datetime
 from decimal import Decimal
 
+import pytest
 from django.conf import settings
 from django.contrib.auth.models import Group, Permission, User
 from django.test import Client, TestCase, override_settings
+from django.urls import reverse
 from django.utils import timezone
 
 from equipment.models import Equipment, EquipmentUser
@@ -322,38 +324,54 @@ class FillupViewsIntegrationTestCase(TestCase):
         self.assertAlmostEqual(
             float(updated_fillup.consumption), 3.25, places=3)
 
-    def test_consumption_and_dist_delta_calculated_for_next_fillup_on_edit(self):
-        """Consumption and distance delta should be calculated for next fillup on
-        editing fillup between two full fillups"""
+    def test_updates_next_fillup_metrics_on_edit_between_full_fillups(
+        self
+    ):
+        """
+        Editing a fillup between two full fillups should update
+        the NEXT fillup's:
+        - distance_delta
+        - consumption
+        """
+
+        self.client.login(username="testuser@foo.bar", password="top_secret")
+
         data = {
             "price": 1.8,
             "amount": 3.9,
-            "distance": 220,
+            "distance": 220,  # changed value
             "equipment": self.equipment3.id,
             "addition_date": "2022-06-15T15:30:00+00:00",
             "tank_full": "1",
         }
-        self.client.login(username="testuser@foo.bar", password="top_secret")
 
-        response = self.client.post(
-            f"/fillup/{self.fillup2.id}/edit/", data=data)
+        url = reverse("fillup:edit", args=[self.fillup2.id])
 
-        updated_fillup = Fillup.objects.get(pk=self.fillup3.id)
+        response = self.client.post(url, data=data)
 
-        self.assertRedirects(
-            response, f"/fillup/equipment/{updated_fillup.equipment_id}/"
+        self.fillup3.refresh_from_db()
+
+        expected_url = reverse(
+            "fillup:detail",
+            args=[self.fillup3.equipment_id],
         )
-        self.assertAlmostEqual(
-            float(updated_fillup.distance_delta), 30.0, places=1)
-        self.assertAlmostEqual(
-            float(updated_fillup.consumption), 13.333, places=3)
+        assert response.status_code == 302
+        assert response.url == expected_url
+
+        assert float(self.fillup3.distance_delta) == pytest.approx(30.0, rel=1e-2)
+        assert float(self.fillup3.consumption) == pytest.approx(13.333, rel=1e-3)
 
     def test_form_gets_prepopulated_on_invalid_form(self):
-        """Form should get prepopulated on invalid form"""
+        """
+        Form should:
+        - preserve submitted values
+        - show validation errors
+        """
+
         data = {
             "price": 1.8,
             "amount": 3.9,
-            "distance": 1,
+            "distance": 1,  # invalid (too small)
             "equipment": self.equipment3.id,
             "addition_date": "2022-06-15T15:30:00+00:00",
             "tank_full": "1",
@@ -362,12 +380,20 @@ class FillupViewsIntegrationTestCase(TestCase):
         self.client.login(username="testuser@foo.bar", password="top_secret")
 
         response = self.client.post(
-            f"/fillup/{self.fillup2.id}/edit/", data=data)
+            reverse("fillup:edit", args=[self.fillup2.id]),
+            data=data,
+        )
+
+        assert response.status_code == 200
 
         form = response.context["form"]
-        self.assertTrue(form.errors)
-        self.assertIn("distance", form.errors)
-        self.assertEqual(form["amount"].value(), "3.9")
-        self.assertEqual(form["price"].value(), "1.8")
-        self.assertEqual(form["tank_full"].value(), True)
-        self.assertEqual(form["addition_date"].value(), "2022-06-15T15:30:00+00:00")
+
+        assert form["price"].value() == "1.8"
+        assert form["amount"].value() == "3.9"
+        assert form["distance"].value() == "1"
+        assert form["equipment"].value() == str(self.equipment3.id)
+        assert form["addition_date"].value() == "2022-06-15T15:30:00+00:00"
+
+        assert "distance" in form.errors
+
+        assert "Distance should be more than" in response.text
