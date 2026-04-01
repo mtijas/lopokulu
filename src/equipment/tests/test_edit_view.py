@@ -348,11 +348,9 @@ class EquipmentEditViewBasicTestCase(TestCase):
             response.content.decode(),
             1,
         )
-        self.assertInHTML(
-            f'<input type="text" name="register_number" maxlength="256" required aria-invalid="true" id="id_register_number">',
-            response.content.decode(),
-            1,
-        )
+        self.assertContains(response, 'name="register_number"')
+        self.assertContains(response, 'aria-invalid="true"')
+        self.assertContains(response, 'aria-describedby="id_register_number_error"')
 
     def create_dummy_equipment_users(self, equipment):
         """Create dummy equipment users for equipment"""

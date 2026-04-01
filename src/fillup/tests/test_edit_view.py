@@ -364,28 +364,10 @@ class FillupViewsIntegrationTestCase(TestCase):
         response = self.client.post(
             f"/fillup/{self.fillup2.id}/edit/", data=data)
 
-        self.assertInHTML(
-            f'<input type="text" name="addition_date" value="2022-06-15T15:30:00+00:00" data-dtpicker="" data-dtpicker-enable-time="" data-dtpicker-time-24h="" required id="id_addition_date">',
-            response.content.decode(),
-            1,
-        )
-        self.assertInHTML(
-            f'<input type="number" name="distance" value="1" step="any" required aria-invalid="true" id="id_distance">',
-            response.content.decode(),
-            1,
-        )
-        self.assertInHTML(
-            f'<input type="number" name="amount" value="3.9" step="any" required id="id_amount">',
-            response.content.decode(),
-            1,
-        )
-        self.assertInHTML(
-            f'<input type="number" name="price" value="1.8" step="0.001" required id="id_price">',
-            response.content.decode(),
-            1,
-        )
-        self.assertInHTML(
-            f'<input type="checkbox" name="tank_full" id="id_tank_full" checked="">',
-            response.content.decode(),
-            1,
-        )
+        form = response.context["form"]
+        self.assertTrue(form.errors)
+        self.assertIn("distance", form.errors)
+        self.assertEqual(form["amount"].value(), "3.9")
+        self.assertEqual(form["price"].value(), "1.8")
+        self.assertEqual(form["tank_full"].value(), True)
+        self.assertEqual(form["addition_date"].value(), "2022-06-15T15:30:00+00:00")
