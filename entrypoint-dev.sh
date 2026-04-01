@@ -9,4 +9,4 @@
 python3 /lopokulu/src/manage.py wait_for_database
 python3 /lopokulu/src/manage.py makemigrations --no-input
 python3 /lopokulu/src/manage.py migrate
-python3 /lopokulu/src/manage.py runserver 0.0.0.0:8000
+python3 -m debugpy --listen 0.0.0.0:5678 --wait-for-client /lopokulu/src/manage.py runserver 0.0.0.0:8000

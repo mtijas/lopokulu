@@ -12,13 +12,15 @@ services:
       context: .
       target: development
     ports:
-      - 8080:8000
+      - "8080:8000"
+      - "5678:5678"
     volumes:
       - ./src:/lopokulu/src/:z
     env_file:
       - .env
     depends_on:
       - postgres
+    working_dir: /lopokulu/src
 
   postgres:
     image: postgres:latest
@@ -30,7 +32,7 @@ services:
   adminer:
     image: adminer:latest
     ports:
-      - 8081:8080
+      - "8081:8080"
     env_file:
       - .env
 

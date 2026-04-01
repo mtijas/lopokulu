@@ -5,3 +5,5 @@
 # SPDX-License-Identifier: CC0-1.0
 
 coverage
+debugpy
+pytest-django
